@@ -238,3 +238,20 @@ footer .heart { color: var(--bad); }
   .site-main { padding-top: 1.1rem; }
   .hide-sm { display: none !important; }
 }
+
+/* ================= FinTrack additions ================= */
+.bar-row { display: grid; grid-template-columns: 180px 1fr 110px; gap: .8rem; align-items: center; padding: .4rem 0; }
+.bar-label { font-weight: 700; font-size: .92rem; }
+.bar-track { height: 14px; background: #eef0f7; border-radius: 999px; overflow: hidden; }
+.bar-track > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); }
+.bar-value { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } .bar-value { text-align: left; } }
+
+.month-row { display: grid; grid-template-columns: 110px 1fr 150px; gap: .9rem; align-items: center; padding: .45rem 0; }
+.month-label { font-weight: 700; font-size: .92rem; }
+.month-bars { display: flex; flex-direction: column; gap: 4px; }
+.month-values { display: flex; gap: .6rem; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .month-row { grid-template-columns: 1fr; } .month-values { justify-content: flex-start; } }
+
+.budget-row { padding: .8rem 0; border-bottom: 1px solid var(--line); }
+.budget-row:last-child { border-bottom: none; }

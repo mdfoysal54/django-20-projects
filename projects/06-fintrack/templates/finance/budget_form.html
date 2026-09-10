@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Set budget · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="card">
+    <h1 class="page-title">Set a monthly budget</h1>
+    <p class="lede">One budget per category per month. The dashboard flags 80% (warning) and 100% (over).</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.category.id_for_label }}">Expense category</label>
+        {{ form.category }}
+        {% if form.category.errors %}<ul class="field-errors">{% for e in form.category.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.amount.id_for_label }}">Monthly limit</label>
+        {{ form.amount }}
+        {% if form.amount.errors %}<ul class="field-errors">{% for e in form.amount.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="grid grid-2" style="gap:.8rem">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.year.id_for_label }}">Year</label>
+          {{ form.year }}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.month.id_for_label }}">Month</label>
+          {{ form.month }}
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Save budget</button>
+      <a class="btn btn-ghost" href="{% url 'budget_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Categories · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Categories</h1>
+    <p class="lede mb-0">Income and expense buckets used across your ledger and budgets.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'category_create' %}">+ New category</a>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Income</h2>
+    <ul class="list-plain">
+      {% for category in categories %}{% if category.kind == 'income' %}
+      <li><span class="flag" style="font-size:1.4rem">{{ category.icon }}</span> {{ category.name }}
+          <span class="badge">{{ category.n }} transaction{{ category.n|pluralize }}</span></li>
+      {% endif %}{% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Expenses</h2>
+    <ul class="list-plain">
+      {% for category in categories %}{% if category.kind == 'expense' %}
+      <li><span class="flag" style="font-size:1.4rem">{{ category.icon }}</span> {{ category.name }}
+          <span class="badge">{{ category.n }} transaction{{ category.n|pluralize }}</span></li>
+      {% endif %}{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

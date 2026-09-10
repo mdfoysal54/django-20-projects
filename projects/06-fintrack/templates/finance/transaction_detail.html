@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Transaction · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <nav class="breadcrumbs"><a href="{% url 'transaction_list' %}">Transactions</a> › <strong>#{{ transaction.pk }}</strong></nav>
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <span class="badge">{{ transaction.get_kind_display }}</span>
+      <span class="badge">{{ transaction.date|date:"D, M j, Y" }}</span>
+    </div>
+    <div class="stat-value mt-2" style="font-size:2rem; color:{% if transaction.is_expense %}var(--bad){% else %}var(--ok){% endif %}">
+      {% if transaction.amount > 0 %}+{% endif %}{{ transaction.amount|floatformat:2 }}
+    </div>
+    <ul class="list-plain mt-2">
+      <li><strong>Note</strong><div class="muted">{{ transaction.note|default:"—" }}</div></li>
+      <li><strong>Account</strong><div class="muted">{{ transaction.account.icon }} {{ transaction.account.name }}</div></li>
+      <li><strong>Category</strong><div class="muted">{{ transaction.category.icon|default:"" }} {{ transaction.category.name|default:"Uncategorised" }}</div></li>
+      {% if transaction.transfer_group %}
+      <li><strong>Transfer group</strong><div class="muted mono small">{{ transaction.transfer_group }}</div></li>
+      {% endif %}
+      <li><strong>Recorded</strong><div class="muted">{{ transaction.created|date:"M j, Y · H:i" }}</div></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

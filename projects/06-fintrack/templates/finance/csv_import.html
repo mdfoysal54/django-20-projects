@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Import CSV · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns:1.2fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <h1 class="page-title">Import transactions from CSV</h1>
+      <p class="lede">Bring in a statement export. Every row is validated; bad rows are skipped with reasons — nothing is half-imported.</p>
+      {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="{{ form.file.id_for_label }}">CSV file</label>
+          {{ form.file }}
+          {% if form.file.errors %}<ul class="field-errors">{% for e in form.file.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="grid grid-2" style="gap:.8rem">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.account.id_for_label }}">Import into account</label>
+            {{ form.account }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.max_rows.id_for_label }}">Max rows</label>
+            {{ form.max_rows }}
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Validate &amp; import</button>
+      </form>
+    </div>
+
+    {% if result %}
+      {% if result.error %}
+        <div class="alert alert-error">{{ result.error }}</div>
+      {% else %}
+      <div class="card">
+        <h2 class="card-title">
+          Import report — {{ result.added_count }} added, {{ result.skipped_count }} skipped
+          <span class="badge badge-info">→ {{ result.account.name }}</span>
+        </h2>
+        {% if result.added %}
+        <h3 class="small" style="text-transform:uppercase;letter-spacing:.05em">Imported</h3>
+        <div class="table-wrap"><table class="tbl">
+          <thead><tr><th>Row</th><th>Date</th><th class="num">Amount</th><th>Note</th></tr></thead>
+          <tbody>{% for row in result.added %}
+            <tr><td>{{ row.row }}</td><td>{{ row.date }}</td>
+                <td class="num">{{ row.amount }}</td><td>{{ row.note }}</td></tr>
+          {% endfor %}</tbody>
+        </table></div>
+        {% endif %}
+        {% if result.skipped %}
+        <h3 class="small mt-2" style="text-transform:uppercase;letter-spacing:.05em">Skipped</h3>
+        <div class="table-wrap"><table class="tbl">
+          <thead><tr><th>Row</th><th>Reason</th></tr></thead>
+          <tbody>{% for row in result.skipped %}
+            <tr><td>{{ row.row }}</td><td class="muted">{{ row.reason }}</td></tr>
+          {% endfor %}</tbody>
+        </table></div>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">CSV format</h2>
+    <pre class="mono small" style="background:#f5f6fb;padding:.9rem;border-radius:10px;overflow-x:auto">date,amount,note,category
+2026-09-01,-45.50,Weekly shop,Groceries
+2026-09-01,3200.00,Salary,Salary
+2026-09-03,-12.00,Bus fare,Transport</pre>
+    <ul class="list-plain small mt-2">
+      <li>✅ <strong>date</strong> — ISO format <span class="mono">YYYY-MM-DD</span>, never in the future</li>
+      <li>✅ <strong>amount</strong> — signed: negatives are expenses, positives income</li>
+      <li>✅ <strong>note</strong> — optional free text (truncated at 200 chars)</li>
+      <li>✅ <strong>category</strong> — optional, must match one of your category names</li>
+      <li>🔒 UTF-8 CSV only · 1 MB max · rows validated one by one</li>
+    </ul>
+  </aside>
+</div>
+{% endblock %}

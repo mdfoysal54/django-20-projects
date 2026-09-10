@@ -20,7 +20,7 @@ shared, secure-by-default baseline.
 | 3 | **StayHub**        | Hotel & room booking engine            | ✅ built · 33 tests green |
 | 4 | **DevJobs**        | Job board & recruitment portal         | ✅ built · 34 tests green |
 | 5 | **TaskFlow**       | Team projects & kanban task manager    | ✅ built · 33 tests green |
-| 6 | **FinTrack**       | Personal finance & budget dashboard    | 🔨 in progress |
+| 6 | **FinTrack**       | Personal finance & budget dashboard    | ✅ built · 41 tests green |
 
 *(This README is updated as each flagship lands — statuses here are the source of truth.)*
 
@@ -44,8 +44,12 @@ python manage.py runserver                            # http://127.0.0.1:8000
 Every project ships demo seeders and a passing test-suite:
 
 ```bash
-python manage.py test
+python manage.py test          # inside one project
+bash tools/verify_all.sh       # verify all six at once from the repo root
 ```
+
+**Verified baseline:** 6/6 projects green — 199 automated tests in total
+(72 canonical security tests + 127 domain tests).
 
 ## What "high security" means here
 
@@ -92,6 +96,12 @@ Django 5.2 LTS · Python 3.10–3.13 · SQLite (dev) / PostgreSQL-ready ·
 WhiteNoise static serving · Argon2 · `python-dotenv`. No JavaScript
 frameworks, no CDNs, no build step — the frontends are hand-built with
 `{% static %}` CSS and progressive enhancement.
+
+## Pushing to GitHub
+
+See **[docs/PUSH-TO-GITHUB.md](docs/PUSH-TO-GITHUB.md)** — one-command script
+(`tools/push_to_github.sh`) or plain copy-paste commands. Secrets, databases
+and media files are git-ignored by construction.
 
 ## License
 

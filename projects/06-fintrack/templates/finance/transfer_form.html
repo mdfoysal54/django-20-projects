@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Transfer · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="card">
+    <h1 class="page-title">Transfer between accounts</h1>
+    <p class="lede">Recorded as two linked rows (out + in) in one database transaction — your money total never changes.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-2" style="gap:.8rem">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.from_account.id_for_label }}">From</label>
+          {{ form.from_account }}
+          {% if form.from_account.errors %}<ul class="field-errors">{% for e in form.from_account.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.to_account.id_for_label }}">To</label>
+          {{ form.to_account }}
+          {% if form.to_account.errors %}<ul class="field-errors">{% for e in form.to_account.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.amount.id_for_label }}">Amount</label>
+          {{ form.amount }}
+          {% if form.amount.errors %}<ul class="field-errors">{% for e in form.amount.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.date.id_for_label }}">Date</label>
+          {{ form.date }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.note.id_for_label }}">Note (optional)</label>
+        {{ form.note }}
+      </div>
+      <button class="btn btn-primary" type="submit">Record transfer</button>
+      <a class="btn btn-ghost" href="{% url 'transaction_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

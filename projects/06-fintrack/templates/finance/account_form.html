@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}New account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="card">
+    <h1 class="page-title">Create an account</h1>
+    <p class="lede">Banks, cards, wallets and cash pots — each one gets its own running balance.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Create account</button>
+      <a class="btn btn-ghost" href="{% url 'account_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

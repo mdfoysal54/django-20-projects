@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.username }} 👋</p>
+  </div>
+</div>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_balance|floatformat:2 }}</div><div class="stat-label">Net worth (all accounts)</div></div>
+  <div class="card stat"><div class="stat-value">{{ transactions }}</div><div class="stat-label">Transactions recorded</div></div>
+  <div class="card stat"><div class="stat-value">{{ budgets }}</div><div class="stat-label">Budgets set</div></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Accounts:</strong> {{ accounts }} · <strong>Categories:</strong> {{ categories }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'transaction_create' %}">→ Add a transaction</a></li>
+      <li><a href="{% url 'csv_import' %}">→ Import a bank CSV</a></li>
+      <li><a href="{% url 'budget_list' %}">→ Review budgets</a></li>
+      <li><a href="{% url 'reports' %}">→ Open reports</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

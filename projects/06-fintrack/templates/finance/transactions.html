@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Transactions · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Transactions</h1>
+    <p class="lede mb-0">{{ count }} matching · net <strong>{{ total|floatformat:2 }}</strong></p>
+  </div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'csv_import' %}">Import CSV</a>
+    <a class="btn btn-primary" href="{% url 'transaction_create' %}">+ Add transaction</a>
+  </div>
+</div>
+
+<div class="card">
+  <form class="pill-row" method="get">
+    <input class="form-control" type="search" name="q" value="{{ selected.q }}" placeholder="Search notes & categories…" style="min-width:220px">
+    <select class="form-control" name="account" style="width:auto">
+      <option value="">All accounts</option>
+      {% for account in accounts %}<option value="{{ account.pk }}"{% if selected.account == account.pk|stringformat:"s" %} selected{% endif %}>{{ account.name }}</option>{% endfor %}
+    </select>
+    <select class="form-control" name="category" style="width:auto">
+      <option value="">All categories</option>
+      {% for category in categories %}<option value="{{ category.pk }}"{% if selected.category == category.pk|stringformat:"s" %} selected{% endif %}>{{ category.icon }} {{ category.name }}</option>{% endfor %}
+    </select>
+    <select class="form-control" name="kind" style="width:auto">
+      <option value="">Any kind</option>
+      <option value="expense"{% if selected.kind == 'expense' %} selected{% endif %}>Expense</option>
+      <option value="income"{% if selected.kind == 'income' %} selected{% endif %}>Income</option>
+      <option value="transfer"{% if selected.kind == 'transfer' %} selected{% endif %}>Transfer</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Filter</button>
+    <a class="btn btn-ghost" href="{% url 'transaction_list' %}">Reset</a>
+  </form>
+</div>
+
+{% if transactions %}
+<div class="table-wrap">
+  <table class="tbl">
+    <thead><tr><th>Date</th><th>Note</th><th>Category</th><th>Account</th><th>Kind</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      {% for txn in transactions %}
+      <tr>
+        <td>{{ txn.date|date:"M j, Y" }}</td>
+        <td><a href="{{ txn.get_absolute_url }}">{{ txn.note|default:"—" }}</a></td>
+        <td class="small">{{ txn.category.icon|default:"" }} {{ txn.category.name|default:"—" }}</td>
+        <td class="small">{{ txn.account.icon }} {{ txn.account.name }}</td>
+        <td><span class="badge{% if txn.kind == 'transfer' %} badge-info{% endif %}">{{ txn.get_kind_display }}</span></td>
+        <td class="num" style="color:{% if txn.is_expense %}var(--bad){% else %}var(--ok){% endif %}">
+          <strong>{% if txn.amount > 0 %}+{% endif %}{{ txn.amount|floatformat:2 }}</strong>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🧾</div>
+  <h2>Nothing here</h2>
+  <p>Record your first transaction or import a bank CSV.</p>
+  <a class="btn btn-primary" href="{% url 'transaction_create' %}">Add transaction</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Budgets · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Budgets — {{ month_name }} {{ year }}</h1>
+    <p class="lede mb-0">Spent {{ total_spent|floatformat:2 }} of {{ total_budget|floatformat:2 }} ·
+      {{ total_remaining|floatformat:2 }} remaining</p>
+  </div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="?year={{ year }}&month={{ month|add:'-1' }}">← Prev</a>
+    <a class="btn btn-secondary" href="?year={{ year }}&month={{ month|add:'1' }}">Next →</a>
+    <a class="btn btn-primary" href="{% url 'budget_create' %}">+ Set budget</a>
+  </div>
+</div>
+
+{% if budgets %}
+<div class="card">
+  {% for budget in budgets %}
+  <div class="budget-row">
+    <div class="pill-row" style="justify-content:space-between">
+      <div>
+        <strong>{{ budget.category.icon }} {{ budget.category.name }}</strong>
+        <span class="badge {{ budget.state_badge }}">
+          {% if budget.state == 'over' %}Over budget{% elif budget.state == 'warn' %}Close to limit{% else %}On track{% endif %}
+        </span>
+      </div>
+      <div class="small">
+        <strong>{{ budget.spent|floatformat:2 }}</strong> / {{ budget.amount|floatformat:2 }}
+        <span class="muted">({{ budget.usage_percent }}%)</span>
+      </div>
+    </div>
+    <div class="progress mt-1"><span style="width: {% if budget.usage_percent > 100 %}100{% else %}{{ budget.usage_percent }}{% endif %}%"></span></div>
+    <div class="small muted mt-1">
+      {% if budget.remaining >= 0 %}{{ budget.remaining|floatformat:2 }} left this month
+      {% else %}{{ budget.remaining|floatformat:2 }} over — consider trimming discretionary spend{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🎯</div>
+  <h2>No budgets for {{ month_name }} {{ year }}</h2>
+  <p>Set spending ceilings per category and FinTrack will warn you at 80% and 100%.</p>
+  <a class="btn btn-primary" href="{% url 'budget_create' %}">Set your first budget</a>
+</div>
+{% endif %}
+{% endblock %}

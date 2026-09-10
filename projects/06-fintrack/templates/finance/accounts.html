@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Accounts · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Accounts</h1>
+    <p class="lede mb-0">Total across active accounts: <strong>{{ total|floatformat:2 }}</strong></p>
+  </div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'transfer_create' %}">Transfer</a>
+    <a class="btn btn-primary" href="{% url 'account_create' %}">+ New account</a>
+  </div>
+</div>
+
+{% if accounts %}
+<div class="grid grid-3">
+  {% for account in accounts %}
+  <div class="card{% if account.archived %} muted{% endif %}">
+    <div class="pill-row" style="justify-content:space-between">
+      <span class="flag">{{ account.icon }}</span>
+      <span class="badge">{{ account.get_kind_display }}</span>
+    </div>
+    <h3 class="card-title mt-1 mb-0">{{ account.name }}</h3>
+    <div class="stat-value" style="font-size:1.5rem; color:{% if account.is_negative %}var(--bad){% else %}var(--ink){% endif %}">
+      {{ account.balance|floatformat:2 }} <span class="small muted">{{ account.currency }}</span>
+    </div>
+    <div class="small muted">Opening: {{ account.opening_balance|floatformat:2 }} · {{ account.transactions.count }} transactions</div>
+    {% if account.archived %}<span class="badge badge-warn">Archived</span>{% endif %}
+    <a class="btn btn-sm btn-secondary mt-1" href="{% url 'account_detail' account.pk %}">View ledger</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🏦</div>
+  <h2>No accounts yet</h2>
+  <p>Add a bank account, card, wallet or cash pot to start tracking.</p>
+  <a class="btn btn-primary" href="{% url 'account_create' %}">Create an account</a>
+</div>
+{% endif %}
+{% endblock %}
