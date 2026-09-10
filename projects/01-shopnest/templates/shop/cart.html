@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Your cart · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Your cart</h1>
+    <p class="lede mb-0">{{ cart.item_count }} item{{ cart.item_count|pluralize }}</p>
+  </div>
+</div>
+
+{% if items %}
+<div class="grid-2 grid" style="align-items:start">
+  <div class="table-wrap">
+    <table class="tbl">
+      <thead><tr><th>Product</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th><th></th></tr></thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>
+            <div class="cart-product">
+              {% if item.product.image %}
+                <img class="mini-thumb" src="{{ item.product.image.url }}" alt="">
+              {% else %}
+                <div class="mini-fallback">{{ item.product.category.icon }}</div>
+              {% endif %}
+              <a href="{{ item.product.get_absolute_url }}"><strong>{{ item.product.name }}</strong></a>
+            </div>
+          </td>
+          <td class="num">${{ item.product.price|floatformat:2 }}</td>
+          <td class="num">
+            <form class="qty-form" method="post" action="{% url 'cart_update' item.pk %}">
+              {% csrf_token %}
+              <input class="form-control" type="number" name="quantity" value="{{ item.quantity }}"
+                     min="0" max="99" aria-label="Quantity for {{ item.product.name }}">
+              <button class="btn btn-sm btn-secondary" type="submit">Update</button>
+            </form>
+          </td>
+          <td class="num"><strong>${{ item.subtotal|floatformat:2 }}</strong></td>
+          <td>
+            <form method="post" action="{% url 'cart_remove' item.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-danger" type="submit" title="Remove {{ item.product.name }}">✕</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div style="padding:.8rem 1rem">
+      <a class="btn btn-ghost btn-sm" href="{% url 'catalog' %}">← Keep shopping</a>
+    </div>
+  </div>
+
+  <aside class="card summary-box">
+    <h2 class="card-title">Order summary</h2>
+    <dl style="display:flex;flex-direction:column;gap:.35rem">
+      <div style="display:flex;justify-content:space-between"><dt class="muted">Subtotal</dt><dd>${{ cart.total|floatformat:2 }}</dd></div>
+      <div style="display:flex;justify-content:space-between"><dt class="muted">Shipping</dt><dd>Free</dd></div>
+      <hr class="divider" style="margin:.4rem 0">
+      <div style="display:flex;justify-content:space-between"><dt><strong>Total</strong></dt><dd><strong>${{ cart.total|floatformat:2 }}</strong></dd></div>
+    </dl>
+    <a class="btn btn-primary btn-block btn-lg" href="{% url 'checkout' %}">Checkout securely →</a>
+  </aside>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🛒</div>
+  <h2>Your cart is empty</h2>
+  <p>Great products are waiting for you.</p>
+  <a class="btn btn-primary" href="{% url 'catalog' %}">Browse the catalogue</a>
+</div>
+{% endif %}
+{% endblock %}

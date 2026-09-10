@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static shop_tags %}
+{% block title %}{{ APP_NAME }} — {{ APP_TAGLINE }}{% endblock %}
+{% block content %}
+
+<section class="hero-split">
+  <div>
+    <h1>Everything you love,<br>delivered fast &amp; secure.</h1>
+    <p class="lede">Hand-picked electronics, fashion, books and homeware with
+       real-time stock, safe checkout and order tracking.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'catalog' %}">Start shopping →</a>
+      <a class="btn btn-lg btn-ghost" href="{% url 'register' %}" style="color:#c7d2fe">Create an account</a>
+    </p>
+  </div>
+  <div class="hero-emoji">🛍️</div>
+</section>
+
+{% if categories %}
+<section>
+  <div class="page-head">
+    <div><h2 class="mb-0">Shop by category</h2>
+    <p class="muted mb-0">What are you looking for today?</p></div>
+  </div>
+  <div class="grid grid-3">
+    {% for c in categories %}
+      <a class="category-tile" href="{% url 'catalog_category' c.slug %}">
+        <span class="icon">{{ c.icon }}</span>
+        <span><span class="name">{{ c.name }}</span><br>
+          <span class="count">{{ c.product_count }} product{{ c.product_count|pluralize }}</span></span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if featured %}
+<section>
+  <div class="section-title"><h2 class="mb-0">✨ Featured today</h2></div>
+  <div class="grid grid-4">
+    {% for p in featured %}{% include "shop/_product_card.html" with product=p %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if newest %}
+<section>
+  <div class="section-title"><h2 class="mb-0">🆕 New arrivals</h2></div>
+  <div class="grid grid-4">
+    {% for p in newest %}{% include "shop/_product_card.html" with product=p %}{% endfor %}
+  </div>
+  <p class="text-center mt-2"><a class="btn btn-secondary" href="{% url 'catalog' %}">Browse the full catalogue</a></p>
+</section>
+{% endif %}
+
+{% endblock %}

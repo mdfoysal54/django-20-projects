@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello again, {{ user.username }} 👋</p>
+  </div>
+</div>
+
+<div class="grid-3 grid" style="grid-template-columns:2fr 1fr;align-items:start">
+  <div class="card">
+    <h2 class="card-title">Recent orders</h2>
+    {% if recent_orders %}
+    <div class="table-wrap" style="border:none">
+      <table class="tbl">
+        <thead><tr><th>Order</th><th>Placed</th><th class="num">Total</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr>
+            <td><a href="{{ order.get_absolute_url }}"><strong>{{ order.number }}</strong></a></td>
+            <td>{{ order.created|date:"M j, Y" }}</td>
+            <td class="num">${{ order.total_amount|floatformat:2 }}</td>
+            <td><span class="badge {{ order.status_badge }}">{{ order.get_status_display }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="mb-0 mt-2"><a class="btn btn-sm btn-secondary" href="{% url 'my_orders' %}">All orders</a></p>
+    {% else %}
+    <p class="muted">No orders yet — <a href="{% url 'catalog' %}">find something you love</a>.</p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Profile</h2>
+      <ul class="list-plain">
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+        <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+      </ul>
+      <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

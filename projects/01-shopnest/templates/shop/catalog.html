@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name|default:"All products" }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="{% url 'home' %}">Home</a> ›
+      {% if category %}
+        <a href="{% url 'catalog' %}">Shop</a> › <strong>{{ category.name }}</strong>
+      {% else %}
+        <strong>All products</strong>
+      {% endif %}
+    </nav>
+    <h1 class="page-title mb-0">{{ category.name|default:"The full catalogue" }}</h1>
+    <p class="lede mb-0">{{ products|length }} product{{ products|length|pluralize }}{% if category %} in {{ category.name }}{% endif %}</p>
+  </div>
+  <form method="get" class="pill-row">
+    <label class="small muted" for="sort">Sort:</label>
+    <select class="form-control" id="sort-select" name="sort" style="width:auto">
+      <option value="newest"{% if sort == 'newest' %} selected{% endif %}>Newest first</option>
+      <option value="price-asc"{% if sort == 'price-asc' %} selected{% endif %}>Price: low → high</option>
+      <option value="price-desc"{% if sort == 'price-desc' %} selected{% endif %}>Price: high → low</option>
+      <option value="name"{% if sort == 'name' %} selected{% endif %}>Name A–Z</option>
+    </select>
+  </form>
+</div>
+
+{% if products %}
+  <div class="grid grid-4">
+    {% for p in products %}{% include "shop/_product_card.html" with product=p %}{% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="big">🔍</div>
+    <h2>Nothing here yet</h2>
+    <p>We are stocking this shelf — check back soon.</p>
+    <a class="btn btn-primary" href="{% url 'catalog' %}">Browse all products</a>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_script %}
+<script nonce="{{ csp_nonce }}">
+  document.getElementById("sort-select").addEventListener("change", function () {
+    this.form.submit();
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My orders · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My orders</h1>
+    <p class="lede mb-0">Track every order you have placed.</p>
+  </div>
+</div>
+
+{% if orders %}
+<div class="table-wrap">
+  <table class="tbl">
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td><a href="{{ order.get_absolute_url }}"><strong>{{ order.number }}</strong></a></td>
+        <td>{{ order.created|date:"M j, Y · H:i" }}</td>
+        <td>{{ order.items.count }} line{{ order.items.count|pluralize }}</td>
+        <td class="num"><strong>${{ order.total_amount|floatformat:2 }}</strong></td>
+        <td><span class="badge {{ order.status_badge }}">{{ order.get_status_display }}</span></td>
+        <td><a class="btn btn-sm btn-secondary" href="{{ order.get_absolute_url }}">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📦</div>
+  <h2>No orders yet</h2>
+  <p>When you place your first order it will show up here with live status.</p>
+  <a class="btn btn-primary" href="{% url 'catalog' %}">Start shopping</a>
+</div>
+{% endif %}
+{% endblock %}

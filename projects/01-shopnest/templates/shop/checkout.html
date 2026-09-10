@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Checkout · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Checkout</h1>
+    <p class="lede mb-0">One last step — your delivery details.</p>
+  </div>
+</div>
+
+<div class="grid-2 grid" style="align-items:start">
+  <div class="card">
+    <h2 class="card-title">Delivery details</h2>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.shipping_address.id_for_label }}">Full address *</label>
+        {{ form.shipping_address }}
+        {% if form.shipping_address.errors %}<ul class="field-errors">{% for e in form.shipping_address.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="grid-2 grid" style="gap:.8rem">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.city.id_for_label }}">City *</label>
+          {{ form.city }}
+          {% if form.city.errors %}<ul class="field-errors">{% for e in form.city.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.phone.id_for_label }}">Phone *</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<ul class="field-errors">{% for e in form.phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Place order →</button>
+    </form>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Your items</h2>
+    <ul class="list-plain">
+      {% for item in items %}
+      <li style="display:flex;justify-content:space-between;gap:1rem">
+        <span>{{ item.quantity }} × {{ item.product.name }}</span>
+        <span class="num"><strong>${{ item.subtotal|floatformat:2 }}</strong></span>
+      </li>
+      {% endfor %}
+    </ul>
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between">
+      <strong>Total</strong>
+      <strong>${{ totals.grand|floatformat:2 }}</strong>
+    </div>
+    <p class="small muted mb-0 mt-2">🔒 Demo checkout — no real payment is taken. Stock is reserved the moment you place the order.</p>
+  </aside>
+</div>
+{% endblock %}

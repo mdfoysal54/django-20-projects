@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.number }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="{% url 'my_orders' %}">My orders</a> › <strong>{{ order.number }}</strong>
+</nav>
+
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Order {{ order.number }}</h1>
+    <p class="muted mb-0">Placed {{ order.created|date:"F j, Y · H:i" }}</p>
+  </div>
+  <span class="badge {{ order.status_badge }}" style="font-size:.95rem;padding:.5rem 1rem">{{ order.get_status_display }}</span>
+</div>
+
+<div class="grid-3 grid" style="grid-template-columns:2fr 1fr;align-items:start">
+  <div class="card">
+    <h2 class="card-title">Items</h2>
+    <div class="table-wrap" style="border:none">
+      <table class="tbl">
+        <thead><tr><th>Product</th><th class="num">Unit price</th><th class="num">Qty</th><th class="num">Total</th></tr></thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td>
+              {{ item.product_name }}
+              {% if item.product %}<div class="small muted"><a href="{{ item.product.get_absolute_url }}">view product</a></div>{% endif %}
+            </td>
+            <td class="num">${{ item.unit_price|floatformat:2 }}</td>
+            <td class="num">{{ item.quantity }}</td>
+            <td class="num"><strong>${{ item.subtotal|floatformat:2 }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <div class="card">
+      <h2 class="card-title">Summary</h2>
+      <div style="display:flex;justify-content:space-between"><span class="muted">Subtotal</span><strong>${{ order.total_amount|floatformat:2 }}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span class="muted">Shipping</span><span>Free</span></div>
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between"><strong>Total paid</strong><strong>${{ order.total_amount|floatformat:2 }}</strong></div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Deliver to</h2>
+      <p class="mb-0" style="white-space:pre-line">{{ order.shipping_address }}</p>
+      <p class="mb-0">{{ order.city }} · {{ order.phone }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

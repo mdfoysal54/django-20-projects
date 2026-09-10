@@ -1,0 +1,10 @@
+{% if categories %}
+<details class="nav-drop"{% if request.resolver_match.url_name == 'catalog_category' %} open{% endif %}>
+  <summary>Categories <span class="caret">▾</span></summary>
+  <div class="drop-panel">
+    {% for c in categories %}
+      <a href="{% url 'catalog_category' c.slug %}">{{ c.icon }} {{ c.name }}</a>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}

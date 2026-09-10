@@ -1,0 +1,22 @@
+{% load humanize %}
+<article class="card card-hover product-card">
+  <a href="{{ product.get_absolute_url }}" class="thumb-link" aria-label="{{ product.name }}">
+    {% if product.image %}
+      <img class="thumb-lg" src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+      <div class="thumb-lg thumb-fallback">{{ product.category.icon }}</div>
+    {% endif %}
+  </a>
+  <div class="product-body">
+    <div class="muted small">{{ product.category.name }}</div>
+    <h3 class="product-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+    <div class="product-foot">
+      <span class="price">${{ product.price|floatformat:2|intcomma }}</span>
+      {% if not product.in_stock %}
+        <span class="badge badge-bad">Out of stock</span>
+      {% elif product.stock <= 5 %}
+        <span class="badge badge-warn">Only {{ product.stock }} left</span>
+      {% endif %}
+    </div>
+  </div>
+</article>
