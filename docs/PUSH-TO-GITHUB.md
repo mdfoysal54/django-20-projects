@@ -21,6 +21,11 @@ password with anyone (including an AI).** If someone asks for it, it's a scam.
 > change your password, access billing, delete your account, or read private
 > repos it wasn't granted.
 
+The script is self-sufficient: it sets a repo-local git identity if one is
+missing, creates the repo if it doesn't exist, wires the CI badge in
+`README.md` to your username, and pushes `main`. The token is passed inline
+and never written to `.git/config` or any file.
+
 ---
 
 ## Route B — push it yourself (recommended if you're unsure)

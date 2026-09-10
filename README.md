@@ -1,5 +1,9 @@
 # django-20-projects
 
+[![tests](https://github.com/OWNER/django-20-projects/actions/workflows/tests.yml/badge.svg)](https://github.com/OWNER/django-20-projects/actions/workflows/tests.yml)
+[![Django](https://img.shields.io/badge/Django-5.2%20LTS-092E20)](https://docs.djangoproject.com/en/5.2/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **Six flagship Django 5.2 projects** — each with its own database models,
 backend logic, first-party HTML/CSS frontend, admin panel, canonical
 security hardening and a full automated test-suite. One monorepo, one
@@ -49,7 +53,23 @@ bash tools/verify_all.sh       # verify all six at once from the repo root
 ```
 
 **Verified baseline:** 6/6 projects green — 199 automated tests in total
-(72 canonical security tests + 127 domain tests).
+(72 canonical security tests + 127 domain tests). CI runs the same suites plus
+`check --deploy` in production mode on every push
+([`.github/workflows/tests.yml`](.github/workflows/tests.yml)).
+
+### Run all six locally at once
+
+```bash
+bash tools/run_all.sh          # serves 8000–8005 (auto-migrates/seeds new clones)
+```
+
+| Port | Project | | Port | Project |
+|---|---|---|---|---|
+| 8000 | 🛍️ ShopNest | | 8003 | 💼 DevJobs |
+| 8001 | 🎓 LearnHub | | 8004 | ✅ TaskFlow |
+| 8002 | 🛎️ StayHub | | 8005 | 💹 FinTrack |
+
+Demo logins everywhere: `alice` / `DemoPass123!` · admin panels: `admin` / `DemoPass123!`
 
 ## What "high security" means here
 

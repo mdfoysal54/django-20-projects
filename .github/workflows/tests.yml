@@ -1,0 +1,60 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - 01-shopnest
+          - 02-learnhub
+          - 03-stayhub
+          - 04-devjobs
+          - 05-taskflow
+          - 06-fintrack
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run test-suite (security + domain)
+        working-directory: projects/${{ matrix.project }}
+        run: python manage.py test
+
+      - name: Production deploy check (fails if hardening regressed)
+        working-directory: projects/${{ matrix.project }}
+        env:
+          DJANGO_DEBUG: "False"
+          DJANGO_SECRET_KEY: "ci-only-key-abcdefghijklmnopqrstuvwxyz-0123456789-ABCDEFGHIJ"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+          DJANGO_CSRF_TRUSTED_ORIGINS: "https://example.com"
+          DJANGO_SECURE_SSL_REDIRECT: "True"
+          DJANGO_COOKIE_SECURE: "True"
+          DJANGO_HSTS: "True"
+        run: python manage.py check --deploy
+
+  summary:
+    name: all projects green
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - run: echo "All six flagship projects passed their test-suites and deploy checks. ✅"

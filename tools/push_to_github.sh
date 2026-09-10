@@ -35,6 +35,22 @@ fi
 
 cd "$(dirname "$0")/.."
 
+# --- make the script self-sufficient -------------------------------------
+# (a) git identity might be missing on a fresh clone — set a repo-local one.
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "Error: not a git repository." >&2; exit 1; }
+if [[ -z "$(git config user.email || true)" ]]; then
+  git config user.name "django-20-projects"
+  git config user.email "dev@django-20-projects.local"
+fi
+
+# (b) wire the GitHub Actions badge to the real username (README ships with OWNER).
+if grep -q "OWNER/django-20-projects" README.md 2>/dev/null; then
+  sed -i.bak "s|OWNER/django-20-projects|$USERNAME/$REPO|g" README.md && rm -f README.md.bak
+  git add README.md
+  git commit -q -m "ci: point Actions badge at $USERNAME/$REPO" || true
+  echo "▶ CI badge wired to $USERNAME/$REPO"
+fi
+
 echo "▶ Checking repository $USERNAME/$REPO …"
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
