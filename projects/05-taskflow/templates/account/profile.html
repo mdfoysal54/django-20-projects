@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.username }} 👋</p>
+  </div>
+</div>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ owned }}</div><div class="stat-label">Projects owned</div></div>
+  <div class="card stat"><div class="stat-value">{{ memberships }}</div><div class="stat-label">Memberships</div></div>
+  <div class="card stat"><div class="stat-value">{{ assigned }}</div><div class="stat-label">Open tasks assigned</div></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'home' %}">→ Dashboard</a></li>
+      <li><a href="{% url 'my_tasks' %}">→ My tasks</a></li>
+      <li><a href="{% url 'activity' %}">→ Activity feed</a></li>
+      <li><a href="{% url 'project_create' %}">→ New project</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

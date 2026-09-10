@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Members · {{ project.name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'home' %}">Dashboard</a> ›
+  <a href="{{ project.get_absolute_url }}">{{ project.name }}</a> › <strong>Members</strong>
+</nav>
+
+<div class="grid" style="grid-template-columns:1.4fr 1fr; align-items:start">
+  <div class="card">
+    <h1 class="page-title">Team members</h1>
+    <p class="lede">Roles: <strong>Admin</strong> manages members and deletes tasks ·
+       <strong>Member</strong> creates and moves tasks · <strong>Viewer</strong> read-only.</p>
+    <div class="table-wrap" style="border:none">
+      <table class="tbl">
+        <thead><tr><th>User</th><th>Role</th><th>Joined</th><th></th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>{{ project.owner.username }}</strong> <span class="badge badge-brand">Owner</span></td>
+            <td>Full control</td>
+            <td>{{ project.created|date:"M j, Y" }}</td>
+            <td></td>
+          </tr>
+          {% for membership in members %}
+          <tr>
+            <td>{{ membership.user.username }}</td>
+            <td><span class="badge{% if membership.role == 'admin' %} badge-info{% endif %}">{{ membership.get_role_display }}</span></td>
+            <td>{{ membership.joined|date:"M j, Y" }}</td>
+            <td class="text-right">
+              <form method="post" action="{% url 'member_remove' project.slug membership.user.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Add a member</h2>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<ul class="field-errors">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        <div class="form-hint">The person needs an existing {{ APP_NAME }} account.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.role.id_for_label }}">Role</label>
+        {{ form.role }}
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Add to project</button>
+    </form>
+    <p class="small muted mb-0 mt-1">Invitations by email are on the roadmap; for now, ask them to
+       <a href="{% url 'register' %}">register</a> first.</p>
+  </aside>
+</div>
+{% endblock %}

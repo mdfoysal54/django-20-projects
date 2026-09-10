@@ -238,3 +238,31 @@ footer .heart { color: var(--bad); }
   .site-main { padding-top: 1.1rem; }
   .hide-sm { display: none !important; }
 }
+
+/* ================= TaskFlow additions ================= */
+.board {
+  display: grid; gap: .9rem; align-items: start;
+  grid-template-columns: repeat(5, minmax(215px, 1fr)); overflow-x: auto;
+  padding-bottom: .6rem;
+}
+.board-col { background: #eef0f7; border: 1px solid var(--line); border-radius: 14px; padding: .7rem; }
+.board-col-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-weight: 800; font-size: .86rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); padding: .15rem .3rem .6rem;
+}
+.board-col-body { display: flex; flex-direction: column; gap: .6rem; }
+
+.task-card { padding: .8rem .9rem; margin-bottom: 0; }
+.task-title { font-size: .96rem; margin: .45rem 0 .2rem; line-height: 1.3; }
+.task-title a { color: var(--ink); }
+.task-title a:hover { color: var(--brand); text-decoration: none; }
+.task-meta { display: flex; justify-content: space-between; align-items: center; }
+.move-form { display: flex; gap: .35rem; }
+.move-form select { flex: 1; padding: .3rem .4rem; border-radius: 8px; border: 1px solid var(--line);
+  font: inherit; font-size: .82rem; background: #fff; }
+
+.comment { display: flex; gap: .7rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.comment:last-of-type { border-bottom: none; }
+
+@media (max-width: 1100px) { .board { grid-template-columns: repeat(5, 250px); } }

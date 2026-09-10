@@ -1,0 +1,18 @@
+{% load static %}
+<article class="card task-card">
+  <div class="pill-row" style="justify-content:space-between">
+    <span class="badge {{ task.priority_badge }}">{{ task.get_priority_display }}</span>
+    {% if task.due_state == 'overdue' %}<span class="badge badge-bad">Overdue</span>
+    {% elif task.due_state == 'today' %}<span class="badge badge-warn">Due today</span>
+    {% elif task.due_state == 'soon' %}<span class="badge badge-info">{{ task.due_date|date:"M j" }}</span>
+    {% elif task.due_date %}<span class="badge">{{ task.due_date|date:"M j" }}</span>{% endif %}
+  </div>
+  <h4 class="task-title"><a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a></h4>
+  <div class="task-meta">
+    <span class="small muted">
+      {% if task.assignee %}@{{ task.assignee.username }}{% else %}unassigned{% endif %}
+      {% if task.estimate_hours %} · ⏱ {{ task.estimate_hours }}h{% endif %}
+      {% if task.comments.count %} · 💬 {{ task.comments.count }}{% endif %}
+    </span>
+  </div>
+</article>

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Your workspace</h1>
+    <p class="lede mb-0">{{ projects|length }} project{{ projects|length|pluralize }} · {{ overdue_count }} overdue task{{ overdue_count|pluralize }}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'project_create' %}">+ New project</a>
+</div>
+
+{% if my_tasks %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Assigned to you</h2></div>
+  <div class="grid grid-3">
+    {% for task in my_tasks %}
+    <div class="card">
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="badge {{ task.priority_badge }}">{{ task.get_priority_display }}</span>
+        {% if task.due_state == 'overdue' %}<span class="badge badge-bad">Overdue</span>
+        {% elif task.due_date %}<span class="badge badge-info">{{ task.due_date|date:"M j" }}</span>{% endif %}
+      </div>
+      <h4 class="task-title mt-1"><a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a></h4>
+      <div class="small muted">{{ task.project.name }} · {{ task.get_status_display }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Projects</h2></div>
+  {% if projects %}
+  <div class="grid grid-3">
+    {% for project in projects %}
+    <a class="card card-hover" href="{{ project.get_absolute_url }}" style="color:inherit; border-top:4px solid {{ project.color }}">
+      <div class="card-title mb-1">{{ project.name }}
+        {% if project.archived %}<span class="badge badge-warn">Archived</span>{% endif %}</div>
+      <p class="small muted mb-1">{{ project.description|truncatechars:80 }}</p>
+      <div class="progress mb-1"><span style="width: {{ project.progress_percent }}%"></span></div>
+      <div class="small muted">{{ project.n_done }}/{{ project.n_tasks }} done · {{ project.member_count }} member{{ project.member_count|pluralize }}</div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="big">📋</div>
+    <h2>No projects yet</h2>
+    <p>Create your first project and invite your team.</p>
+    <a class="btn btn-primary" href="{% url 'project_create' %}">Create a project</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

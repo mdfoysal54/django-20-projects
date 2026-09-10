@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} · {{ project.name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'home' %}">Dashboard</a> ›
+  <a href="{{ project.get_absolute_url }}">{{ project.name }}</a> › <strong>{{ task.title }}</strong>
+</nav>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <div class="pill-row" style="justify-content:space-between">
+        <div class="pill-row">
+          <span class="badge {{ task.priority_badge }}">{{ task.get_priority_display }}</span>
+          <span class="badge badge-info">{{ task.get_status_display }}</span>
+          {% if task.due_state == 'overdue' %}<span class="badge badge-bad">Overdue</span>
+          {% elif task.due_state == 'today' %}<span class="badge badge-warn">Due today</span>{% endif %}
+        </div>
+        {% if my_role != 'viewer' %}
+        <a class="btn btn-sm btn-secondary" href="{% url 'task_edit' project.slug task.pk %}">Edit task</a>
+        {% endif %}
+      </div>
+      <h1 class="page-title mt-1">{{ task.title }}</h1>
+      <p style="white-space:pre-line">{{ task.description|default:"No description yet." }}</p>
+      <div class="pill-row mt-1">
+        <span class="badge">👤 {% if task.assignee %}{{ task.assignee.username }}{% else %}Unassigned{% endif %}</span>
+        {% if task.due_date %}<span class="badge">📅 {{ task.due_date|date:"D, M j, Y" }}</span>{% endif %}
+        {% if task.estimate_hours %}<span class="badge">⏱ {{ task.estimate_hours }}h estimate</span>{% endif %}
+        <span class="badge">✍️ {{ task.created_by.username }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Comments ({{ comments|length }})</h2>
+      {% for comment in comments %}
+      <div class="comment">
+        <span class="avatar">{{ comment.author.username|slice:":1"|upper }}</span>
+        <div>
+          <div class="small"><strong>{{ comment.author.username }}</strong>
+            <span class="muted">· {{ comment.created|date:"M j, Y · H:i" }}</span></div>
+          <div style="white-space:pre-line">{{ comment.body }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="muted">No comments yet.</p>
+      {% endfor %}
+
+      {% if can_edit %}
+      <hr class="divider">
+      <form method="post">
+        {% csrf_token %}
+        {{ comment_form.body }}
+        {% if comment_form.body.errors %}<ul class="field-errors">{% for e in comment_form.body.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        <button class="btn btn-primary mt-1" type="submit">Post comment</button>
+      </form>
+      {% else %}
+      <p class="small muted mb-0">You have viewer access — commenting is disabled.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Move task</h2>
+      {% if my_role != 'viewer' %}
+      <form method="post" action="{% url 'task_move' project.slug task.pk %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <select class="form-control" name="status" aria-label="Status">
+            {% for value, label in task.Status.choices %}
+              <option value="{{ value }}"{% if value == task.status %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Update status</button>
+      </form>
+      {% else %}<p class="small muted mb-0">Viewers cannot move tasks.</p>{% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Details</h2>
+      <ul class="list-plain small">
+        <li><strong>Project</strong><div class="muted"><a href="{{ project.get_absolute_url }}">{{ project.name }}</a></div></li>
+        <li><strong>Created</strong><div class="muted">{{ task.created|date:"M j, Y" }}</div></li>
+        <li><strong>Last updated</strong><div class="muted">{{ task.updated|timesince }} ago</div></li>
+        {% if task.completed_at %}<li><strong>Completed</strong><div class="muted">{{ task.completed_at|date:"M j, Y" }}</div></li>{% endif %}
+      </ul>
+      {% if my_role == 'owner' or my_role == 'admin' %}
+      <form method="post" action="{% url 'task_delete' project.slug task.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-block btn-sm" type="submit">Delete task</button>
+      </form>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

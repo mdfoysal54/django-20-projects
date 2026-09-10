@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My tasks · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My tasks</h1>
+    <p class="lede mb-0">Everything assigned to you across {{ user.memberships.count }} project{{ user.memberships.count|pluralize }} (+ projects you own).</p>
+  </div>
+</div>
+
+{% if tasks %}
+<div class="table-wrap">
+  <table class="tbl">
+    <thead><tr><th>Task</th><th>Project</th><th>Status</th><th>Priority</th><th>Due</th></tr></thead>
+    <tbody>
+      {% for task in tasks %}
+      <tr>
+        <td><a href="{% url 'task_detail' task.pk %}"><strong>{{ task.title }}</strong></a></td>
+        <td>{{ task.project.name }}</td>
+        <td><span class="badge badge-info">{{ task.get_status_display }}</span></td>
+        <td><span class="badge {{ task.priority_badge }}">{{ task.get_priority_display }}</span></td>
+        <td>
+          {% if task.due_state == 'overdue' %}<span class="badge badge-bad">{{ task.due_date|date:"M j" }} — overdue</span>
+          {% elif task.due_date %}{{ task.due_date|date:"M j, Y" }}{% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🎉</div>
+  <h2>Nothing assigned to you</h2>
+  <p>Enjoy the calm — or grab something from a project board.</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">Open dashboard</a>
+</div>
+{% endif %}
+{% endblock %}

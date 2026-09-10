@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New project{% else %}Edit {{ project.name }}{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Create a project{% else %}Project settings{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}You become the owner. Add members and tasks right after.{% else %}Only the owner and admins can change these settings.{% endif %}</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Create project{% else %}Save changes{% endif %}</button>
+      {% if mode == 'edit' %}<a class="btn btn-ghost" href="{{ project.get_absolute_url }}">Cancel</a>{% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <nav class="breadcrumbs"><a href="{% url 'home' %}">Dashboard</a> › <strong>{{ project.name }}</strong></nav>
+    <h1 class="page-title mb-0" style="border-left:6px solid {{ project.color }}; padding-left:.6rem">{{ project.name }}</h1>
+    <p class="lede mb-0">{{ project.description|truncatechars:140 }}</p>
+    <div class="pill-row mt-1">
+      <span class="badge badge-ok">{{ my_role|title }}</span>
+      <span class="badge">{{ project.task_count }} tasks</span>
+      <span class="badge badge-info">{{ project.done_count }} done</span>
+      <span class="badge">{{ project.progress_percent }}% complete</span>
+      {% if project.archived %}<span class="badge badge-warn">Archived</span>{% endif %}
+      {% if unassigned_count %}<span class="badge badge-warn">{{ unassigned_count }} unassigned</span>{% endif %}
+    </div>
+  </div>
+  <div class="pill-row">
+    {% if my_role == 'owner' or my_role == 'admin' %}
+      <a class="btn btn-secondary" href="{% url 'project_edit' project.slug %}">Edit</a>
+      <a class="btn btn-secondary" href="{% url 'member_list' project.slug %}">Members ({{ project.member_count }})</a>
+      <form method="post" action="{% url 'project_archive' project.slug %}">
+        {% csrf_token %}
+        <button class="btn btn-ghost" type="submit">{% if project.archived %}Restore{% else %}Archive{% endif %}</button>
+      </form>
+    {% endif %}
+    {% if my_role != 'viewer' %}
+      <a class="btn btn-primary" href="{% url 'task_create' project.slug %}">+ New task</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="board">
+  {% for column in columns %}
+  <section class="board-col">
+    <header class="board-col-head">
+      <span>{{ column.label }}</span>
+      <span class="badge">{{ column.tasks|length }}</span>
+    </header>
+    <div class="board-col-body">
+      {% for task in column.tasks %}
+        {% include "tasks/_task_card.html" %}
+        {% if my_role != 'viewer' %}
+        <form class="move-form" method="post" action="{% url 'task_move' project.slug task.pk %}">
+          {% csrf_token %}
+          <select name="status" aria-label="Move {{ task.title }}">
+            {% for value, label in task.Status.choices %}
+              <option value="{{ value }}"{% if value == task.status %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-sm btn-secondary" type="submit">Move</button>
+        </form>
+        {% endif %}
+      {% empty %}
+        <p class="small muted text-center" style="padding:.8rem 0">Empty</p>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+
+<div class="grid" style="grid-template-columns:2fr 1fr; align-items:start; margin-top:1.6rem">
+  <div class="card">
+    <h2 class="card-title">Recent activity</h2>
+    {% if activities %}
+      <ul class="list-plain">
+        {% for activity in activities %}
+        <li class="small">
+          <span class="avatar" style="width:24px;height:24px;font-size:.7rem">{{ activity.user.username|slice:":1"|upper }}</span>
+          <strong>{{ activity.user.username }}</strong> {{ activity.verb }}
+          <span class="muted">· {{ activity.created|timesince }} ago</span>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="muted mb-0">Nothing yet — create a task to get started.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Team</h2>
+    <ul class="list-plain">
+      <li><span class="avatar">{{ project.owner.username|slice:":1"|upper }}</span>
+          <strong>{{ project.owner.username }}</strong> <span class="badge badge-brand">Owner</span></li>
+      {% for membership in members %}
+      <li><span class="avatar">{{ membership.user.username|slice:":1"|upper }}</span>
+          {{ membership.user.username }}
+          <span class="badge{% if membership.role == 'admin' %} badge-info{% endif %}">{{ membership.get_role_display }}</span></li>
+      {% endfor %}
+    </ul>
+    {% if my_role == 'owner' or my_role == 'admin' %}
+      <a class="btn btn-secondary btn-block btn-sm" href="{% url 'member_list' project.slug %}">Manage members</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
