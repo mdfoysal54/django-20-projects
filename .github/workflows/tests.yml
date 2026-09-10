@@ -54,7 +54,7 @@ jobs:
         working-directory: projects/${{ matrix.project }}
         run: |
           python manage.py migrate -v 0
-          python ../tools/smoke_pages.py .
+          python ../../tools/smoke_pages.py .
 
       - name: Production deploy check (fails if hardening regressed)
         working-directory: projects/${{ matrix.project }}
