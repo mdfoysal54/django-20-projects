@@ -1,6 +1,6 @@
 # django-20-projects
 
-[![tests](https://github.com/OWNER/django-20-projects/actions/workflows/tests.yml/badge.svg)](https://github.com/OWNER/django-20-projects/actions/workflows/tests.yml)
+[![tests](https://github.com/mdfoysal54/django-20-projects/actions/workflows/tests.yml/badge.svg)](https://github.com/mdfoysal54/django-20-projects/actions/workflows/tests.yml)
 [![Django](https://img.shields.io/badge/Django-5.2%20LTS-092E20)](https://docs.djangoproject.com/en/5.2/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
