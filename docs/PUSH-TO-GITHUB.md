@@ -1,56 +1,111 @@
-# Pushing this repo to GitHub
+# Publishing this repo to GitHub
 
-Two supported routes — both end in the same place. **Never share your GitHub
-password with anyone (including an AI).** If someone asks for it, it's a scam.
+Two things get published:
 
----
+1. **The monorepo** → `django-20-projects` (all 16 projects, tooling, docs).
+2. **One repository per project** → named after the project: `shopnest`,
+   `learnhub`, `stayhub`, `devjobs`, `taskflow`, `fintrack`, `blogpress`,
+   `eventtix`, `helpdesk`, `medcare`, `fittrack`, `recipebox`, `invoicepro`,
+   `attendx`, `quizmaster`, `linkshort`.
 
-## Route A — let the agent push (you approve once with a temporary token)
+Each project repository is built from the files the monorepo tracks for that
+project only (no local database, no `__pycache__`, no `.env`), gets its own
+`requirements.txt`, its own GitHub Actions workflow running `manage.py test`
+plus `check --deploy`, and a CI badge wired to its own name.
 
-1. Create a **fine-grained Personal Access Token**:
-   GitHub → *Settings* → *Developer settings* → *Personal access tokens* →
-   **Fine-grained tokens** → *Generate new token*
-   - **Repository access:** All repositories (or pre-create `django-20-projects` and select just it)
-   - **Permissions:** Repository permissions → **Contents: Read and write**
-   - **Expiration:** 7 days (shortest available)
-2. Paste the token when the agent asks. The push happens immediately.
-3. **Revoke the token right after** — same settings page. It takes 10 seconds
-   and makes the token worthless if it ever leaks.
-
-> What the token can do: push code to repos you selected. What it cannot do:
-> change your password, access billing, delete your account, or read private
-> repos it wasn't granted.
-
-The script is self-sufficient: it sets a repo-local git identity if one is
-missing, creates the repo if it doesn't exist, wires the CI badge in
-`README.md` to your username, and pushes `main`. The token is passed inline
-and never written to `.git/config` or any file.
+**Never share your GitHub password with anyone (including an AI).** If someone
+asks for it, it's a scam. Tokens only.
 
 ---
 
-## Route B — push it yourself (recommended if you're unsure)
+## Route A — one command (recommended)
 
-Everything is already committed on branch `main`. On any machine with Git:
+### 1. Create a fine-grained token with exactly these settings
+
+GitHub → *Settings* → *Developer settings* → *Personal access tokens* →
+**Fine-grained tokens** → *Generate new token*
+
+| Setting | Value | Why |
+|---|---|---|
+| **Repository access** | **All repositories** | a brand-new repository can't be pre-selected |
+| **Permissions ▸ Contents** | **Read and write** | push the code |
+| **Permissions ▸ Administration** | **Read and write** | create the 16 new repositories |
+| **Permissions ▸ Workflows** | **Read and write** | the repos ship `.github/workflows/tests.yml` |
+| **Expiration** | 7 days (shortest available) | blast radius stays tiny |
+
+A token with only *Contents: read* can log in and list repositories, but every
+push and every `POST /user/repos` comes back `403 Resource not accessible by
+personal access token` — that is a permissions error, not a git error.
+
+### 2. Run it
 
 ```bash
-# 1. Get the code onto your machine (download the workspace, then:)
+export GITHUB_TOKEN=github_pat_xxxxxxxx
+bash tools/push_all.sh mdfoysal54
+```
+
+That pushes the monorepo first, then creates and pushes the 16 project
+repositories one by one, printing a line per repository:
+
+```
+════ 1/2  monorepo ════
+  ✓ pushed main → https://github.com/mdfoysal54/django-20-projects
+════ 2/2  one repository per project ════
+  + created mdfoysal54/shopnest
+  ✓ 01-shopnest → https://github.com/mdfoysal54/shopnest  (48 files)
+  …
+Done — created 16, pushed 16, failed 0.
+```
+
+Useful flags and switches:
+
+```bash
+DRYRUN=1 bash tools/push_projects.sh mdfoysal54          # build every tree, push nothing
+FORCE=1  bash tools/push_all.sh mdfoysal54               # overwrite existing repos
+REPO_PREFIX=django- bash tools/push_projects.sh mdfoysal54   # → django-shopnest, …
+bash tools/push_projects.sh mdfoysal54 01-shopnest 16-linkshort   # just these two
+```
+
+Pushing only the monorepo (what `tools/push_to_github.sh` does on its own):
+
+```bash
+export GITHUB_TOKEN=github_pat_xxxxxxxx
+bash tools/push_to_github.sh mdfoysal54 django-20-projects
+```
+
+### 3. Revoke the token right after
+
+Same settings page — 10 seconds, and the token is worthless if it ever leaks.
+
+---
+
+## Route B — push it yourself
+
+Everything is already committed on branch `main`.
+
+```bash
 cd django-20-projects
 
-# 2. Set your identity for this repo only
 git config user.name  "Your Name"
 git config user.email "you@example.com"
 
-# 3. Create an EMPTY repo on github.com named django-20-projects
-#    (no README, no .gitignore, no license — this repo already has them)
+# Create an EMPTY repo named django-20-projects on github.com
+# (no README, no .gitignore, no license — this repo already has them)
 
-# 4. Point it at your new repo and push
 git remote add origin https://github.com/<your-username>/django-20-projects.git
 git branch -M main
 git push -u origin main
 ```
 
-That's it. GitHub will ask you to authenticate (browser or a token — either
-works).
+For a single project as its own repository, export it and push:
+
+```bash
+mkdir -p /tmp/shopnest && git archive HEAD:projects/01-shopnest | tar -x -C /tmp/shopnest
+cd /tmp/shopnest && git init -b main && git add -A \
+  && git commit -m "ShopNest — standalone Django 5.2 e-commerce project" \
+  && git remote add origin https://github.com/<your-username>/shopnest.git \
+  && git push -u origin main
+```
 
 ---
 
@@ -79,9 +134,11 @@ git ls-files | grep -E "\.env$|sqlite3$"      # should print nothing
 
 ## After the push — quick repository setup
 
-- **About panel:** description = *Six flagship Django 5.2 projects — full-stack, tested, hardened.*
-  Topics: `django` `python` `full-stack` `postgresql` `security` `portfolio`
-- **Pin** the repo to your profile.
-- Each project README explains its own quickstart; the root README is the index.
-- Optional: enable *Actions* later — `tools/verify_all.sh` is CI-ready
-  (run tests for all six projects in one command).
+- **Monorepo About panel:** description = *Sixteen deep Django 5.2 flagship
+  projects — full-stack, tested, hardened.* Topics: `django` `python`
+  `full-stack` `security` `portfolio` `django-projects`.
+- **Each project repo:** the workflow badge is already in its README; add
+  topics like `django` `python` `web-app`.
+- **Pin** the monorepo and your favourite three projects to your profile.
+- CI runs on every push: `manage.py test`, the page smoke-render, and
+  `check --deploy` in production mode.
