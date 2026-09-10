@@ -1,0 +1,37 @@
+{% load static %}
+<article class="card card-hover job-card">
+  <div class="job-top">
+    <div class="job-logo">{{ job.company.logo_emoji }}</div>
+    <div style="flex:1">
+      <h3 class="job-title"><a href="{{ job.get_absolute_url }}">{{ job.title }}</a></h3>
+      <div class="small muted">
+        {{ job.company.name }} · 📍 {{ job.location }}
+      </div>
+    </div>
+    {% if job.is_expired %}
+      <span class="badge badge-bad">Expired</span>
+    {% else %}
+      <span class="badge badge-ok">Open</span>
+    {% endif %}
+  </div>
+  <div class="pill-row mt-1">
+    <span class="badge badge-brand">{{ job.get_job_type_display }}</span>
+    <span class="badge badge-info">{{ job.get_remote_display }}</span>
+    <span class="badge">{{ job.get_level_display }}</span>
+    {% if job.status == 'draft' %}<span class="badge badge-warn">Draft</span>{% endif %}
+  </div>
+  <p class="small muted mt-1 mb-1">{{ job.description|truncatechars:130 }}</p>
+  <div class="job-foot">
+    <div>
+      {% for tag in job.tag_list|slice:":4" %}<span class="tag">{{ tag }}</span>{% endfor %}
+    </div>
+    <div class="text-right">
+      <div class="small"><strong>{{ job.salary_display }}</strong></div>
+      <div class="small muted">
+        {% if job.days_left is not None %}
+          {% if job.days_left == 0 %}Closes today{% else %}{{ job.days_left }} day{{ job.days_left|pluralize }} left{% endif %}
+        {% else %}Open until filled{% endif %}
+      </div>
+    </div>
+  </div>
+</article>

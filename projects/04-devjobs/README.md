@@ -1,52 +1,103 @@
-# DevJobs
+# 💼 DevJobs — job board & recruitment portal
 
-> **Job board & recruitment portal** — flagship Django project in the **django-20-projects** monorepo.
+> Flagship **#4** of the [django-20-projects](../../README.md) monorepo.
+> Django 5.2 LTS · first-party HTML/CSS frontend · hardened security baseline ·
+> **34 automated tests, all green.**
 
-*Status: scaffolded — this page will be replaced by the project walkthrough
-as the app is built out.*
+A two-sided job board: candidates search, save and apply to roles with resume
+uploads; employers manage company profiles, post jobs and move applicants
+through a real hiring pipeline (submitted → review → shortlisted → interview →
+offer → hired / rejected).
 
 ---
 
-## Quickstart (needs Python 3.10+)
+## Feature tour
+
+| Area | What's implemented |
+|---|---|
+| **Job search** | Keyword search across title/description/tags/company, location, job type, level and workplace (remote/hybrid/on-site) filters, three sort orders, expired jobs auto-hidden |
+| **Job pages** | Transparent salary display (range / single+ / not disclosed), requirement lists, skill tags, similar roles from the same company, deadline countdown |
+| **Applying** | Login-gated, one application per job (view check **and** DB unique constraint), cover-letter quality gate, resume upload with extension allow-list + 2 MB cap, optional portfolio |
+| **Candidate area** | Application tracker with live pipeline badges, one-click withdraw (POST + CSRF, owner-only), saved-jobs shortlist with toggle |
+| **Employer area** | Company profiles, create/edit jobs, open/close toggle, applicant list with resumes, per-candidate review page with pipeline status + **private** employer notes |
+| **Admin** | Company inline job editing, job bulk open/close, application bulk status actions, resume flag column |
+
+## Page map
+
+```
+/                                    home (search hero, stats, companies hiring)
+/jobs/                               job list with filters (?q=&location=&job_type=&level=&remote=&sort=)
+/jobs/<slug>/                        job detail (apply / already-applied / owner states)
+/jobs/<slug>/apply/                  application form (login required)
+/jobs/<slug>/save/                   POST toggle save-for-later
+/companies/<slug>/                   public company page
+/my-applications/                    candidate tracker
+/applications/<id>/withdraw/         POST withdraw
+/saved-jobs/                         shortlist
+/employer/                           dashboard (own jobs only, new-applicant counts)
+/employer/company/new/               create company
+/employer/jobs/new/                  post a job
+/employer/jobs/<slug>/edit/          edit / close / re-open
+/employer/jobs/<slug>/applicants/    applicant list
+/employer/applications/<id>/review/  pipeline status + private notes
+/profile/  /accounts/*  /admin/      account & admin
+```
+
+## Data model
+
+```
+User ──< Company ──< Job ──< Application >── User
+        (owner)      (posted_by)     │  unique (job, applicant)
+                                     └── status · resume · employer_notes
+User ──< SavedJob >── Job
+```
+
+- `unique_together("job", "applicant")` makes "apply once" a database law, not
+  just a view check.
+- Applications are never deleted — `withdraw()` is the only candidate-side
+  transition, so an employer's pipeline history stays truthful.
+- Salary inputs are validated (`min ≤ max`), deadlines can't be in the past.
+
+## Quickstart
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-cp .env.example .env             # then fill in DJANGO_SECRET_KEY
+cp .env.example .env
 python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver       # http://127.0.0.1:8000
+python manage.py seed_demo            # 4 companies, 9 jobs, demo applications
+python manage.py runserver
 ```
 
-Run the test-suite (43 canonical security + domain tests):
+**Demo accounts**
 
-```bash
-python manage.py test
-```
+| Username | Password | Role |
+|---|---|---|
+| `nadia` | `DemoPass123!` | recruiter — Nimbus Cloud & BlueOrbit Labs |
+| `tanvir` | `DemoPass123!` | recruiter — Pixel & Pine & The Ledger Co |
+| `alice` | `DemoPass123!` | candidate — 2 applications (interview / shortlisted) |
+| `bob` | `DemoPass123!` | candidate — 2 applications (submitted / reviewing) |
+| `admin` | `DemoPass123!` | superuser |
 
-## Tech stack
+## Tests — 34 total
 
-- **Django 5.2 LTS** (Python 3.10–3.13), SQLite out of the box, PostgreSQL-ready
-- First-party HTML/CSS frontend, no CDN, no build step
-- Argon2 password hashing, CSP + nonce, HSTS/secure-cookie flags via `.env`,
-  login brute-force throttling, CSRF everywhere
+- `core/tests_security.py` — 12 canonical security tests
+- `core/tests.py` — 22 domain tests: salary display variants, min>max
+  rejection, expired/draft visibility, deadline enforcement, keyword +
+  filter search, apply-once, short cover letters, recruiter-can't-apply-to-own-job,
+  resume happy path, **extension blocklist (`.exe` rejected)**, **2 MB size cap**,
+  withdraw + no-reapply, cross-user protection on applications, employer
+  scoping (strangers get 404 on applicants and review pages), pipeline moves,
+  open/close toggling, saved-job toggling, seeder integrity
 
-## Repository layout
+## Security notes
 
-```
-04-devjobs/
-├── manage.py
-├── config/            settings · root urls · wsgi/asgi
-├── core/              models · views · forms · admin · middleware · tests
-├── templates/         first-party pages
-├── static/css/        first-party stylesheet
-├── tests/             security + domain tests live in core/tests*.py
-└── docs/              SECURITY.md — hardening checklist
-```
+Beyond the [shared baseline](../../docs/SECURITY.md):
 
-## Security checklist
-
-See **[/docs/SECURITY.md](../docs/SECURITY.md)** (monorepo-wide) and
-`config/settings.py` for exactly which flags this project sets.
+- **Upload hardening**: resumes are extension-allow-listed (pdf/doc/docx/txt/rtf/odt),
+  capped at 2 MB, and stored with the client filename reduced to its basename
+  (`Path(name).name`) so no path traversal reaches the storage layer.
+- Candidate data (cover letters, resumes, email) is visible only to the job's
+  poster and admins — verified by tests that log in as a stranger and expect 404s.
+- Company selection on job creation is validated against `owner=request.user`;
+  a tampered `company` pk in the POST body cannot cross tenants.

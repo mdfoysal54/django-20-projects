@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}My applications · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My applications</h1>
+    <p class="lede mb-0">Track every application through the pipeline.</p>
+  </div>
+</div>
+
+{% if applications %}
+<div class="table-wrap">
+  <table class="tbl">
+    <thead><tr><th>Role</th><th>Company</th><th>Applied</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for application in applications %}
+      <tr>
+        <td><a href="{{ application.job.get_absolute_url }}"><strong>{{ application.job.title }}</strong></a></td>
+        <td>{{ application.job.company.name }}</td>
+        <td>{{ application.created|date:"M j, Y" }}</td>
+        <td><span class="badge {{ application.status_badge }}">{{ application.get_status_display }}</span></td>
+        <td class="text-right">
+          {% if application.is_active %}
+          <form method="post" action="{% url 'withdraw_application' application.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger" type="submit">Withdraw</button>
+          </form>
+          {% else %}<span class="small muted">Closed</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📨</div>
+  <h2>No applications yet</h2>
+  <p>Find a role that fits and send your first application.</p>
+  <a class="btn btn-primary" href="{% url 'job_list' %}">Browse jobs</a>
+</div>
+{% endif %}
+{% endblock %}

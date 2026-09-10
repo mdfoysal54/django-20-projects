@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Saved jobs · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Saved jobs</h1>
+    <p class="lede mb-0">Your shortlist for later.</p>
+  </div>
+</div>
+{% if saves %}
+<div class="grid grid-2">
+  {% for save in saves %}{% include "jobs/_job_card.html" with job=save.job %}{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">☆</div>
+  <h2>Nothing saved yet</h2>
+  <p>Tap “Save for later” on any job to keep it here.</p>
+  <a class="btn btn-primary" href="{% url 'job_list' %}">Browse jobs</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Applicants · {{ job.title }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'dashboard' %}">Employer dashboard</a> › <strong>{{ job.title }}</strong></nav>
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Applicants — {{ job.title }}</h1>
+    <p class="lede mb-0">{{ applications|length }} application{{ applications|length|pluralize }} · {{ job.company.name }}</p>
+  </div>
+  <a class="btn btn-secondary" href="{% url 'job_edit' job.slug %}">Edit job</a>
+</div>
+
+{% if applications %}
+<div class="grid" style="gap:.9rem">
+  {% for application in applications %}
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="pill-row">
+        <span class="avatar">{{ application.applicant.username|slice:":1"|upper }}</span>
+        <div>
+          <strong>{{ application.applicant.username }}</strong>
+          <div class="small muted">Applied {{ application.created|date:"M j, Y · H:i" }}</div>
+        </div>
+      </div>
+      <span class="badge {{ application.status_badge }}">{{ application.get_status_display }}</span>
+    </div>
+    <p class="small mt-1 mb-1">{{ application.cover_letter|truncatechars:220 }}</p>
+    <div class="pill-row">
+      {% if application.resume %}<a class="btn btn-sm btn-secondary" href="{{ application.resume.url }}" target="_blank" rel="noopener">📄 Resume</a>{% endif %}
+      {% if application.portfolio_url %}<a class="btn btn-sm btn-ghost" href="{{ application.portfolio_url }}" target="_blank" rel="noopener nofollow">🔗 Portfolio</a>{% endif %}
+      <a class="btn btn-sm btn-primary" href="{% url 'application_review' application.pk %}">Review &amp; update status →</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📭</div>
+  <h2>No applications yet</h2>
+  <p>Share the job link — applicants will land here with their cover letters and resumes.</p>
+  <a class="btn btn-secondary" href="{{ job.get_absolute_url }}">View public job page</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Review {{ application.applicant.username }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'job_applicants' application.job.slug %}">Applicants</a> › <strong>{{ application.applicant.username }}</strong>
+</nav>
+
+<div class="grid" style="grid-template-columns:1.5fr 1fr; align-items:start">
+  <div class="card">
+    <h1 class="page-title mb-1">{{ application.applicant.username }}</h1>
+    <p class="muted">Applied to <a href="{{ application.job.get_absolute_url }}">{{ application.job.title }}</a>
+       on {{ application.created|date:"F j, Y · H:i" }}</p>
+    <hr class="divider">
+    <h2 class="card-title">Cover letter</h2>
+    <p style="white-space:pre-line">{{ application.cover_letter }}</p>
+    <div class="pill-row mt-2">
+      {% if application.resume %}<a class="btn btn-secondary" href="{{ application.resume.url }}" target="_blank" rel="noopener">📄 Download resume</a>{% else %}<span class="badge">No resume attached</span>{% endif %}
+      {% if application.portfolio_url %}<a class="btn btn-ghost" href="{{ application.portfolio_url }}" target="_blank" rel="noopener nofollow">🔗 Portfolio</a>{% endif %}
+      <a class="btn btn-ghost" href="mailto:{{ application.applicant.email }}">✉️ {{ application.applicant.email|default:"no email" }}</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Pipeline status</h2>
+    <p class="small muted">Current: <span class="badge {{ application.status_badge }}">{{ application.get_status_display }}</span></p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.status.id_for_label }}">Move candidate to</label>
+        {{ form.status }}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.employer_notes.id_for_label }}">Private notes</label>
+        {{ form.employer_notes }}
+        <div class="form-hint">Only visible to you and platform admins.</div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Save changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

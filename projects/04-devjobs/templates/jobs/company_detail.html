@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="job-top">
+    <div class="job-logo" style="width:64px;height:64px;font-size:2rem">{{ company.logo_emoji }}</div>
+    <div>
+      <h1 class="page-title mb-0">{{ company.name }}</h1>
+      <p class="muted mb-0">📍 {{ company.location|default:"Location not specified" }}
+        {% if company.website %}· <a href="{{ company.website }}" target="_blank" rel="noopener noreferrer nofollow">Website</a>{% endif %}</p>
+    </div>
+  </div>
+  {% if company.about %}<p class="mt-2 mb-0">{{ company.about }}</p>{% endif %}
+</div>
+
+<h2 class="section-title">Open roles ({{ jobs|length }})</h2>
+{% if jobs %}
+<div class="grid grid-2">
+  {% for job in jobs %}{% include "jobs/_job_card.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><div class="big">📭</div><h2>No open roles right now</h2><p>Follow this company — new roles appear here the moment they're posted.</p></div>
+{% endif %}
+{% endblock %}

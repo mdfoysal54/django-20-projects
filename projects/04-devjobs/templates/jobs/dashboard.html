@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Employer dashboard · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Employer dashboard</h1>
+    <p class="lede mb-0">Your company profile, postings and applicant flow.</p>
+  </div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'company_create' %}">+ Company</a>
+    <a class="btn btn-primary" href="{% url 'job_create' %}">+ Post a job</a>
+  </div>
+</div>
+
+{% if companies %}
+<div class="grid grid-3 mb-3">
+  {% for company in companies %}
+  <div class="card">
+    <div class="card-title">{{ company.logo_emoji }} {{ company.name }}</div>
+    <div class="small muted mb-1">{{ company.location }} · {{ company.n_jobs }} job{{ company.n_jobs|pluralize }}</div>
+    <a class="btn btn-sm btn-secondary" href="{{ company.get_absolute_url }}">Public page</a>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if jobs %}
+<div class="table-wrap">
+  <table class="tbl">
+    <thead><tr><th>Role</th><th>Status</th><th class="num">Applicants</th><th class="num">New</th><th>Deadline</th><th></th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td><a href="{{ job.get_absolute_url }}"><strong>{{ job.title }}</strong></a>
+            <div class="small muted">{{ job.company.name }} · {{ job.get_job_type_display }}</div></td>
+        <td>
+          {% if job.status == 'open' and not job.is_expired %}<span class="badge badge-ok">Open</span>
+          {% elif job.is_expired %}<span class="badge badge-bad">Expired</span>
+          {% else %}<span class="badge badge-warn">{{ job.get_status_display }}</span>{% endif %}
+        </td>
+        <td class="num">{{ job.n_apps }}</td>
+        <td class="num">{% if job.n_new %}<span class="badge badge-brand">{{ job.n_new }}</span>{% else %}—{% endif %}</td>
+        <td>{{ job.deadline|date:"M j, Y"|default:"—" }}</td>
+        <td class="text-right">
+          <a class="btn btn-sm btn-primary" href="{% url 'job_applicants' job.slug %}">Applicants</a>
+          <a class="btn btn-sm btn-secondary" href="{% url 'job_edit' job.slug %}">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📢</div>
+  <h2>No job posts yet</h2>
+  <p>Create a company profile and publish your first role.</p>
+  <a class="btn btn-primary" href="{% url 'job_create' %}">Post a job</a>
+</div>
+{% endif %}
+{% endblock %}

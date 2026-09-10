@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — where developers find great teams{% endblock %}
+{% block content %}
+
+<section class="jobs-hero">
+  <div>
+    <h1>Find the job that<br>respects your craft.</h1>
+    <p class="lede">Curated developer roles with transparent salary ranges, honest
+       requirements and applications you can track.</p>
+    <form class="hero-search" method="get" action="{% url 'job_list' %}">
+      <input class="form-control" type="search" name="q" placeholder="Django, PostgreSQL, React…" aria-label="Search jobs">
+      <input class="form-control" type="search" name="location" placeholder="Location (or leave empty for remote)" aria-label="Location">
+      <button class="btn btn-primary" type="submit">Search jobs</button>
+    </form>
+  </div>
+  <div class="hero-emoji" style="font-size:5rem">💼</div>
+</section>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ stats.jobs }}</div><div class="stat-label">Open roles</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.companies }}</div><div class="stat-label">Hiring companies</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.remote }}</div><div class="stat-label">Remote-first</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.applications }}</div><div class="stat-label">Applications sent</div></div>
+</div>
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">Fresh opportunities</h2></div>
+    <a class="btn btn-secondary" href="{% url 'job_list' %}">Browse all jobs →</a>
+  </div>
+  <div class="grid grid-2">
+    {% for job in featured %}{% include "jobs/_job_card.html" %}{% endfor %}
+  </div>
+</section>
+
+{% if companies %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Companies hiring now</h2></div>
+  <div class="grid grid-3">
+    {% for company in companies %}
+    <a class="card card-hover" href="{{ company.get_absolute_url }}" style="color:inherit">
+      <div class="pill-row">
+        <span class="flag">{{ company.logo_emoji }}</span>
+        <div>
+          <div class="card-title mb-0">{{ company.name }}</div>
+          <div class="small muted">{{ company.location }} · {{ company.n_open }} open role{{ company.n_open|pluralize }}</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="section-title"><h2 class="mb-0">For employers</h2></div>
+  <div class="grid grid-3">
+    <div class="card"><div style="font-size:1.8rem">📝</div><h3 class="card-title">Post in minutes</h3><p class="muted small mb-0">Structured posting: level, remote policy, transparent salary range, deadline.</p></div>
+    <div class="card"><div style="font-size:1.8rem">📊</div><h3 class="card-title">Pipeline that fits</h3><p class="muted small mb-0">Move candidates from submitted → interview → offer with private notes.</p></div>
+    <div class="card"><div style="font-size:1.8rem">🔒</div><h3 class="card-title">Candidate data protected</h3><p class="muted small mb-0">Resume uploads are type- and size-validated; only you can read them.</p></div>
+  </div>
+</section>
+
+{% endblock %}
