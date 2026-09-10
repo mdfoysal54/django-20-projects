@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ course.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'catalog' %}">Courses</a> › <strong>{{ course.title }}</strong>
+</nav>
+
+<div class="grid" style="grid-template-columns:1.5fr 1fr; align-items:start">
+  <div>
+    <div class="pill-row mb-1">
+      <span class="badge {{ course.level_badge }}">{{ course.get_level_display }}</span>
+      <span class="badge badge-info">{{ course.lesson_count }} lessons</span>
+      <span class="badge">{{ course.total_minutes }} minutes</span>
+      {% if course.status == 'draft' %}<span class="badge badge-warn">Draft</span>{% endif %}
+      {% if course.status == 'archived' %}<span class="badge badge-bad">Archived</span>{% endif %}
+    </div>
+    <h1 class="page-title">{{ course.title }}</h1>
+    <p class="lede">{{ course.summary }}</p>
+    <div class="card">
+      <h2 class="card-title">About this course</h2>
+      <p style="white-space:pre-line" class="mb-0">{{ course.description }}</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Curriculum</h2>
+      {% if lessons %}
+      <ul class="curriculum">
+        {% for lesson in lessons %}
+        <li>
+          <span class="lesson-num">{{ lesson.order }}</span>
+          <div style="flex:1">
+            {% if can_view %}
+              <a href="{% url 'lesson_detail' course.slug lesson.pk %}"><strong>{{ lesson.title }}</strong></a>
+            {% else %}
+              <strong>{{ lesson.title }}</strong>
+              <span class="badge ml-1">🔒</span>
+            {% endif %}
+            <div class="small muted">⏱ {{ lesson.duration_minutes }} min</div>
+          </div>
+          {% if lesson.pk in completed_ids %}
+            <span class="badge badge-ok">✓ Done</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="muted mb-0">The instructor is still building this curriculum.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <div class="course-price-big">
+        {% if course.is_free %}<span class="badge badge-ok" style="font-size:1rem">Free</span>
+        {% else %}<span class="price" style="font-size:1.8rem">${{ course.price|floatformat:2 }}</span>{% endif %}
+      </div>
+      <hr class="divider">
+
+      {% if course.instructor_id == user.id %}
+        <p class="small muted">You are the instructor of this course.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'course_edit' course.slug %}">Manage course</a>
+        <a class="btn btn-secondary btn-block mt-1" href="{% url 'lesson_create' course.slug %}">+ Add lesson</a>
+      {% elif enrollment %}
+        <div class="mb-1"><strong>Your progress</strong></div>
+        <div class="progress mb-1"><span style="width: {{ enrollment.progress_percent }}%"></span></div>
+        <div class="small muted mb-2">{{ enrollment.completed_lessons }}/{{ course.lesson_count }} lessons · {{ enrollment.progress_percent }}%</div>
+        {% if enrollment.is_finished %}
+          <div class="alert alert-success">🎉 Completed — well done!</div>
+        {% elif next_lesson %}
+          <a class="btn btn-primary btn-block" href="{% url 'lesson_detail' course.slug next_lesson.pk %}">
+            {% if enrollment.completed_lessons %}Continue learning →{% else %}Start learning →{% endif %}
+          </a>
+        {% endif %}
+      {% elif course.status == 'published' %}
+        <form method="post" action="{% url 'enroll' course.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-primary btn-block btn-lg" type="submit">
+            {% if user.is_authenticated %}Enrol now — {% else %}Log in &amp; enrol — {% endif %}
+            {% if course.is_free %}Free{% else %}${{ course.price|floatformat:2 }}{% endif %}
+          </button>
+        </form>
+        <p class="small muted text-center mb-0 mt-1">Instant access · progress tracked</p>
+      {% else %}
+        <p class="small muted mb-0">This course is not open for enrolment.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Instructor</h2>
+      <div class="pill-row">
+        <span class="avatar">{{ course.instructor.username|slice:":1"|upper }}</span>
+        <strong>{{ course.instructor.get_full_name|default:course.instructor.username }}</strong>
+      </div>
+      <p class="small muted mb-0 mt-1">{{ course.instructor.courses_taught.count }} course{{ course.instructor.courses_taught.count|pluralize }} on {{ APP_NAME }}.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">This course includes</h2>
+      <ul class="list-plain small">
+        <li>📚 {{ course.lesson_count }} structured lessons</li>
+        <li>⏱ {{ course.total_minutes }} minutes of material</li>
+        <li>📈 Progress tracking with per-lesson completion</li>
+        <li>♾️ Lifetime access — learn at your own pace</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

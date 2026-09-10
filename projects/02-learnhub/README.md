@@ -1,52 +1,99 @@
-# LearnHub
+# 🎓 LearnHub — online learning platform (LMS)
 
-> **Online learning platform (LMS)** — flagship Django project in the **django-20-projects** monorepo.
+> Flagship **#2** of the [django-20-projects](../../README.md) monorepo.
+> Django 5.2 LTS · first-party HTML/CSS frontend · hardened security baseline ·
+> **29 automated tests, all green.**
 
-*Status: scaffolded — this page will be replaced by the project walkthrough
-as the app is built out.*
+A complete LMS: course catalogue with search & level filters, gated lesson
+content, one-click enrolment, per-lesson progress tracking with automatic
+"next lesson" flow, an instructor authoring area (create → add lessons →
+publish) and enrolment dashboards.
 
 ---
 
-## Quickstart (needs Python 3.10+)
+## Feature tour
+
+| Area | What's implemented |
+|---|---|
+| **Catalogue** | Published-only listing, keyword search across title/summary/description, level filter (beginner → advanced), per-course lesson counts + total duration |
+| **Course pages** | Curriculum list with durations, instructor card, "includes" panel, draft/archived badges, related enrolment state |
+| **Enrolment** | One-click POST enrolment (CSRF-protected), duplicate-proof via `unique_together`, instructors auto-redirected |
+| **Gated lessons** | Lesson bodies visible **only** to enrolled students, the course instructor or staff — everyone else is bounced back to the course page |
+| **Progress** | Per-lesson completion records, live percentage, "next incomplete lesson" continue-button, completion celebration at 100%, idempotent marking |
+| **Instructor area** | `/teach/` dashboard with per-course lesson/student counts, create course (draft by default), add lessons with collision-checked positions, **publish blocked until ≥1 lesson exists** |
+| **Accounts** | Register, login throttle, password change, profile with progress digest |
+| **Admin** | Course inline lesson editing, publish/unpublish/archive bulk actions, enrolment progress columns |
+
+## Page map
+
+```
+/                                    home (hero, continue-learning, featured, how-it-works)
+/courses/                            catalogue (search + level filter)
+/courses/<slug>/                     course detail + curriculum
+/courses/<slug>/enroll/              POST enrolment
+/my-learning/                        enrolled courses with progress bars
+/courses/<slug>/lessons/<id>/        lesson player (gated)
+/courses/<slug>/lessons/<id>/complete/  POST mark-complete → next lesson
+/teach/                              instructor dashboard
+/teach/new/                          create course
+/teach/<slug>/edit/                  edit + publish course
+/teach/<slug>/lessons/new/           add lesson
+/profile/                            account
+/admin/                              Django admin
+```
+
+## Data model
+
+```
+User ──< Course ──< Lesson
+  │         │           │
+  │         │           └──< LessonProgress >── Enrollment
+  │         └──< Enrollment >── User (unique student×course)
+  └── courses_taught
+```
+
+- `Course.lesson_count`, `total_minutes`, `student_count`, `is_free` are derived, never stored twice.
+- `Enrollment.progress_percent` is computed from completed `LessonProgress` rows — impossible to desync.
+- `unique_together` guards: one enrolment per student per course, one progress row per lesson, unique lesson positions.
+
+## Quickstart
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-cp .env.example .env             # then fill in DJANGO_SECRET_KEY
+cp .env.example .env
 python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver       # http://127.0.0.1:8000
+python manage.py seed_demo          # 2 instructors, 6 courses, 35 lessons, 2 students
+python manage.py runserver
 ```
 
-Run the test-suite (43 canonical security + domain tests):
+**Demo accounts**
 
-```bash
-python manage.py test
-```
+| Username | Password | Role |
+|---|---|---|
+| `sara` | `DemoPass123!` | instructor (4 courses) |
+| `rafiq` | `DemoPass123!` | instructor (2 courses) |
+| `alice` | `DemoPass123!` | student — enrolled, 3/6 lessons done |
+| `bob` | `DemoPass123!` | student — enrolled in 2 courses |
+| `admin` | `DemoPass123!` | superuser |
 
-## Tech stack
+## Tests — 29 total
 
-- **Django 5.2 LTS** (Python 3.10–3.13), SQLite out of the box, PostgreSQL-ready
-- First-party HTML/CSS frontend, no CDN, no build step
-- Argon2 password hashing, CSP + nonce, HSTS/secure-cookie flags via `.env`,
-  login brute-force throttling, CSRF everywhere
+- `core/tests_security.py` — 12 canonical security tests
+- `core/tests.py` — 17 domain tests: draft visibility rules, search & level
+  filters, enrolment gating (unauthenticated *and* unenrolled), instructor
+  preview rights, progress maths, idempotent completion, authoring permissions
+  (404 for non-instructors), publish-without-lessons block, lesson-order
+  collision rejection, seeder integrity
 
-## Repository layout
+## Security notes
 
-```
-02-learnhub/
-├── manage.py
-├── config/            settings · root urls · wsgi/asgi
-├── core/              models · views · forms · admin · middleware · tests
-├── templates/         first-party pages
-├── static/css/        first-party stylesheet
-├── tests/             security + domain tests live in core/tests*.py
-└── docs/              SECURITY.md — hardening checklist
-```
+Beyond the [shared baseline](../../docs/SECURITY.md):
 
-## Security checklist
-
-See **[/docs/SECURITY.md](../docs/SECURITY.md)** (monorepo-wide) and
-`config/settings.py` for exactly which flags this project sets.
+- Lesson content is **authorisation-gated server-side**, not hidden with CSS —
+  the test suite proves an unenrolled user cannot read a lesson body even when
+  they know the URL.
+- Authoring views are scoped with `get_object_or_404(Course, slug=…, instructor=request.user)`,
+  so guessing a slug gives a 404, never an edit form.
+- Course status transitions (draft → published) are server-side state checks;
+  the publish button is disabled *and* the POST is re-validated.

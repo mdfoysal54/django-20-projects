@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New course{% else %}Edit: {{ course.title }}{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <nav class="breadcrumbs"><a href="{% url 'teach' %}">Teach</a> › <strong>{% if mode == 'create' %}New course{% else %}Edit course{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Create a course{% else %}Edit “{{ course.title }}”{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}New courses start as drafts. Add lessons, then publish when ready.{% else %}Update the details below, or publish when the curriculum is ready.{% endif %}</p>
+
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="pill-row">
+        <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Create &amp; add lessons{% else %}Save changes{% endif %}</button>
+        {% if mode == 'edit' %}
+          <button class="btn btn-secondary" type="submit" name="action" value="publish"
+                  {% if not course.lesson_count %}disabled title="Add a lesson first"{% endif %}>
+            {% if course.status == 'published' %}Re-publish{% else %}Publish course{% endif %}
+          </button>
+          {% if course.status == 'published' %}
+            <button class="btn btn-ghost" type="submit" name="action" value="unpublish">Unpublish</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} · {{ course.title }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'catalog' %}">Courses</a> ›
+  <a href="{{ course.get_absolute_url }}">{{ course.title }}</a> ›
+  <strong>Lesson {{ position }} of {{ total }}</strong>
+</nav>
+
+<div class="grid" style="grid-template-columns:1fr 320px; align-items:start">
+  <article class="card">
+    <div class="pill-row mb-1">
+      <span class="badge badge-brand">Lesson {{ position }}/{{ total }}</span>
+      <span class="badge">⏱ {{ lesson.duration_minutes }} min</span>
+      {% if record.completed %}<span class="badge badge-ok">✓ Completed</span>{% endif %}
+    </div>
+    <h1 class="page-title">{{ lesson.title }}</h1>
+    <hr class="divider">
+    <div class="lesson-body" style="white-space:pre-line; font-size:1.02rem">{{ lesson.content }}</div>
+
+    {% if lesson.resource_url %}
+      <div class="alert alert-info mt-2">🔗 Resource:
+        <a href="{{ lesson.resource_url }}" rel="noopener noreferrer" target="_blank">{{ lesson.resource_url }}</a>
+      </div>
+    {% endif %}
+
+    <hr class="divider">
+    <div class="pill-row" style="justify-content:space-between">
+      <div>
+        {% if prev %}<a class="btn btn-secondary" href="{% url 'lesson_detail' course.slug prev.pk %}">← Previous</a>{% endif %}
+        {% if next %}<a class="btn btn-secondary" href="{% url 'lesson_detail' course.slug next.pk %}">Next →</a>{% endif %}
+      </div>
+      <form method="post" action="{% url 'lesson_complete' course.slug lesson.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">
+          {% if record.completed %}Already complete ✓{% else %}Mark complete ✓{% endif %}
+        </button>
+      </form>
+    </div>
+  </article>
+
+  <aside class="card">
+    <h2 class="card-title">{{ course.title }}</h2>
+    <div class="small muted mb-1">
+      {% with e=record.enrollment %}{{ e.progress_percent }}% complete{% endwith %}
+    </div>
+    <ul class="curriculum">
+      {% for item in course.lessons %}
+      <li class="{% if item.pk == lesson.pk %}lesson-current{% endif %}">
+        <span class="lesson-num">{{ item.order }}</span>
+        <div style="flex:1">
+          <a href="{% url 'lesson_detail' course.slug item.pk %}">{{ item.title }}</a>
+          <div class="small muted">{{ item.duration_minutes }} min</div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <a class="btn btn-secondary btn-block mt-1" href="{{ course.get_absolute_url }}">Back to course</a>
+  </aside>
+</div>
+{% endblock %}

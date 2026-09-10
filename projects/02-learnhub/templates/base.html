@@ -1,12 +1,10 @@
-
 {% load static %}
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}{{ APP_NAME }}{% endblock %} · {{ APP_NAME }}</title>
-<meta name="description" content="{% block meta_description %}{{ APP_TAGLINE }}{% endblock %}">
+<title>{% block title %}{{ APP_NAME }} — {{ APP_TAGLINE }}{% endblock %}</title>
 <meta name="color-scheme" content="light">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% block extra_head %}{% endblock %}
@@ -15,30 +13,28 @@
 <header class="site-header">
   <nav class="nav" aria-label="Main navigation">
     <a class="brand" href="{% url 'home' %}">
-      <span class="brand-badge">{{ APP_NAME|slice:":1" }}</span>
+      <span class="brand-badge">🎓</span>
       <span>{{ APP_NAME }}</span>
     </a>
     <div class="nav-links">
-      {% block nav_links %}
-      {% endblock %}
+      <a href="{% url 'catalog' %}"{% if request.resolver_match.url_name == 'catalog' %} class="active"{% endif %}>Courses</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'my_learning' %}"{% if request.resolver_match.url_name == 'my_learning' %} class="active"{% endif %}>My learning</a>
+        <a href="{% url 'teach' %}"{% if request.resolver_match.url_name == 'teach' %} class="active"{% endif %}>Teach</a>
+      {% endif %}
     </div>
     <div class="nav-right">
-      {% block nav_right %}
       {% if user.is_authenticated %}
-        {% url 'profile' as profile_url %}
-        <span class="small muted hide-sm">Hi, <strong>{{ user.username }}</strong></span>
-        {% if profile_url %}
-        <a class="btn btn-sm btn-ghost" href="{{ profile_url }}">My profile</a>
-        {% endif %}
+        <a class="btn btn-sm btn-primary" href="{% url 'course_create' %}">+ New course</a>
+        <a class="btn btn-sm btn-ghost" href="{% url 'profile' %}">{{ user.username }}</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
-          <button class="btn btn-sm btn-secondary" type="submit">Log out</button>
+          <button class="btn btn-sm btn-ghost" type="submit">Log out</button>
         </form>
       {% else %}
         <a class="btn btn-sm btn-ghost" href="{% url 'login' %}">Log in</a>
         <a class="btn btn-sm btn-primary" href="{% url 'register' %}">Sign up</a>
       {% endif %}
-      {% endblock %}
     </div>
   </nav>
 </header>
@@ -49,14 +45,13 @@
       <div class="alert alert-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>
     {% endfor %}
   {% endif %}
-
   {% block content %}{% endblock %}
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <div>&copy; {% now "Y" %} {{ APP_NAME }} — {{ APP_TAGLINE }}</div>
-    <div><span class="heart">&#9829;</span> Built with Django 5.2</div>
+    <div>© {% now "Y" %} {{ APP_NAME }} — {{ APP_TAGLINE }}</div>
+    <div><a href="{% url 'catalog' %}">Catalogue</a> · <a href="/admin/">Staff area</a></div>
   </div>
 </footer>
 {% block extra_script %}{% endblock %}

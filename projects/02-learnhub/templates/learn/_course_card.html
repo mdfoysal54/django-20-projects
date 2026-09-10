@@ -1,0 +1,20 @@
+{% load static %}
+<article class="card card-hover course-card">
+  <div class="course-banner" style="background: linear-gradient(135deg, {% cycle '#312e81,#6d5ae0' '#0f766e,#34d399' '#9f1239,#f472b6' '#b45309,#fbbf24' '#1d4ed8,#60a5fa' '#7c2d12,#fb923c' %});">
+    <span class="course-emoji">{{ course.title|slice:":1" }}</span>
+    <span class="badge {{ course.level_badge }}">{{ course.get_level_display }}</span>
+  </div>
+  <div class="course-body">
+    <h3 class="course-title"><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></h3>
+    <p class="small muted mb-1">{{ course.summary|default:course.description|truncatechars:90 }}</p>
+    <div class="small muted mb-1">👩‍🏫 {{ course.instructor.get_full_name|default:course.instructor.username }}</div>
+    <div class="course-foot">
+      <span class="small muted">📚 {{ course.lesson_count }} lessons · ⏱ {{ course.total_minutes }} min</span>
+      {% if course.is_free %}
+        <span class="badge badge-ok">Free</span>
+      {% else %}
+        <span class="price">${{ course.price|floatformat:2 }}</span>
+      {% endif %}
+    </div>
+  </div>
+</article>

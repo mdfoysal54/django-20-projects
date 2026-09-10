@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Course catalogue · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Course catalogue</h1>
+    <p class="lede mb-0">{{ courses|length }} course{{ courses|length|pluralize }} available</p>
+  </div>
+  <form method="get" class="pill-row">
+    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search courses…" style="min-width:220px">
+    <select class="form-control" name="level" style="width:auto">
+      <option value="">All levels</option>
+      {% for value, label in levels %}
+        <option value="{{ value }}"{% if level == value %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit">Filter</button>
+  </form>
+</div>
+
+{% if courses %}
+  <div class="grid grid-3">
+    {% for course in courses %}{% include "learn/_course_card.html" %}{% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="big">🔍</div>
+    <h2>No courses match</h2>
+    <p>Try a different search term or clear the filters.</p>
+    <a class="btn btn-primary" href="{% url 'catalog' %}">Reset filters</a>
+  </div>
+{% endif %}
+{% endblock %}

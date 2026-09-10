@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.username }} 👋</p>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:2fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Enrolled courses</h2>
+    {% if enrollments %}
+      <ul class="curriculum">
+        {% for e in enrollments %}
+        <li>
+          <span class="lesson-num">{{ forloop.counter }}</span>
+          <div style="flex:1">
+            <a href="{{ e.course.get_absolute_url }}"><strong>{{ e.course.title }}</strong></a>
+            <div class="progress mt-1" style="max-width:280px"><span style="width: {{ e.progress_percent }}%"></span></div>
+            <div class="small muted">{{ e.progress_percent }}% complete</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="muted mb-0">No enrolments yet.</p>{% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Profile</h2>
+      <ul class="list-plain">
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+        <li><strong>Enrolments:</strong> {{ enrollments|length }}</li>
+        <li><strong>Courses taught:</strong> {{ taught_count }}</li>
+        <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+      </ul>
+      <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+      <a class="btn btn-ghost btn-block mt-1" href="{% url 'teach' %}">Go to teach area</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

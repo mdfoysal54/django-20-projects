@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Add lesson · {{ course.title }}{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns:1.4fr 1fr; align-items:start">
+  <div class="card">
+    <nav class="breadcrumbs"><a href="{% url 'teach' %}">Teach</a> › <a href="{{ course.get_absolute_url }}">{{ course.title }}</a> › <strong>Add lesson</strong></nav>
+    <h1 class="page-title">Add a lesson</h1>
+    <p class="lede">Lessons appear in curriculum order. Keep them focused — 10–30 minutes each works best.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-2" style="gap:.8rem">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.order.id_for_label }}">Position</label>
+          {{ form.order }}
+          {% if form.order.errors %}<ul class="field-errors">{% for e in form.order.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.duration_minutes.id_for_label }}">Duration (minutes)</label>
+          {{ form.duration_minutes }}
+          {% if form.duration_minutes.errors %}<ul class="field-errors">{% for e in form.duration_minutes.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Lesson title</label>
+        {{ form.title }}
+        {% if form.title.errors %}<ul class="field-errors">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.resource_url.id_for_label }}">Resource link (optional)</label>
+        {{ form.resource_url }}
+        {% if form.resource_url.errors %}<ul class="field-errors">{% for e in form.resource_url.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.content.id_for_label }}">Lesson body</label>
+        {{ form.content }}
+        {% if form.content.errors %}<ul class="field-errors">{% for e in form.content.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <button class="btn btn-primary" type="submit">Add lesson</button>
+      <a class="btn btn-ghost" href="{{ course.get_absolute_url }}">Back to course</a>
+    </form>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Curriculum so far ({{ course.lesson_count }})</h2>
+    {% if course.lessons %}
+      <ul class="curriculum">
+        {% for lesson in course.lessons %}
+        <li><span class="lesson-num">{{ lesson.order }}</span><div>{{ lesson.title }}<div class="small muted">{{ lesson.duration_minutes }} min</div></div></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted mb-0">No lessons yet — this will be the first one.</p>
+    {% endif %}
+    <hr class="divider">
+    <div class="small muted">Status:
+      {% if course.status == 'published' %}<span class="badge badge-ok">Published</span>
+      {% else %}<span class="badge badge-warn">Draft</span>{% endif %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

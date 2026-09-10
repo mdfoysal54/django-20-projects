@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — learn anything, build everything{% endblock %}
+{% block content %}
+
+<section class="hero lms-hero">
+  <div class="grid grid-2" style="align-items:center">
+    <div>
+      <h1>Learn Django by<br>actually building things.</h1>
+      <p class="lede">Structured courses with real curricula, lesson-by-lesson progress
+         tracking and instructors who ship code. Free and paid tiers.</p>
+      <p>
+        <a class="btn btn-lg btn-primary" href="{% url 'catalog' %}">Browse courses →</a>
+        {% if not user.is_authenticated %}<a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Join free</a>{% endif %}
+      </p>
+      <div class="pill-row mt-3">
+        <span class="badge badge-brand">{{ total_courses }} courses</span>
+        <span class="badge badge-info">{{ total_lessons }} lessons</span>
+        <span class="badge badge-ok">{{ total_students }} enrolments</span>
+      </div>
+    </div>
+    <div class="hero-emoji" style="font-size:5.5rem">🎓</div>
+  </div>
+</section>
+
+{% if my_enrollments %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Continue learning</h2></div>
+  <div class="grid grid-3">
+    {% for e in my_enrollments %}
+    <a class="card card-hover" href="{{ e.course.get_absolute_url }}" style="color:inherit">
+      <div class="card-title">{{ e.course.title }}</div>
+      <div class="progress mb-1"><span style="width: {{ e.progress_percent }}%"></span></div>
+      <div class="small muted">{{ e.completed_lessons }}/{{ e.course.lesson_count }} lessons · {{ e.progress_percent }}%</div>
+      {% if e.is_finished %}<div class="badge badge-ok mt-1">✅ Completed</div>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Featured courses</h2></div>
+  <div class="grid grid-3">
+    {% for course in featured %}{% include "learn/_course_card.html" %}{% endfor %}
+  </div>
+  <p class="text-center mt-2"><a class="btn btn-secondary" href="{% url 'catalog' %}">See all courses</a></p>
+</section>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">How it works</h2></div>
+  <div class="grid grid-3">
+    <div class="card"><div class="big" style="font-size:2rem">1️⃣</div><h3 class="card-title">Enrol in seconds</h3><p class="muted mb-0">One click on any published course — no payment flow, no friction.</p></div>
+    <div class="card"><div class="big" style="font-size:2rem">2️⃣</div><h3 class="card-title">Learn lesson by lesson</h3><p class="muted mb-0">Structured curricula with durations, resources and ordered progress.</p></div>
+    <div class="card"><div class="big" style="font-size:2rem">3️⃣</div><h3 class="card-title">Track real progress</h3><p class="muted mb-0">Your dashboard shows exactly how far you are — and what's next.</p></div>
+  </div>
+</section>
+
+{% endblock %}

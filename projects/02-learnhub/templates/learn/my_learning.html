@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My learning · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My learning</h1>
+    <p class="lede mb-0">Every course you've enrolled in, with live progress.</p>
+  </div>
+</div>
+
+{% if enrollments %}
+<div class="grid grid-2">
+  {% for e in enrollments %}
+  <div class="card">
+    <div class="pill-row mb-1">
+      <span class="badge {{ e.course.level_badge }}">{{ e.course.get_level_display }}</span>
+      {% if e.is_finished %}<span class="badge badge-ok">✅ Completed</span>
+      {% elif e.progress_percent > 0 %}<span class="badge badge-info">In progress</span>
+      {% else %}<span class="badge">Not started</span>{% endif %}
+    </div>
+    <h3 class="card-title"><a href="{{ e.course.get_absolute_url }}">{{ e.course.title }}</a></h3>
+    <p class="small muted">👩‍🏫 {{ e.course.instructor.get_full_name|default:e.course.instructor.username }} · enrolled {{ e.enrolled_at|date:"M j, Y" }}</p>
+    <div class="progress mb-1"><span style="width: {{ e.progress_percent }}%"></span></div>
+    <div class="pill-row" style="justify-content:space-between">
+      <span class="small muted">{{ e.completed_lessons }}/{{ e.course.lesson_count }} lessons · {{ e.progress_percent }}%</span>
+      <a class="btn btn-sm btn-primary" href="{{ e.course.get_absolute_url }}">{% if e.is_finished %}Review{% elif e.progress_percent %}Continue{% else %}Start{% endif %} →</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📚</div>
+  <h2>You haven't enrolled yet</h2>
+  <p>Pick your first course and start stacking those green checkmarks.</p>
+  <a class="btn btn-primary" href="{% url 'catalog' %}">Browse courses</a>
+</div>
+{% endif %}
+{% endblock %}
