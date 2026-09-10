@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Search stays · {{ APP_NAME }}{% endblock %}
+{% block content %}
+
+<form class="search-bar mb-2" method="get" action="{% url 'search' %}">
+  <div class="search-field">
+    <label for="id_city">Where</label>
+    {{ form.city }}
+  </div>
+  <div class="search-field">
+    <label for="id_check_in">Check-in</label>
+    {{ form.check_in }}
+  </div>
+  <div class="search-field">
+    <label for="id_check_out">Check-out</label>
+    {{ form.check_out }}
+  </div>
+  <div class="search-field" style="max-width:110px">
+    <label for="id_guests">Guests</label>
+    {{ form.guests }}
+  </div>
+  <button class="btn btn-primary search-btn" type="submit">Update search</button>
+</form>
+
+{% if form.errors %}
+  <div class="alert alert-error">
+    {% for field, errors in form.errors.items %}{% for e in errors %}{{ e }} {% endfor %}{% endfor %}
+  </div>
+{% endif %}
+
+<div class="grid" style="grid-template-columns:260px 1fr; align-items:start">
+  <aside class="card">
+    <h2 class="card-title">Filters</h2>
+    <form method="get" action="{% url 'search' %}">
+      <input type="hidden" name="city" value="{{ city }}">
+      <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+      <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+      <div class="form-group">
+        <label class="form-label" for="{{ filter_form.min_price.id_for_label }}">Min price / night</label>
+        {{ filter_form.min_price }}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ filter_form.max_price.id_for_label }}">Max price / night</label>
+        {{ filter_form.max_price }}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ filter_form.stars.id_for_label }}">Minimum rating</label>
+        {{ filter_form.stars }}
+      </div>
+      <button class="btn btn-secondary btn-block" type="submit">Apply filters</button>
+    </form>
+    <hr class="divider">
+    <p class="small muted mb-0">
+      Showing stays available for
+      <strong>{{ nights }} night{{ nights|pluralize }}</strong>:
+      {{ check_in|date:"M j" }} → {{ check_out|date:"M j, Y" }}{% if guests %} · {{ guests }} guest{{ guests|pluralize }}{% endif %}.
+    </p>
+  </aside>
+
+  <div>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title mb-0">{% if city %}Stays in {{ city }}{% else %}All stays{% endif %}</h1>
+        <p class="lede mb-0">{{ hotels|length }} result{{ hotels|length|pluralize }} with availability</p>
+      </div>
+    </div>
+    {% if hotels %}
+      <div class="grid grid-2">
+        {% for hotel in hotels %}{% include "stay/_hotel_card.html" %}{% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="big">🌙</div>
+        <h2>No stays available for those dates</h2>
+        <p>Try shifting your dates by a day or widening the filters.</p>
+        <a class="btn btn-primary" href="{% url 'search' %}">Start over</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

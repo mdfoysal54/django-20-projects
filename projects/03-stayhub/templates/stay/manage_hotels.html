@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Host area · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Host area</h1>
+    <p class="lede mb-0">Your properties, rooms and upcoming bookings.</p>
+  </div>
+</div>
+
+{% if hotels %}
+<div class="grid grid-2">
+  {% for hotel in hotels %}
+  <div class="card">
+    <div class="pill-row mb-1">
+      <span class="badge" style="color:#b45309">{{ hotel.stars }}</span>
+      <span class="badge badge-info">📍 {{ hotel.city }}</span>
+      {% if not hotel.is_active %}<span class="badge badge-bad">Inactive</span>{% endif %}
+    </div>
+    <h3 class="card-title"><a href="{{ hotel.get_absolute_url }}">{{ hotel.name }}</a></h3>
+    <p class="small muted mb-2">{{ hotel.room_count }} room{{ hotel.room_count|pluralize }} · from
+      {% if hotel.min_price %}${{ hotel.min_price|floatformat:0 }}/night{% else %}—{% endif %}</p>
+    <div class="pill-row">
+      <a class="btn btn-sm btn-primary" href="{% url 'manage_rooms' hotel.slug %}">Manage rooms &amp; bookings</a>
+      <a class="btn btn-sm btn-secondary" href="{{ hotel.get_absolute_url }}">Public page</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🏨</div>
+  <h2>No properties yet</h2>
+  <p>Hotels and rooms are managed from the Django admin in this build — this dashboard lights up as soon as a hotel is assigned to your account.</p>
+  <a class="btn btn-primary" href="/admin/">Open admin</a>
+</div>
+{% endif %}
+{% endblock %}

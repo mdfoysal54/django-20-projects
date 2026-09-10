@@ -1,0 +1,18 @@
+{% load static %}
+<article class="card card-hover hotel-card">
+  <div class="hotel-banner">
+    <span class="hotel-emoji">{{ hotel.hero_emoji }}</span>
+    <span class="badge" style="background:#fff;color:#b45309">{{ hotel.stars }}</span>
+  </div>
+  <div class="hotel-body">
+    <h3 class="hotel-title"><a href="{{ hotel.get_absolute_url }}">{{ hotel.name }}</a></h3>
+    <p class="small muted mb-1">📍 {{ hotel.city }}{% if hotel.address %} · {{ hotel.address }}{% endif %}</p>
+    <div class="small muted mb-1">{{ hotel.amenity_list|slice:":3"|join:" · " }}</div>
+    <div class="hotel-foot">
+      <span class="small muted">{{ hotel.room_count }} room{{ hotel.room_count|pluralize }}</span>
+      {% if hotel.from_price %}
+        <span><strong class="price">${{ hotel.from_price|floatformat:0 }}</strong> <span class="small muted">/ night</span></span>
+      {% endif %}
+    </div>
+  </div>
+</article>

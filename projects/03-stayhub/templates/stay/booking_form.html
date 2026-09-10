@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Book Room {{ room.number }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  <a href="{% url 'search' %}">Stays</a> ›
+  <a href="{{ hotel.get_absolute_url }}">{{ hotel.name }}</a> › <strong>Book room {{ room.number }}</strong>
+</nav>
+
+<div class="grid grid-2" style="align-items:start">
+  <div class="card">
+    <h1 class="page-title">Confirm your booking</h1>
+    <p class="lede">{{ hotel.name }} · Room {{ room.number }} ({{ room.get_room_type_display }})</p>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {% for e in form.non_field_errors %}{{ e }} {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.guests.id_for_label }}">Guests (max {{ room.capacity }})</label>
+        {{ form.guests }}
+        {% if form.guests.errors %}<ul class="field-errors">{% for e in form.guests.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.special_requests.id_for_label }}">Special requests (optional)</label>
+        {{ form.special_requests }}
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Request booking →</button>
+      <a class="btn btn-ghost" href="{{ hotel.get_absolute_url }}">Back to hotel</a>
+    </form>
+    <p class="small muted mt-2 mb-0">🔒 No payment is taken in this demo. Bookings start as
+       <strong>pending</strong>; a host confirms them from the admin, and you can cancel free of charge.</p>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Your stay</h2>
+    <ul class="list-plain">
+      <li><strong>Check-in</strong><div class="muted">{{ check_in|date:"D, M j, Y" }} · from 2:00 pm</div></li>
+      <li><strong>Check-out</strong><div class="muted">{{ check_out|date:"D, M j, Y" }} · before 11:00 am</div></li>
+      <li><strong>Nights</strong><div class="muted">{{ nights }}</div></li>
+      <li><strong>Room</strong><div class="muted">{{ room.number }} · {{ room.get_room_type_display }} · sleeps {{ room.capacity }}</div></li>
+    </ul>
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between">
+      <span class="muted">${{ room.price_per_night|floatformat:2 }} × {{ nights }} night{{ nights|pluralize }}</span>
+      <strong>${{ total|floatformat:2 }}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between" class="mt-1">
+      <strong>Total</strong><strong class="price">${{ total|floatformat:2 }}</strong>
+    </div>
+    <p class="small muted mb-0 mt-1">Final total is computed and snapshotted server-side at booking time.</p>
+  </aside>
+</div>
+{% endblock %}

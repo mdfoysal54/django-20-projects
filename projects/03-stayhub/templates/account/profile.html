@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.username }} 👋</p>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:2fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Recent bookings</h2>
+    {% if bookings %}
+      <ul class="list-plain">
+        {% for b in bookings %}
+        <li style="display:flex;justify-content:space-between;gap:1rem;align-items:center">
+          <div>
+            <a href="{{ b.get_absolute_url }}"><strong>{{ b.room.hotel.name }}</strong></a>
+            <span class="badge {{ b.status_badge }}">{{ b.get_status_display }}</span>
+            <div class="small muted">{{ b.check_in|date:"M j" }} → {{ b.check_out|date:"M j, Y" }} · {{ b.reference }}</div>
+          </div>
+          <strong>${{ b.total_price|floatformat:2 }}</strong>
+        </li>
+        {% endfor %}
+      </ul>
+      <a class="btn btn-secondary btn-sm mt-1" href="{% url 'my_bookings' %}">All trips</a>
+    {% else %}<p class="muted mb-0">No bookings yet.</p>{% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Profile</h2>
+      <ul class="list-plain">
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+        <li><strong>Bookings:</strong> {{ user.bookings.count }}</li>
+        <li><strong>Properties hosted:</strong> {{ hotels_owned }}</li>
+        <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+      </ul>
+      <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

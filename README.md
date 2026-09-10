@@ -17,8 +17,8 @@ shared, secure-by-default baseline.
 |---|--------------------|----------------------------------------|--------|
 | 1 | **ShopNest**       | Full-featured e-commerce platform      | ✅ built · 29 tests green |
 | 2 | **LearnHub**       | Online learning platform (LMS)         | ✅ built · 29 tests green |
-| 3 | **StayHub**        | Hotel & room booking engine            | 🔨 in progress |
-| 4 | **DevJobs**        | Job board & recruitment portal         | ⏳ queued |
+| 3 | **StayHub**        | Hotel & room booking engine            | ✅ built · 33 tests green |
+| 4 | **DevJobs**        | Job board & recruitment portal         | 🔨 in progress |
 | 5 | **TaskFlow**       | Team projects & kanban task manager    | ⏳ queued |
 | 6 | **FinTrack**       | Personal finance & budget dashboard    | ⏳ queued |
 

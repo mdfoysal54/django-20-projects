@@ -238,3 +238,48 @@ footer .heart { color: var(--bad); }
   .site-main { padding-top: 1.1rem; }
   .hide-sm { display: none !important; }
 }
+
+/* ================= StayHub additions ================= */
+.stay-hero {
+  background: linear-gradient(120deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+  border-radius: 22px; padding: 3rem 2.4rem 2.4rem; color: #fff; margin-bottom: 1.8rem;
+}
+.stay-hero h1 { color: #fff; font-size: clamp(1.9rem, 4vw, 2.8rem); letter-spacing: -.02em; }
+.stay-hero .lede { color: #c7d2fe; max-width: 62ch; }
+.search-bar {
+  display: flex; gap: .7rem; align-items: flex-end; flex-wrap: wrap;
+  background: var(--surface); border-radius: 16px; padding: .9rem 1rem;
+  box-shadow: var(--shadow); margin-top: 1.4rem;
+}
+.site-main > form.search-bar { margin-top: 0; }
+.search-field { display: flex; flex-direction: column; gap: .25rem; flex: 1; min-width: 140px; }
+.search-field label { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.search-btn { height: 42px; }
+
+.hotel-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.hotel-banner { position: relative; height: 120px; display: grid; place-items: center;
+  background: linear-gradient(135deg, #1e3a8a, #38bdf8); }
+.hotel-emoji { font-size: 3.2rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,.35)); }
+.hotel-banner .badge { position: absolute; top: .6rem; right: .6rem; }
+.hotel-body { padding: 1rem 1.1rem 1.1rem; display: flex; flex-direction: column; gap: .25rem; flex: 1; }
+.hotel-title { font-size: 1.08rem; margin: 0; }
+.hotel-title a { color: var(--ink); }
+.hotel-title a:hover { color: var(--brand); text-decoration: none; }
+.hotel-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: .5rem; }
+
+.hotel-hero {
+  display: flex; justify-content: space-between; align-items: center; gap: 2rem;
+  border-radius: 20px; padding: 2.2rem 2.2rem; color: #fff; margin-bottom: 1.2rem;
+}
+.hotel-hero h1 { margin: .2rem 0 .4rem; }
+.hotel-hero-emoji { font-size: 5.5rem; filter: drop-shadow(0 12px 24px rgba(0,0,0,.4)); }
+@media (max-width: 760px) { .hotel-hero { flex-direction: column; text-align: center; } .hotel-hero-emoji { font-size: 4rem; } }
+
+.room-row { display: flex; justify-content: space-between; gap: 1.6rem; align-items: stretch; }
+.room-info { flex: 1; }
+.room-price { text-align: right; min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: .15rem; }
+@media (max-width: 760px) { .room-row { flex-direction: column; } .room-price { text-align: left; align-items: flex-start; } }
+.night-strip { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; margin-top: .5rem; }
+.night-chip { padding: .15rem .5rem; border-radius: 8px; font-size: .78rem; font-weight: 700; }
+.night-taken { background: #fdecec; color: var(--bad); text-decoration: line-through; }
+.night-free { background: #e7f7f0; color: var(--ok); }

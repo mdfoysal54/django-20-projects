@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ hotel.name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'search' %}">Stays</a> › <strong>{{ hotel.name }}</strong></nav>
+
+<div class="hotel-hero" style="background: linear-gradient(120deg, #0f172a, #1d4ed8);">
+  <div>
+    <div class="pill-row mb-1">
+      <span class="badge" style="background:rgba(255,255,255,.9);color:#b45309">{{ hotel.stars }}</span>
+      <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">📍 {{ hotel.city }}</span>
+    </div>
+    <h1 style="color:#fff">{{ hotel.name }}</h1>
+    <p style="color:#c7d2fe;max-width:60ch">{{ hotel.description }}</p>
+    <div class="pill-row">
+      {% for a in hotel.amenity_list %}<span class="tag" style="background:rgba(255,255,255,.15);color:#e0e7ff">✓ {{ a }}</span>{% endfor %}
+    </div>
+  </div>
+  <div class="hotel-hero-emoji">{{ hotel.hero_emoji }}</div>
+</div>
+
+<div class="card">
+  <form class="search-bar" method="get" action="">
+    <div class="search-field">
+      <label for="id_check_in">Check-in</label>
+      <input class="form-control" type="date" id="id_check_in" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+    </div>
+    <div class="search-field">
+      <label for="id_check_out">Check-out</label>
+      <input class="form-control" type="date" id="id_check_out" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+    </div>
+    <button class="btn btn-primary search-btn" type="submit">Check availability</button>
+    <span class="small muted" style="align-self:center">{{ nights }} night{{ nights|pluralize }} selected</span>
+  </form>
+</div>
+
+<h2 class="section-title">Rooms for {{ check_in|date:"M j" }} → {{ check_out|date:"M j, Y" }}</h2>
+
+{% for row in room_rows %}
+<div class="card room-row">
+  <div class="room-info">
+    <div class="pill-row mb-1">
+      <span class="badge badge-brand">Room {{ row.room.number }}</span>
+      <span class="badge">{{ row.room.get_room_type_display }}</span>
+      <span class="badge badge-info">Sleeps {{ row.room.capacity }}</span>
+    </div>
+    <h3 class="card-title">{{ row.room.get_room_type_display }} — Room {{ row.room.number }}</h3>
+    <p class="muted small mb-1">{{ row.room.description }}</p>
+    <div class="night-strip" aria-label="Availability for the next 14 nights">
+      <span class="small muted">Next bookings:</span>
+      {% if row.blocks %}
+        {% for day, pk in row.blocks.items|slice:":6" %}<span class="night-chip night-taken" title="Booked">{{ day|date:"M j" }}</span>{% endfor %}
+      {% else %}
+        <span class="night-chip night-free">No bookings in the near window — wide open</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="room-price">
+    <div class="price" style="font-size:1.5rem">${{ row.room.price_per_night|floatformat:2 }}</div>
+    <div class="small muted">per night</div>
+    <div class="small muted">${{ row.total|floatformat:2 }} total · {{ nights }} night{{ nights|pluralize }}</div>
+    {% if row.available %}
+      <a class="btn btn-primary mt-1" href="{% url 'booking_create' row.room.pk %}?check_in={{ check_in|date:'Y-m-d' }}&check_out={{ check_out|date:'Y-m-d' }}">Book now →</a>
+    {% else %}
+      <button class="btn btn-secondary mt-1" disabled>Unavailable these dates</button>
+    {% endif %}
+  </div>
+</div>
+{% empty %}
+<div class="empty-state"><div class="big">🛏️</div><h2>No rooms yet</h2><p>This hotel is still setting up its rooms.</p></div>
+{% endfor %}
+{% endblock %}

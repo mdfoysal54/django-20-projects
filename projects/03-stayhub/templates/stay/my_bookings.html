@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}My trips · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My trips</h1>
+    <p class="lede mb-0">Upcoming stays, past trips and cancellations.</p>
+  </div>
+</div>
+
+{% if bookings %}
+<div class="grid grid-2">
+  {% for booking in bookings %}
+  <div class="card">
+    <div class="pill-row mb-1">
+      <span class="badge {{ booking.status_badge }}">{{ booking.get_status_display }}</span>
+      <span class="badge">{{ booking.reference }}</span>
+      {% if booking.is_upcoming %}<span class="badge badge-info">Upcoming</span>{% endif %}
+    </div>
+    <h3 class="card-title">
+      <a href="{{ booking.get_absolute_url }}">{{ booking.room.hotel.name }}</a>
+    </h3>
+    <p class="muted small mb-1">
+      {{ booking.room.hotel.hero_emoji }} Room {{ booking.room.number }} · {{ booking.room.get_room_type_display }}
+    </p>
+    <ul class="list-plain small">
+      <li>📅 {{ booking.check_in|date:"D, M j" }} → {{ booking.check_out|date:"D, M j, Y" }} ({{ booking.nights }} night{{ booking.nights|pluralize }})</li>
+      <li>👥 {{ booking.guests }} guest{{ booking.guests|pluralize }}</li>
+      <li>💵 <strong>${{ booking.total_price|floatformat:2 }}</strong> total (snapshotted at booking)</li>
+    </ul>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-secondary" href="{{ booking.get_absolute_url }}">Details</a>
+      {% if booking.can_cancel %}
+      <form method="post" action="{% url 'booking_cancel' booking.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-danger" type="submit">Cancel booking</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🧳</div>
+  <h2>No trips yet</h2>
+  <p>Your bookings will appear here with references, totals and cancellation options.</p>
+  <a class="btn btn-primary" href="{% url 'search' %}">Find a stay</a>
+</div>
+{% endif %}
+{% endblock %}

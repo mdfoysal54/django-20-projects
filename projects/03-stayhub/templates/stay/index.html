@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — hotels, resorts & guest houses{% endblock %}
+{% block content %}
+
+<section class="stay-hero">
+  <h1>Find your next stay.</h1>
+  <p class="lede">Real availability, honest prices, zero double-bookings —
+     search by dates and we only show rooms you can actually book.</p>
+
+  <form class="search-bar" method="get" action="{% url 'search' %}">
+    <div class="search-field">
+      <label for="id_city">Where</label>
+      {{ form.city }}
+    </div>
+    <div class="search-field">
+      <label for="id_check_in">Check-in</label>
+      {{ form.check_in }}
+    </div>
+    <div class="search-field">
+      <label for="id_check_out">Check-out</label>
+      {{ form.check_out }}
+    </div>
+    <div class="search-field" style="max-width:110px">
+      <label for="id_guests">Guests</label>
+      {{ form.guests }}
+    </div>
+    <button class="btn btn-primary btn-lg search-btn" type="submit">Search</button>
+  </form>
+
+  <div class="pill-row mt-2">
+    {% for city in cities %}<a class="badge badge-brand" href="{% url 'search' %}?city={{ city|urlencode }}">📍 {{ city }}</a>{% endfor %}
+  </div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_hotels }}</div><div class="stat-label">Hotels &amp; resorts</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_rooms }}</div><div class="stat-label">Bookable rooms</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_bookings }}</div><div class="stat-label">Bookings made</div></div>
+</div>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Popular stays</h2></div>
+  <div class="grid grid-3">
+    {% for hotel in hotels %}{% include "stay/_hotel_card.html" %}{% endfor %}
+  </div>
+  <p class="text-center mt-2"><a class="btn btn-secondary" href="{% url 'search' %}">See all stays</a></p>
+</section>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Why book with {{ APP_NAME }}?</h2></div>
+  <div class="grid grid-4">
+    <div class="card"><div style="font-size:1.8rem">📅</div><h3 class="card-title">Real availability</h3><p class="muted small mb-0">The calendar reflects live bookings — no phantom availability.</p></div>
+    <div class="card"><div style="font-size:1.8rem">🔒</div><h3 class="card-title">Race-proof booking</h3><p class="muted small mb-0">Database-level locking stops double-bookings even under load.</p></div>
+    <div class="card"><div style="font-size:1.8rem">💳</div><h3 class="card-title">Price you see is final</h3><p class="muted small mb-0">Your total is snapshotted at booking time. No surprise rate changes.</p></div>
+    <div class="card"><div style="font-size:1.8rem">↩️</div><h3 class="card-title">Free cancellation</h3><p class="muted small mb-0">Cancel any upcoming booking online — dates free instantly.</p></div>
+  </div>
+</section>
+
+{% endblock %}

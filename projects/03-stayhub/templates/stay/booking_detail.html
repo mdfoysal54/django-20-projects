@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Booking {{ booking.reference }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'my_bookings' %}">My trips</a> › <strong>{{ booking.reference }}</strong></nav>
+
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">Booking {{ booking.reference }}</h1>
+    <p class="muted mb-0">Booked {{ booking.created|date:"F j, Y · H:i" }}</p>
+  </div>
+  <span class="badge {{ booking.status_badge }}" style="font-size:.95rem;padding:.5rem 1rem">{{ booking.get_status_display }}</span>
+</div>
+
+<div class="grid grid-2" style="align-items:start">
+  <div class="card">
+    <h2 class="card-title">{{ booking.room.hotel.hero_emoji }} {{ booking.room.hotel.name }}</h2>
+    <p class="muted mb-2">📍 {{ booking.room.hotel.city }}{% if booking.room.hotel.address %} · {{ booking.room.hotel.address }}{% endif %}</p>
+    <ul class="list-plain">
+      <li><strong>Room</strong><div class="muted">{{ booking.room.number }} · {{ booking.room.get_room_type_display }} · sleeps {{ booking.room.capacity }}</div></li>
+      <li><strong>Check-in</strong><div class="muted">{{ booking.check_in|date:"l, F j, Y" }} · from 2:00 pm</div></li>
+      <li><strong>Check-out</strong><div class="muted">{{ booking.check_out|date:"l, F j, Y" }} · before 11:00 am</div></li>
+      <li><strong>Guests</strong><div class="muted">{{ booking.guests }}</div></li>
+      {% if booking.special_requests %}
+      <li><strong>Special requests</strong><div class="muted" style="white-space:pre-line">{{ booking.special_requests }}</div></li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Payment summary</h2>
+      <div style="display:flex;justify-content:space-between">
+        <span class="muted">${{ booking.room.price_per_night|floatformat:2 }} × {{ booking.nights }} night{{ booking.nights|pluralize }}</span>
+        <span>${{ booking.total_price|floatformat:2 }}</span>
+      </div>
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between">
+        <strong>Total</strong><strong class="price">${{ booking.total_price|floatformat:2 }}</strong>
+      </div>
+      <p class="small muted mb-0 mt-1">Price locked at booking time. No payment collected in this demo.</p>
+    </div>
+
+    {% if booking.can_cancel %}
+    <div class="card">
+      <h2 class="card-title">Need to change plans?</h2>
+      <p class="small muted">Cancelling frees the dates immediately and cannot be undone.</p>
+      <form method="post" action="{% url 'booking_cancel' booking.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-block" type="submit">Cancel this booking</button>
+      </form>
+    </div>
+    {% elif booking.status == 'cancelled' %}
+      <div class="alert alert-error">This booking was cancelled — the dates were released for other guests.</div>
+    {% elif booking.status == 'completed' %}
+      <div class="alert alert-info">We hope you enjoyed your stay! 🎉</div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
