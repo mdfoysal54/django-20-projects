@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ exam.name }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ exam.name }}</h1><p class="lede">Max {{ exam.max_marks }} · {{ exam.held_on }}</p></div>
+<div class="card"><form method="post" class="grid grid-3">{% csrf_token %}
+  <select name="student" class="form-control">{% for s in students %}<option value="{{ s.pk }}">{{ s }}</option>{% endfor %}</select>
+  <select name="subject" class="form-control">{% for s in subjects %}<option value="{{ s.pk }}">{{ s }}</option>{% endfor %}</select>
+  <input class="form-control" name="marks" placeholder="Marks">
+  <button class="btn btn-primary" type="submit">Record</button></form>
+<div class="table-wrap mt-2"><table class="tbl"><thead><tr><th>Student</th><th>Subject</th><th class="num">Marks</th><th>Grade</th></tr></thead>
+<tbody>{% for sc in scores %}<tr><td>{{ sc.student }}</td><td>{{ sc.subject }}</td><td class="num">{{ sc.marks }}</td><td>{{ sc.grade }}</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

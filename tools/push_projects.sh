@@ -61,6 +61,9 @@ declare -A DESC=(
   [attendx]="AttendX — class attendance tracking with registers, statuses and attendance-rate reports."
   [quizmaster]="QuizMaster — quizzes with auto-grading, timed attempts, analytics and authoring studio."
   [linkshort]="LinkShort — URL shortener with atomic click analytics, expiry and click caps."
+  [nexora]="Nexora — retail operating system: POS, stock, purchase, accounts, warranty, কিস্তি."
+  [campusos]="CampusOS — school operating system: admissions, fees, exams, timetable, library."
+  [aetherhr]="AetherHR — people operating system: HRIS, leave, Bangladesh payroll, recruiting."
 )
 
 TOKEN_LOGIN="$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Register · {{ section }}</h1>
+  <form class="pill-row"><select name="section" class="form-control" onchange="this.form.submit()">{% for s in sections %}<option value="{{ s.pk }}" {% if s.pk == section.pk %}selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+  <input class="form-control" type="date" name="day" value="{{ day }}"><button class="btn">Go</button></form></div>
+<form method="post">{% csrf_token %}
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Student</th>{% for m,l in marks %}<th>{{ l }}</th>{% endfor %}</tr></thead>
+<tbody>{% for st in students %}<tr><td>{{ st }}</td>
+  {% for m,l in marks %}<td><input type="radio" name="m_{{ st.pk }}" value="{{ m }}"{% if m == "P" %} checked{% endif %}></td>{% endfor %}
+</tr>{% empty %}<tr><td>No enrolled students in this section.</td></tr>{% endfor %}</tbody></table></div>
+<button class="btn btn-primary mt-2" type="submit">Save register</button></form>
+
+{% endblock %}

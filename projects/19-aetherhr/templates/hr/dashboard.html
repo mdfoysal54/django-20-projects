@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}HQ{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ company.name }}</h1><p class="lede">{{ n_people }} people · {{ pending }} leave waiting</p></div>
+<div class="grid grid-2">
+  <div class="card"><h3>In today</h3>{% for p in punches %}<div class="cart-row"><span>{{ p.employee }}</span><span>{{ p.in_at|time }}</span></div>{% empty %}<p class="muted">Nobody punched in yet.</p>{% endfor %}</div>
+  <div class="card"><h3>News</h3>{% for n in news %}<div class="cart-row"><span>{{ n.title }}</span><span class="small">{{ n.published_on }}</span></div>{% endfor %}</div>
+</div>
+
+{% endblock %}

@@ -27,9 +27,10 @@ invariants, its tests and its frontend.
 | Flagships | 01 ShopNest · 02 LearnHub · 03 StayHub · 04 DevJobs · 05 TaskFlow · 06 FinTrack | Commerce, learning, travel, hiring, teamwork, finance |
 | Wave 2 | 07 BlogPress · 08 EventTix · 09 HelpDesk · 10 MedCare · 11 FitTrack | Publishing, ticketing, support, clinics, fitness |
 | Wave 2 | 12 RecipeBox · 13 InvoicePro · 14 AttendX · 15 QuizMaster · 16 LinkShort | Recipes, invoicing, attendance, quizzes, link analytics |
+| Wave 3 | 17 Nexora · 18 CampusOS · 19 AetherHR | Retail OS, school OS, people OS — sellable products |
 
-Verified baseline: **16/16 green — 559 automated tests** (176 canonical
-security + 383 domain) plus **291 pages smoke-rendered** from a seeded database.
+Verified baseline: **19/19 green — 633 automated tests** (209 canonical
+security + 424 domain) plus **432 pages smoke-rendered** from a seeded database.
 
 Depth per project is not decoration. Examples of rules that are enforced in the
 database or in guarded model methods, and covered by tests:
@@ -49,10 +50,16 @@ database or in guarded model methods, and covered by tests:
   key is never sent to the player's page.
 - **LinkShort** — click counts increment atomically in SQL, expired or capped
   links answer `410 Gone`, and only salted IP hashes are stored.
+- **Nexora** — stock never goes negative; transfers conserve quantity; POS
+  overpayment is refused; কিস্তি dues sum exactly to principal + interest.
+- **CampusOS** — a section never enrols past capacity; fee overpayment is
+  refused; exam grades are derived from marks; library loans cannot over-issue.
+- **AetherHR** — house rent is 50% of basic; leave cannot overlap or overdraw;
+  clock-out cannot precede clock-in; unpaid days prorate against a 30-day month.
 
 ## Scaling further is a copy job, not a rewrite
 
-Everything shared lives in `tools/canonical*.py`. To spin up project #17:
+Everything shared lives in `tools/canonical*.py`. To spin up project #20:
 
 ```bash
 # 1. add an entry to tools/canonical.PROJECTS
@@ -64,4 +71,4 @@ python ../tools/smoke_pages.py .   # every route renders
 
 A new project immediately inherits the CSP/nonce middleware, login throttling,
 hardened settings, branded error pages, auth templates and the canonical
-security suite. The sixteen projects here show how to finish the job properly.
+security suite. The nineteen projects here show how to finish the job properly.

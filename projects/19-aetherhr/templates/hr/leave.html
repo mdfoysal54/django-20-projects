@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Leave{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ req.kind }} · {{ req.employee }}</h1>
+<p>{{ req.starts_on }} → {{ req.ends_on }} ({{ req.days }} days)</p>
+<p>{{ req.reason }}</p>
+<p>Status {{ req.get_status_display }}</p>
+{% if req.status == "pend" %}
+<form method="post" action="{% url 'leave_decide' req.pk %}">{% csrf_token %}
+  <button class="btn btn-primary" name="intent" value="ok">Approve</button>
+  <button class="btn btn-danger" name="intent" value="no">Reject</button>
+</form>{% endif %}</div>
+
+{% endblock %}

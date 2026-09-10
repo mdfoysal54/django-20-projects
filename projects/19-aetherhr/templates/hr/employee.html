@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ emp }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><div><h1>{{ emp }}</h1><p class="lede">{{ emp.code }} · {{ emp.designation }} · {{ emp.department }}</p></div></div>
+<div class="grid grid-2">
+  <div class="card"><p>Basic ৳ {{ emp.basic }} · House rent ৳ {{ emp.house_rent }}</p>
+    <p>Medical ৳ {{ emp.medical }} · Conveyance ৳ {{ emp.conveyance }}</p>
+    <h2>Gross ৳ {{ emp.gross }}</h2>
+    <p>Manager {{ emp.manager|default:"—" }}</p></div>
+  <div class="card"><h3>Payslips</h3>{% for s in slips %}<div class="cart-row"><a href="{{ s.get_absolute_url }}">{{ s.period }}</a><strong>৳ {{ s.net }}</strong></div>{% endfor %}
+    <h3>Leave</h3>{% for l in leaves %}<div class="cart-row"><span>{{ l.kind }} {{ l.starts_on }}</span><span>{{ l.get_status_display }}</span></div>{% endfor %}</div>
+</div>
+
+{% endblock %}

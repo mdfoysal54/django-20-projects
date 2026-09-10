@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ title }}</h1></div>
+{% if kind == "hc" %}
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Department</th><th class="num">Headcount</th></tr></thead>
+<tbody>{% for d, n in rows %}<tr><td>{{ d }}</td><td class="num">{{ n }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Employee</th><th>Type</th><th class="num">Remaining</th></tr></thead>
+<tbody>{% for r in rows %}<tr><td>{{ r.employee }}</td><td>{{ r.kind }}</td><td class="num">{{ r.remaining }}</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}
+
+{% endblock %}

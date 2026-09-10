@@ -6,7 +6,7 @@ Two things get published:
 2. **One repository per project** → named after the project: `shopnest`,
    `learnhub`, `stayhub`, `devjobs`, `taskflow`, `fintrack`, `blogpress`,
    `eventtix`, `helpdesk`, `medcare`, `fittrack`, `recipebox`, `invoicepro`,
-   `attendx`, `quizmaster`, `linkshort`.
+   `attendx`, `quizmaster`, `linkshort`, `nexora`, `campusos`, `aetherhr`.
 
 Each project repository is built from the files the monorepo tracks for that
 project only (no local database, no `__pycache__`, no `.env`), gets its own

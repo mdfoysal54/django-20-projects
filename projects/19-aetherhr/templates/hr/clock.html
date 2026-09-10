@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Clock{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Clock</h1></div>
+<div class="card">
+  {% if me %}
+    <p>Today: {% if today %}in {{ today.in_at }} {% if today.out_at %}· out {{ today.out_at }} · {{ today.hours }} h{% endif %}{% else %}not punched{% endif %}</p>
+    <form method="post" style="display:inline">{% csrf_token %}<input type="hidden" name="intent" value="in"><button class="btn btn-primary">Clock in</button></form>
+    <form method="post" style="display:inline">{% csrf_token %}<input type="hidden" name="intent" value="out"><button class="btn btn-secondary">Clock out</button></form>
+  {% else %}<p class="muted">Your user is not linked to an employee record.</p>{% endif %}
+  <h3 class="mt-2">History</h3>
+  {% for p in history %}<div class="cart-row"><span>{{ p.day }}</span><span>{{ p.hours }} h</span></div>{% endfor %}
+</div>
+
+{% endblock %}

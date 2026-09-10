@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ student.full_name }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><div><h1>{{ student.full_name }}</h1>
+  <p class="lede">{{ student.number }} · {{ student.section }} · attendance {{ rate }}%</p></div>
+  <span class="badge">{{ student.get_status_display }}</span></div>
+<div class="grid grid-2">
+  <div class="card">
+    <p>Guardian {{ student.guardian }} · {{ student.guardian.phone }}</p>
+    <p>Born {{ student.born_on }}</p>
+    {% if student.status != "ok" %}
+    <form method="post" action="{% url 'student_enrol' student.number %}">{% csrf_token %}
+      <select name="section" class="form-control">{% for s in sections %}<option value="{{ s.pk }}">{{ s }} (cap {{ s.capacity }})</option>{% endfor %}</select>
+      <button class="btn btn-primary mt-1" type="submit">Enrol</button>
+    </form>{% endif %}
+  </div>
+  <div class="card"><h3>Fees</h3>{% for i in invoices %}<div class="cart-row"><a href="{{ i.get_absolute_url }}">{{ i.number }}</a><strong>due ৳ {{ i.balance }}</strong></div>{% endfor %}
+    <h3>Scores</h3>{% for sc in scores %}<div class="cart-row"><span>{{ sc.exam }} {{ sc.subject.code }}</span><strong>{{ sc.grade }} ({{ sc.marks }})</strong></div>{% endfor %}
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block crumb %}Settings{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Configuration</h1><a class="btn" href="{% url 'settings_company' %}">Company</a></div>
+    <div class="grid grid-2">
+      <div class="card"><h3>Shops</h3>{% for s in shops %}<div class="cart-row"><span>{{ s.name }} ({{ s.code }})</span></div>{% endfor %}
+        <form method="post" action="{% url 'settings_company' %}">{% csrf_token %}<input type="hidden" name="intent" value="shop">
+        {% for field in shop_form %}<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <button class="btn btn-primary" type="submit">Add shop</button></form></div>
+      <div class="card"><h3>Stations</h3>{% for s in stations %}<div class="cart-row"><span>{{ s }} · {{ s.get_kind_display }}</span></div>{% endfor %}
+        <form method="post" action="{% url 'settings_company' %}">{% csrf_token %}<input type="hidden" name="intent" value="station">
+        {% for field in station_form %}<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <button class="btn btn-primary" type="submit">Add station</button></form></div>
+    </div>
+    <p class="muted small">Language and colour live on your <a href="{% url 'profile' %}">profile</a>. Product / customer / supplier / account settings are in the rail.</p>
+{% endblock %}

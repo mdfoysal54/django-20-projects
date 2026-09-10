@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Campus OS{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">School operating system</div>
+  <h1>Admissions, fees, exams and the parent desk — in one <em>campus</em>.</h1>
+  <p class="lede">CampusOS is a complete school ERP: students and guardians, capacity-safe enrolment, fee invoices with no overpayment, attendance registers, auto-graded exams, timetable, library loans, transport and notices. Built to sell and to deploy.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the campus</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+  <div class="card"><h3>Admissions</h3><p class="muted">Applicants become students only when a section still has a seat.</p></div>
+  <div class="card"><h3>Fees</h3><p class="muted">Invoices, partials, overpayment refused. bKash and bank.</p></div>
+  <div class="card"><h3>Exams</h3><p class="muted">Marks clamp to the paper; grades A+ to F are derived, never typed.</p></div>
+  <div class="card"><h3>Library</h3><p class="muted">You cannot loan a book that is not on the shelf.</p></div>
+</div>
+
+{% endblock %}

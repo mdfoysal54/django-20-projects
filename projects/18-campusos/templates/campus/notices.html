@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Notices{% endblock %}
+{% block content %}
+
+<div class="grid grid-2"><div class="card"><form method="post">{% csrf_token %}
+  {% for field in form %}<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+  <button class="btn btn-primary" type="submit">Publish</button></form></div>
+  <div class="card">{% for r in rows %}<div class="mb-2"><h3>{{ r.title }}</h3><p class="muted small">{{ r.published_on }} · {{ r.audience }}</p><p>{{ r.body }}</p></div>{% endfor %}</div></div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Campus{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ school.name }}</h1><p class="lede">{{ school.motto }}</p></div>
+<div class="grid grid-3">
+  <div class="card stat"><div class="stat-label">Enrolled</div><div class="stat-value">{{ n_students }}</div></div>
+  <div class="card stat"><div class="stat-label">Applicants</div><div class="stat-value">{{ n_applicants }}</div></div>
+  <div class="card stat"><div class="stat-label">Fees due</div><div class="stat-value">৳ {{ due }}</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card"><h3>Recently enrolled</h3>
+    {% for s in recent %}<div class="cart-row"><a href="{{ s.get_absolute_url }}">{{ s }}</a><span>{{ s.section }}</span></div>{% endfor %}</div>
+  <div class="card"><h3>Notices</h3>
+    {% for n in notices %}<div class="cart-row"><span>{{ n.title }}</span><span class="small muted">{{ n.published_on }}</span></div>{% empty %}<p class="muted">No notices.</p>{% endfor %}</div>
+</div>
+
+{% endblock %}

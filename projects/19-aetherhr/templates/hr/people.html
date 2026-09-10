@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Directory{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Directory</h1><form><input class="form-control" name="q" value="{{ q }}" placeholder="Search"></form></div>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Name</th><th>Dept</th><th>Role</th><th class="num">Gross</th></tr></thead>
+<tbody>{% for e in rows %}<tr><td class="mono"><a href="{{ e.get_absolute_url }}">{{ e.code }}</a></td>
+  <td>{{ e }}</td><td>{{ e.department }}</td><td>{{ e.designation }}</td><td class="num">৳ {{ e.gross }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

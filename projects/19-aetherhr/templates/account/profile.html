@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="card"><h1>Profile</h1>
+<form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Phone</label><input class="form-control" name="phone" value="{{ profile.phone }}"></div>
+  <div class="form-group"><label class="form-label">Theme</label>
+    <select name="theme" class="form-control"><option value="violet">Violet</option><option value="void">Void</option></select></div>
+  <div class="form-group"><label class="form-label">Language</label>
+    <select name="language" class="form-control"><option value="en">English</option><option value="bn">বাংলা</option></select></div>
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+<p class="mt-2"><a href="{% url 'password_change' %}">Change password</a></p></div>
+{% endblock %}

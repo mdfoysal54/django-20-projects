@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Assets{% endblock %}
+{% block content %}
+
+<div class="grid grid-2"><div class="card"><form method="post">{% csrf_token %}
+  <input class="form-control" name="name" placeholder="Name">
+  <input class="form-control mt-1" name="tag" placeholder="Tag">
+  <select name="employee" class="form-control mt-1"><option value="">Unassigned</option>{% for e in people %}<option value="{{ e.pk }}">{{ e }}</option>{% endfor %}</select>
+  <input class="form-control mt-1" name="cost" placeholder="Cost">
+  <button class="btn btn-primary mt-1" type="submit">Add</button></form></div>
+  <div class="card">{% for r in rows %}<div class="cart-row"><span>{{ r.tag }} {{ r.name }}</span><span>{{ r.assigned_to }}</span></div>{% endfor %}</div></div>
+
+{% endblock %}

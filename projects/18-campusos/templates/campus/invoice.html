@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ invoice.number }}</h1>
+<p>{{ invoice.student }} · {{ invoice.head }} · {{ invoice.period }}</p>
+<p>Amount ৳ {{ invoice.amount }} · Paid ৳ {{ invoice.paid_total }} · Balance ৳ {{ invoice.balance }}</p>
+<form method="post" action="{% url 'invoice_pay' invoice.number %}">{% csrf_token %}
+  {% for field in form %}<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+  <button class="btn btn-primary" type="submit">Collect</button></form>
+{% for p in invoice.payments.all %}<div class="cart-row"><span>{{ p.received_on }} {{ p.method }}</span><strong>৳ {{ p.amount }}</strong></div>{% endfor %}
+</div>
+
+{% endblock %}

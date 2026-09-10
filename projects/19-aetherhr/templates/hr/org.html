@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Org{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Org chart</h1></div>
+{% for r in roots %}
+  <div class="card"><h3>{{ r }} · {{ r.designation }}</h3>
+    <ul>{% for c in r.reports.all %}<li><a href="{{ c.get_absolute_url }}">{{ c }}</a> — {{ c.designation }}</li>{% empty %}<li class="muted">No direct reports.</li>{% endfor %}</ul>
+  </div>
+{% endfor %}
+
+{% endblock %}

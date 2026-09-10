@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Timetable · {{ section }}</h1>
+  <form><select name="section" class="form-control" onchange="this.form.submit()">{% for s in sections %}<option value="{{ s.pk }}" {% if s == section %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></form></div>
+<div class="table-wrap"><table class="tbl"><thead><tr><th></th>{% for d in days %}<th>{{ d }}</th>{% endfor %}</tr></thead>
+<tbody>{% for slot in slots %}<tr><td>P{{ slot }}</td>
+  {% for d in days %}{% with wd=forloop.counter0 %}<td>{% if grid|default_if_none:None %}{% endif %}
+    {% for wdkey, slotsmap in grid.items %}{% if wdkey == wd %}{% for sk, p in slotsmap.items %}{% if sk == slot %}{{ p.subject.code }}<div class="small muted">{{ p.teacher }}</div>{% endif %}{% endfor %}{% endif %}{% endfor %}
+  </td>{% endwith %}{% endfor %}
+</tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

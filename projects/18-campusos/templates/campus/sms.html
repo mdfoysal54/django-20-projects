@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}SMS{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <input class="form-control" name="to" placeholder="Phone">
+  <textarea class="form-control mt-1" name="body" placeholder="Message"></textarea>
+  <button class="btn btn-primary mt-1" type="submit">Log SMS</button></form>
+{% for r in rows %}<div class="cart-row"><span>{{ r.to }}</span><span class="small">{{ r.body }}</span></div>{% endfor %}</div>
+
+{% endblock %}

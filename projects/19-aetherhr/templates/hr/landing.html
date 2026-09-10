@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}People OS{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">People operating system</div>
+  <h1>HR, leave, attendance and Bangladesh payroll — in one <em>violet</em> desk.</h1>
+  <p class="lede">AetherHR is a complete HRIS: directory and org chart, clock in/out, leave that cannot overlap or overdraw, payroll with house-rent at 50% of basic, recruiting pipeline, reviews, assets and announcements. Built to sell and to deploy.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open AetherHR</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+  <div class="card"><h3>Clock</h3><p class="muted">One in, one out. Hours are derived, never typed.</p></div>
+  <div class="card"><h3>Leave</h3><p class="muted">Overlaps refused. Approvals deduct the balance.</p></div>
+  <div class="card"><h3>Payroll</h3><p class="muted">Basic + 50% house rent + medical + conveyance. Unpaid days prorate against 30.</p></div>
+  <div class="card"><h3>Talent</h3><p class="muted">Jobs, applicants, reviews, assets.</p></div>
+</div>
+
+{% endblock %}

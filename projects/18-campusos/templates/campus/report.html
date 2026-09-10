@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ title }}</h1></div>
+{% if kind == "fees" %}
+<p>Total outstanding ৳ {{ total }}</p>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Invoice</th><th>Student</th><th class="num">Due</th></tr></thead>
+<tbody>{% for r in rows %}<tr><td>{{ r.number }}</td><td>{{ r.student }}</td><td class="num">৳ {{ r.balance }}</td></tr>{% endfor %}</tbody></table></div>
+{% elif kind == "results" %}
+<p>{{ exam }}</p>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Subject</th><th>Grade</th></tr></thead>
+<tbody>{% for sc in scores %}<tr><td>{{ sc.student }}</td><td>{{ sc.subject }}</td><td>{{ sc.grade }} ({{ sc.marks }})</td></tr>{% endfor %}</tbody></table></div>
+{% elif kind == "att" %}
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Student</th><th class="num">Rate</th></tr></thead>
+<tbody>{% for s, rate in rows %}<tr><td>{{ s }}</td><td class="num">{{ rate }}%</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Fees{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Fee invoices</h1><a class="btn btn-primary" href="{% url 'fee_create' %}">Raise a fee</a></div>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>No.</th><th>Student</th><th>Head</th><th class="num">Amount</th><th class="num">Due</th><th></th></tr></thead>
+<tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.student }}</td><td>{{ r.head }}</td>
+  <td class="num">৳ {{ r.amount }}</td><td class="num">৳ {{ r.balance }}</td><td>{{ r.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

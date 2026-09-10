@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Payroll{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Payroll {{ period }}</h1></div>
+<form method="post">{% csrf_token %}<input type="hidden" name="intent" value="run">
+  <input class="form-control" name="period" value="{{ period }}">
+  <p class="small muted">Unpaid days per person (optional)</p>
+  {% for e in people %}<div class="cart-row"><span>{{ e }}</span><input name="u_{{ e.pk }}" value="0" size="3"></div>{% endfor %}
+  <button class="btn btn-primary mt-2" type="submit">Run payroll</button>
+</form>
+<div class="table-wrap mt-2"><table class="tbl"><thead><tr><th>Employee</th><th class="num">Gross</th><th class="num">Net</th></tr></thead>
+<tbody>{% for s in slips %}<tr><td><a href="{{ s.get_absolute_url }}">{{ s.employee }}</a></td><td class="num">৳ {{ s.gross }}</td><td class="num">৳ {{ s.net }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+
+<div class="grid grid-2"><div class="card"><form method="post">{% csrf_token %}
+  <input class="form-control" name="title" placeholder="Title">
+  <select name="department" class="form-control mt-1">{% for d in departments %}<option value="{{ d.pk }}">{{ d }}</option>{% endfor %}</select>
+  <textarea class="form-control mt-1" name="body" placeholder="Description"></textarea>
+  <button class="btn btn-primary mt-1" type="submit">Post job</button></form></div>
+  <div class="card">{% for j in jobs %}<div class="cart-row"><a href="{{ j.get_absolute_url }}">{{ j.title }}</a><span>{{ j.department }}</span></div>{% endfor %}</div></div>
+
+{% endblock %}

@@ -22,6 +22,10 @@ PROJECTS = [
     {"dir": "14-attendx", "title": "AttendX", "tag": "Class attendance tracking & reports"},
     {"dir": "15-quizmaster", "title": "QuizMaster", "tag": "Online quizzes with auto-grading"},
     {"dir": "16-linkshort", "title": "LinkShort", "tag": "URL shortener with click analytics"},
+    # ---- wave 3: sellable operating systems ---------------------------------
+    {"dir": "17-nexora", "title": "Nexora", "tag": "Retail operating system — POS, stock, purchase, accounts, warranty, installment"},
+    {"dir": "18-campusos", "title": "CampusOS", "tag": "School operating system — admissions, fees, exams, timetable, parent portal"},
+    {"dir": "19-aetherhr", "title": "AetherHR", "tag": "People operating system — HRIS, attendance, leave, payroll, performance"},
 ]
 
 # --------------------------------------------------------------------------

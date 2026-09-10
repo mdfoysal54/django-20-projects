@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ job.title }}</h1><p>{{ job.body }}</p>
+<form method="post">{% csrf_token %}
+  <input class="form-control" name="name" placeholder="Applicant name">
+  <input class="form-control mt-1" name="email" placeholder="Email">
+  <button class="btn btn-primary mt-1" type="submit">Add applicant</button></form>
+{% for a in applicants %}<div class="cart-row"><span>{{ a.name }} · {{ a.get_stage_display }}</span>
+  <form method="post" action="{% url 'applicant_advance' job.pk a.pk %}">{% csrf_token %}<button class="btn btn-sm">Advance</button></form></div>{% endfor %}
+</div>
+
+{% endblock %}

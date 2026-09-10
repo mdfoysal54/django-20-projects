@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Transport{% endblock %}
+{% block content %}
+
+<div class="grid grid-2"><div class="card"><form method="post">{% csrf_token %}<input type="hidden" name="intent" value="route">
+  {% for field in form %}<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+  <button class="btn btn-primary" type="submit">Save route</button></form></div>
+  <div class="card"><h3>Board a student</h3>
+    <form method="post">{% csrf_token %}
+      <select name="student" class="form-control">{% for s in students %}<option value="{{ s.pk }}">{{ s }}</option>{% endfor %}</select>
+      <select name="route" class="form-control mt-1">{% for r in routes %}<option value="{{ r.pk }}">{{ r }}</option>{% endfor %}</select>
+      <button class="btn btn-primary mt-1">Board</button></form>
+    {% for r in riders %}<div class="cart-row"><span>{{ r.student }}</span><span>{{ r.route }}</span></div>{% endfor %}
+  </div></div>
+
+{% endblock %}

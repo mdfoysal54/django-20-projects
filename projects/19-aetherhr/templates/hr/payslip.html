@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Payslip{% endblock %}
+{% block content %}
+
+<div class="card"><h1>Payslip {{ slip.period }} · {{ slip.employee }}</h1>
+<p>Basic ৳ {{ slip.basic }} · House rent ৳ {{ slip.house_rent }}</p>
+<p>Medical ৳ {{ slip.medical }} · Conveyance ৳ {{ slip.conveyance }}</p>
+<p>Gross ৳ {{ slip.gross }} · Unpaid days {{ slip.unpaid_days }}</p>
+<h2>Net ৳ {{ slip.net }}</h2></div>
+
+{% endblock %}

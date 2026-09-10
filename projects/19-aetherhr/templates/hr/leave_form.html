@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Request leave{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Type</label><select name="kind" class="form-control">{% for k in kinds %}<option value="{{ k.pk }}">{{ k }}</option>{% endfor %}</select></div>
+  <div class="form-group"><label class="form-label">From</label><input class="form-control" type="date" name="starts" required></div>
+  <div class="form-group"><label class="form-label">To</label><input class="form-control" type="date" name="ends" required></div>
+  <div class="form-group"><label class="form-label">Reason</label><input class="form-control" name="reason"></div>
+  <button class="btn btn-primary" type="submit">Submit</button></form></div>
+
+{% endblock %}

@@ -4,10 +4,10 @@
 [![Django](https://img.shields.io/badge/Django-5.2%20LTS-092E20)](https://docs.djangoproject.com/en/5.2/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Sixteen deep Django 5.2 projects** — each with its own database models,
+**Nineteen deep Django 5.2 projects** — each with its own database models,
 backend logic, first-party HTML/CSS frontend, admin panel, canonical security
 hardening and a full automated test-suite. One monorepo, one shared,
-secure-by-default baseline, **559 automated tests passing**.
+secure-by-default baseline, **633 automated tests passing**.
 
 > Scope note: this repository was commissioned as a "20 projects" portfolio.
 > We built it as **16 deep projects instead of 20 shallow ones** — six
@@ -15,7 +15,7 @@ secure-by-default baseline, **559 automated tests passing**.
 > (see [docs/PORTFOLIO.md](docs/PORTFOLIO.md)). Everything is a drop-in
 > template for project #17.
 
-## The sixteen projects
+## The nineteen projects
 
 | # | Project | Directory | Theme | Tests |
 |---|---------|-----------|-------|-------|
@@ -35,6 +35,9 @@ secure-by-default baseline, **559 automated tests passing**.
 | 14 | **AttendX** | `14-attendx` | Attendance tracking & reports | 44 ✅ |
 | 15 | **QuizMaster** | `15-quizmaster` | Quizzes with auto-grading | 37 ✅ |
 | 16 | **LinkShort** | `16-linkshort` | URL shortener & click analytics | 42 ✅ |
+| 17 | **Nexora** | `17-nexora` | Retail OS — POS, stock, accounts, কিস্তি, warranty | 36 ✅ |
+| 18 | **CampusOS** | `18-campusos` | School OS — admissions, fees, exams, timetable | 20 ✅ |
+| 19 | **AetherHR** | `19-aetherhr` | People OS — HRIS, leave, BD payroll, recruiting | 18 ✅ |
 
 Each project lives in `projects/XX-name/`, is fully self-contained (own
 migrations, own SQLite database, own templates and stylesheet), and can be run
@@ -58,20 +61,20 @@ Every project ships demo seeders and a passing test-suite:
 
 ```bash
 python manage.py test               # inside one project
-bash tools/verify_all.sh            # verify all sixteen at once from the repo root
+bash tools/verify_all.sh            # verify all nineteen at once from the repo root
 python tools/smoke_pages.py projects/16-linkshort   # render every route, report failures
 ```
 
-**Verified baseline:** 16/16 projects green — **559 automated tests** (176
-canonical security tests + 383 domain tests) and **291 pages smoke-rendered**
+**Verified baseline:** 19/19 projects green — **633 automated tests** (209
+canonical security tests + 424 domain tests) and **432 pages smoke-rendered**
 from seeded databases. CI runs the same suites plus the page smoke test and
 `check --deploy` in production mode on every push
 ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)).
 
-### Run all sixteen locally at once
+### Run all nineteen locally at once
 
 ```bash
-bash tools/run_all.sh          # serves 8000–8015 (auto-migrates/seeds new clones)
+bash tools/run_all.sh          # serves 8000–8018 (auto-migrates/seeds new clones)
 ```
 
 | Port | Project | | Port | Project |
@@ -84,6 +87,8 @@ bash tools/run_all.sh          # serves 8000–8015 (auto-migrates/seeds new clo
 | 8005 | 💹 FinTrack | | 8013 | 🗓️ AttendX |
 | 8006 | 📰 BlogPress | | 8014 | 🧠 QuizMaster |
 | 8007 | 🎟️ EventTix | | 8015 | 🔗 LinkShort |
+| 8016 | ◈ Nexora | | 8017 | 🏛 CampusOS |
+| 8018 | ✦ AetherHR | | | |
 
 Demo logins: `alice` / `DemoPass123!` (ShopNest superuser: `admin` / `admin`).
 Admin panels: `admin` / `DemoPass123!` unless a project's README says otherwise.
@@ -111,6 +116,9 @@ every one of these is enforced in code or in the database, and covered by tests:
 | AttendX | Attendance only on held, non-future sessions; excused absences leave the denominator |
 | QuizMaster | Partial credit only when nothing wrong was picked; the answer key never reaches the player |
 | LinkShort | Clicks increment atomically in SQL; expired/capped links answer `410 Gone` |
+| Nexora | Stock never goes negative; overpayment refused; কিস্তি dues sum to principal+interest |
+| CampusOS | A section never enrols past capacity; fee overpayment refused; grades are derived |
+| AetherHR | House rent = 50% of basic; leave cannot overlap or overdraw; clock-out after clock-in |
 
 ## What "high security" means here
 
@@ -146,7 +154,7 @@ django-20-projects/
 │   │   ├── templates/      first-party pages (no framework)
 │   │   ├── static/css/     first-party stylesheet
 │   │   └── docs/           per-project notes
-│   ├── 02-learnhub/  … 16-linkshort/   (every project identical in shape)
+│   ├── 02-learnhub/  … 19-aetherhr/   (every project identical in shape)
 ├── docs/                   monorepo-wide guides (SECURITY, PORTFOLIO, PUSH-TO-GITHUB)
 └── tools/                  scaffold · canonical sources · verify_all · run_all · smoke_pages · push_to_github
 ```

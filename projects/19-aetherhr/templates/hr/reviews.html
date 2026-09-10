@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+
+<div class="grid grid-2"><div class="card"><form method="post">{% csrf_token %}
+  <select name="employee" class="form-control">{% for e in people %}<option value="{{ e.pk }}">{{ e }}</option>{% endfor %}</select>
+  <input class="form-control mt-1" name="period" placeholder="YYYY-MM">
+  <input class="form-control mt-1" name="rating" placeholder="Rating 1-5" value="4">
+  <textarea class="form-control mt-1" name="goals" placeholder="Goals"></textarea>
+  <button class="btn btn-primary mt-1" type="submit">Save review</button></form></div>
+  <div class="card">{% for r in rows %}<div class="cart-row"><span>{{ r.employee }} {{ r.period }}</span><strong>{{ r.rating }}/5</strong></div>{% endfor %}</div></div>
+
+{% endblock %}
