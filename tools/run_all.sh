@@ -36,8 +36,10 @@ for entry in "${PROJECTS[@]}"; do
     (cd "$project" && python manage.py migrate -v 0 && python manage.py seed_demo -v 0) \
       || { echo "  ✗ setup failed for $dir"; continue; }
   fi
+  # `exec` makes the recorded PID the Python process itself, so the Ctrl+C
+  # trap below reliably stops the actual servers (not just the wrapper).
   (cd "$project" && DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1" \
-      python manage.py runserver "0.0.0.0:$port" --noreload >/dev/null 2>&1) &
+      exec python manage.py runserver "0.0.0.0:$port" --noreload >/dev/null 2>&1) &
   PIDS+=($!)
   printf "%-14s %-6s http://127.0.0.1:%s\n" "$label" ":$port" "$port"
 done
