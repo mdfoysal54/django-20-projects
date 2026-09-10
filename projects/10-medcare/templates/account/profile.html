@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.get_full_name|default:user.username }} 👋
+      {% if doctor %}<span class="badge badge-brand">{{ doctor.speciality.name }} · clinician</span>{% endif %}</p></div>
+</div>
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total }}</div><div class="stat-label">Appointments</div></div>
+  <div class="card stat"><div class="stat-value">{{ upcoming }}</div><div class="stat-label">Upcoming</div></div>
+  <div class="card stat"><div class="stat-value">{{ completed }}</div><div class="stat-label">Completed</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Name:</strong> {{ user.get_full_name|default:"—" }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'my_appointments' %}">→ My appointments</a></li>
+      <li><a href="{% url 'doctor_list' %}">→ Book a doctor</a></li>
+      {% if doctor %}
+      <li><a href="{% url 'schedule' %}">→ Clinic day</a></li>
+      <li><a href="{% url 'availability' %}">→ My availability</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

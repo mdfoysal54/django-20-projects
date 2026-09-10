@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ exercise.name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'exercise_list' %}">Exercises</a> › <strong>{{ exercise.name }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.5fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <div class="pill-row">
+        <span class="badge badge-brand">{{ exercise.get_muscle_group_display }}</span>
+        <span class="badge">{{ exercise.get_unit_display }}</span>
+        {% if exercise.is_compound %}<span class="badge">compound lift</span>{% endif %}
+      </div>
+      <h1 class="page-title">{{ exercise.name }}</h1>
+      <p class="muted">{{ exercise.description|default:"No description yet." }}</p>
+      {% if best %}
+      <div class="grid grid-2">
+        <div class="stat-mini"><div class="stat-value">{{ best.weight_kg|default:"—" }}{% if best.weight_kg %} kg{% endif %}</div>
+          <div class="stat-label">Your best weight</div></div>
+        <div class="stat-mini"><div class="stat-value">{{ best.volume_kg|floatformat:0 }} kg</div>
+          <div class="stat-label">Best set volume</div></div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if chart %}
+    <div class="card">
+      <h2 class="card-title">Your history</h2>
+      <div class="bar-chart">
+        {% for point in chart %}
+        <div class="bar-wrap" title="{{ point.date|date:'j M' }}: {{ point.value }}">
+          <div class="bar" style="height:{% widthratio point.value max_value 100 %}%"></div>
+          <div class="bar-label">{{ point.date|date:"d/m" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="card-title">Your logged sets</h2>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Workout</th><th>Sets × reps</th><th>Weight</th><th>Volume</th></tr></thead>
+        <tbody>
+        {% for entry in history %}
+          <tr>
+            <td>{{ entry.workout.date|date:"j M Y" }}</td>
+            <td><a href="{{ entry.workout.get_absolute_url }}">{{ entry.workout.title|truncatechars:30 }}</a></td>
+            <td>{{ entry.sets }} × {{ entry.reps|default:"—" }}</td>
+            <td class="mono">{% if entry.weight_kg %}{{ entry.weight_kg }} kg{% else %}—{% endif %}</td>
+            <td class="mono">{% if entry.volume_kg %}{{ entry.volume_kg|floatformat:0 }}{% else %}—{% endif %}
+              {% if entry.is_personal_best %}<span class="badge badge-warn">🏆</span>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="muted">{% if user.is_authenticated %}You have not logged this exercise yet.{% else %}Log in to see your history.{% endif %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Most logged by</h2>
+      {% for row in recent_users %}
+      <div class="small">{{ row.workout__user__username }} <span class="muted">· {{ row.n }} set{{ row.n|pluralize }}</span></div>
+      {% empty %}
+      <p class="muted mb-0">Nobody has logged this yet — be first.</p>
+      {% endfor %}
+    </div>
+    {% if user.is_authenticated %}
+    <div class="card">
+      <h2 class="card-title">Log it now</h2>
+      <p class="small muted">Open a workout and add this exercise there.</p>
+      <a class="btn btn-primary btn-block" href="{% url 'workout_create' %}">Start a workout</a>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

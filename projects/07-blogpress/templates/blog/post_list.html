@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}All posts · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">{% if category %}{{ category.name }}{% else %}All posts{% endif %}</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} post{{ page_obj.paginator.count|pluralize }}{% if q %} matching “{{ q }}”{% endif %}</p>
+  </div>
+  <form class="pill-row" method="get">
+    {% if category %}<input type="hidden" name="category" value="{{ category.slug }}">{% endif %}
+    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search posts…" style="min-width:220px">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="pill-row mb-3">
+  <a class="badge {% if not category %}badge-brand{% endif %}" href="{% url 'post_list' %}">All topics</a>
+  {% for c in categories %}
+    <a class="badge {% if category and category.pk == c.pk %}badge-brand{% endif %}" href="{% url 'post_list' %}?category={{ c.slug }}">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="grid grid-2">
+  {% for post in page_obj %}
+  <article class="card post-row">
+    <span class="post-emoji">{{ post.cover_emoji }}</span>
+    <div>
+      <h3 class="post-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+      <p class="small muted mb-1">{{ post.excerpt|default:post.body|truncatechars:140 }}</p>
+      <div class="small muted">{{ post.category.name|default:"Uncategorised" }} · {{ post.author.username }} ·
+        {{ post.published_at|date:"M j, Y" }} · 👁 {{ post.views_count }}</div>
+    </div>
+  </article>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🔍</div><h2>Nothing found</h2>
+    <p>Try another search or topic.</p><a class="btn btn-primary" href="{% url 'post_list' %}">Reset</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}
+    <a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if category %}&category={{ category.slug }}{% endif %}">← Newer</a>
+  {% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if category %}&category={{ category.slug }}{% endif %}">Older →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

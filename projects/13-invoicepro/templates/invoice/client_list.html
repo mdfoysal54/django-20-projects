@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Clients · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Clients</h1>
+    <p class="lede mb-0">{{ clients|length }} client{{ clients|length|pluralize }}</p></div>
+  <a class="btn btn-primary" href="{% url 'client_create' %}">+ New client</a>
+</div>
+
+<form class="card filter-bar mb-3" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search name, company or email…">
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+<div class="grid grid-3">
+  {% for client in clients %}
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="card-title mb-0">{{ client.name }}</div>
+      <span class="badge">{{ client.invoice_count }} invoice{{ client.invoice_count|pluralize }}</span>
+    </div>
+    <div class="small muted">{{ client.company|default:"—" }}</div>
+    <div class="small muted">{{ client.email|default:"no email" }}</div>
+    <div class="pill-row mt-1">
+      <span class="badge">Tax {{ client.default_tax_rate }}%</span>
+      <span class="badge">Net {{ client.default_terms_days }} days</span>
+      <span class="badge badge-warn">Outstanding ৳{{ client.outstanding|floatformat:2 }}</span>
+    </div>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-secondary" href="{% url 'client_edit' client.pk %}">Edit</a>
+      <a class="btn btn-sm btn-ghost" href="{% url 'invoice_list' %}?q={{ client.name }}">Invoices</a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🤝</div><h2>No clients yet</h2>
+    <p>Add who you bill, then invoices fill themselves in.</p>
+    <a class="btn btn-primary" href="{% url 'client_create' %}">Add a client</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

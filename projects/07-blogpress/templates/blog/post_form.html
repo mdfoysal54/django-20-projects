@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New post{% else %}Edit post{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:820px">
+  <nav class="breadcrumbs"><a href="{% url 'dashboard' %}">My writing</a> › <strong>{% if mode == 'create' %}New post{% else %}Edit{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Write a new post{% else %}Edit “{{ post.title }}”{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}Saved as a draft first — publishing is a separate, deliberate step.{% else %}Changes apply immediately.{% endif %}</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Save draft{% else %}Save changes{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'dashboard' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -4,12 +4,24 @@ Tokens: __SLUG__, __TITLE__, __TAG__ are substituted by scaffold.py.
 """
 
 PROJECTS = [
+    # ---- flagships (already built) ------------------------------------------
     {"dir": "01-shopnest", "title": "ShopNest", "tag": "Full-featured e-commerce platform"},
     {"dir": "02-learnhub", "title": "LearnHub", "tag": "Online learning platform (LMS)"},
     {"dir": "03-stayhub", "title": "StayHub", "tag": "Hotel & room booking engine"},
     {"dir": "04-devjobs", "title": "DevJobs", "tag": "Job board & recruitment portal"},
     {"dir": "05-taskflow", "title": "TaskFlow", "tag": "Team projects & kanban task manager"},
     {"dir": "06-fintrack", "title": "FinTrack", "tag": "Personal finance & budget dashboard"},
+    # ---- second wave ---------------------------------------------------------
+    {"dir": "07-blogpress", "title": "BlogPress", "tag": "Blog & publishing platform with comments"},
+    {"dir": "08-eventtix", "title": "EventTix", "tag": "Event ticketing with capacity control"},
+    {"dir": "09-helpdesk", "title": "HelpDesk", "tag": "Support ticket desk with agent queue"},
+    {"dir": "10-medcare", "title": "MedCare", "tag": "Clinic appointment scheduling"},
+    {"dir": "11-fittrack", "title": "FitTrack", "tag": "Workout & fitness progress tracker"},
+    {"dir": "12-recipebox", "title": "RecipeBox", "tag": "Recipe sharing with ratings & favourites"},
+    {"dir": "13-invoicepro", "title": "InvoicePro", "tag": "Freelancer invoicing & payments"},
+    {"dir": "14-attendx", "title": "AttendX", "tag": "Class attendance tracking & reports"},
+    {"dir": "15-quizmaster", "title": "QuizMaster", "tag": "Online quizzes with auto-grading"},
+    {"dir": "16-linkshort", "title": "LinkShort", "tag": "URL shortener with click analytics"},
 ]
 
 # --------------------------------------------------------------------------

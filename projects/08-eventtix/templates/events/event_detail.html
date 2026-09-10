@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'event_list' %}">Events</a> › <strong>{{ event.title }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <div class="event-hero">{{ event.cover_emoji }}</div>
+      <div class="pill-row mb-1">
+        {% if event.status == 'soldout' %}<span class="badge badge-warn">Sold out</span>
+        {% elif event.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+        {% else %}<span class="badge badge-ok">On sale</span>{% endif %}
+        <span class="badge">{{ event.total_sold }}/{{ event.total_capacity }} sold</span>
+        <span class="badge">{{ event.sell_through }}% full</span>
+      </div>
+      <h1 class="page-title">{{ event.title }}</h1>
+      <p class="muted">📍 {{ event.venue }} · 🗓 {{ event.starts_at|date:"l, F j, Y · g:i A" }}</p>
+      <hr class="divider">
+      <div>{{ event.description|linebreaks }}</div>
+      {% if is_organiser %}
+      <hr class="divider">
+      <div class="pill-row">
+        <a class="btn btn-secondary btn-sm" href="{% url 'event_manage' event.slug %}">Manage event</a>
+        <a class="btn btn-secondary btn-sm" href="{% url 'event_attendees' event.slug %}">Attendees</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'door_scan' event.slug %}">Door check-in</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card mt-3">
+      <h2 class="card-title">Ticket tiers</h2>
+      <table class="table">
+        <thead><tr><th>Tier</th><th>Price</th><th>Remaining</th><th></th></tr></thead>
+        <tbody>
+        {% for tier in tiers %}
+          <tr>
+            <td><strong>{{ tier.name }}</strong></td>
+            <td class="mono">৳{{ tier.price }}</td>
+            <td>
+              {% if tier.remaining == 0 %}<span class="badge badge-warn">Sold out</span>
+              {% else %}{{ tier.remaining }} of {{ tier.capacity }}{% endif %}
+            </td>
+            <td style="width:55%">
+              <div class="capacity-bar"><span style="width:{% widthratio tier.sold tier.capacity 100 %}%"></span></div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No tiers on sale yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Book tickets</h2>
+      {% if not user.is_authenticated %}
+        <p class="small muted">Log in to reserve seats. Booking is instant — no payment step in this demo.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'login' %}?next={{ event.get_absolute_url }}">Log in to book</a>
+      {% elif event.status == 'cancelled' %}
+        <p class="muted mb-0">This event was cancelled.</p>
+      {% elif event.remaining == 0 or event.status == 'soldout' %}
+        <p class="muted mb-0">😢 Every tier is sold out.</p>
+      {% else %}
+        <form method="post" action="{% url 'book' event.slug %}">
+          {% csrf_token %}
+          <label class="form-label" for="{{ form.tier.id_for_label }}">Choose a tier</label>
+          <select class="form-control" name="tier" id="{{ form.tier.id_for_label }}" required>
+            {% for tier in tiers %}{% if tier.remaining %}
+              <option value="{{ tier.pk }}">{{ tier.name }} — ৳{{ tier.price }} ({{ tier.remaining }} left)</option>
+            {% endif %}{% endfor %}
+          </select>
+          <label class="form-label mt-1" for="quantity">Tickets (max 10 per booking)</label>
+          <input class="form-control" type="number" id="quantity" name="quantity" value="1" min="1" max="10" required>
+          <button class="btn btn-primary btn-block mt-1" type="submit">Reserve seats</button>
+          <p class="form-hint mb-0">Seats are held atomically — if the last one goes while you type, you'll be told, not oversold.</p>
+        </form>
+      {% endif %}
+    </div>
+
+    {% if my_bookings %}
+    <div class="card">
+      <h2 class="card-title">You're going</h2>
+      {% for booking in my_bookings %}
+      <div class="pill-row mb-1">
+        <div>
+          <strong>{{ booking.reference }}</strong>
+          <div class="small muted">{{ booking.quantity }} ticket{{ booking.quantity|pluralize }} · {{ booking.created|date:"M j" }}</div>
+        </div>
+        <a class="btn btn-sm btn-secondary" href="{{ booking.get_absolute_url }}">View</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="card-title">Organised by</h2>
+      <div class="pill-row"><span class="avatar">{{ event.organiser.username|slice:":1"|upper }}</span>
+        <div><strong>{{ event.organiser.username }}</strong><div class="small muted">Member since {{ event.organiser.date_joined|date:"M Y" }}</div></div>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

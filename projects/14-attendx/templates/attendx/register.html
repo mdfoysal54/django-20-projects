@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Register · {{ cohort.name }} {{ session.date }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a> ›
+  <strong>Register — {{ session.date|date:"j M Y" }}</strong></nav>
+
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Take the register</h1>
+    <p class="lede mb-0">{{ session.topic|default:"No topic set" }} · {{ roster|length }} student{{ roster|length|pluralize }} enrolled</p></div>
+  <div class="pill-row">
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-secondary" type="submit" name="action" value="all_present">⚡ Mark all present</button>
+    </form>
+    <a class="btn btn-ghost" href="{{ session.get_absolute_url }}">Cancel</a>
+  </div>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ counts.present }}</div><div class="stat-label">Present</div></div>
+  <div class="card stat"><div class="stat-value">{{ counts.late }}</div><div class="stat-label">Late</div></div>
+  <div class="card stat"><div class="stat-value">{{ counts.absent }}</div><div class="stat-label">Absent</div></div>
+  <div class="card stat"><div class="stat-value">{{ counts.unmarked }}</div><div class="stat-label">Not marked yet</div></div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="card">
+    <table class="table register-table">
+      <thead><tr><th>Student</th><th>Present</th><th>Late</th><th>Absent</th><th>Excused</th></tr></thead>
+      <tbody>
+      {% for row in roster %}
+        <tr>
+          <td><strong>{{ row.student.get_full_name|default:row.student.username }}</strong>
+            <div class="small muted mono">{{ row.student.username }}</div></td>
+          <td colspan="4">
+            <div class="radio-row">
+              <label class="radio-pill">
+                <input type="radio" name="student_{{ row.student.pk }}" value="present"
+                  {% if row.status == 'present' or not row.status %}checked{% endif %}> Present
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="student_{{ row.student.pk }}" value="late"
+                  {% if row.status == 'late' %}checked{% endif %}> Late
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="student_{{ row.student.pk }}" value="absent"
+                  {% if row.status == 'absent' %}checked{% endif %}> Absent
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="student_{{ row.student.pk }}" value="excused"
+                  {% if row.status == 'excused' %}checked{% endif %}> Excused
+              </label>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="muted">Nobody is enrolled in this cohort yet — share code
+          <strong class="mono">{{ cohort.code }}</strong>.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pill-row mt-2">
+    <button class="btn btn-primary" type="submit" name="action" value="save">Save register</button>
+    <button class="btn btn-secondary" type="submit" name="action" value="finish">Save &amp; finish</button>
+    <span class="small muted">Unmarked students are skipped and stay “not marked”.</span>
+  </div>
+</form>
+{% endblock %}

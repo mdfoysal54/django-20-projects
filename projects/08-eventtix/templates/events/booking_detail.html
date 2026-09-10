@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Booking {{ booking.reference }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'my_bookings' %}">My tickets</a> › <strong>{{ booking.reference }}</strong></nav>
+<div class="container-narrow" style="max-width:720px">
+  <div class="card ticket-card {% if not booking.is_active %}cancelled{% endif %}">
+    <div class="pill-row" style="justify-content:space-between">
+      <div>
+        <div class="small muted">BOOKING REFERENCE</div>
+        <div class="ticket-ref mono">{{ booking.reference }}</div>
+      </div>
+      <div class="ticket-emoji">{{ booking.event.cover_emoji }}</div>
+    </div>
+    <hr class="divider dashed">
+    <h1 class="page-title">{{ booking.event.title }}</h1>
+    <div class="grid grid-2" style="gap:.5rem">
+      <div><div class="small muted">When</div><strong>{{ booking.event.starts_at|date:"D, M j, Y · g:i A" }}</strong></div>
+      <div><div class="small muted">Where</div><strong>{{ booking.event.venue }}</strong></div>
+      <div><div class="small muted">Holder</div><strong>{{ booking.customer.username }}</strong></div>
+      <div><div class="small muted">Tickets</div><strong>{{ booking.quantity }} × ৳{{ booking.unit_price }}</strong></div>
+    </div>
+    <hr class="divider dashed">
+    <div class="pill-row" style="justify-content:space-between">
+      <div>
+        {% if booking.is_active %}<span class="badge badge-ok">Confirmed</span>
+          {% if booking.checked_in %}<span class="badge badge-warn">Checked in {{ booking.checked_in }}/{{ booking.quantity }}</span>{% endif %}
+        {% else %}<span class="badge badge-danger">Cancelled {{ booking.cancelled_at|date:"M j, Y" }}</span>{% endif %}
+      </div>
+      <div class="ticket-total">Total <strong class="mono">৳{{ booking.total }}</strong></div>
+    </div>
+    <div class="qr-box mono">{{ booking.qr_token }}</div>
+    <p class="form-hint">Show this token at the door — the organiser scans or types it in.</p>
+    <div class="pill-row">
+      <a class="btn btn-secondary" href="{% url 'ticket_stub' booking.reference %}">Printable stub</a>
+      {% if booking.is_active %}
+      <form method="post" action="{% url 'booking_cancel' booking.reference %}">
+        {% csrf_token %}<button class="btn btn-danger" type="submit">Cancel booking</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

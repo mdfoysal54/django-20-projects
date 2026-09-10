@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}/s/{{ link.code }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'dashboard' %}">Links</a> › <strong class="mono">/s/{{ link.code }}</strong></nav>
+
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">{{ link.title|default:"Untitled link" }}</h1>
+    <p class="lede mb-0">
+      <span class="badge {% if link.status_label == 'active' %}badge-ok{% elif link.status_label == 'disabled' %}badge{% else %}badge-danger{% endif %}">
+        {{ link.status_label }}</span>
+      created {{ link.created|date:"j M Y" }}
+      {% if link.expires_at %}· expires {{ link.expires_at|date:"j M Y, H:i" }}{% endif %}
+      {% if link.max_clicks %}· cap {{ link.max_clicks }}{% endif %}</p>
+  </div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'link_edit' link.code %}">Edit</a>
+    <form method="post" action="{% url 'link_toggle' link.code %}">
+      {% csrf_token %}<button class="btn btn-secondary" type="submit">
+        {% if link.active %}Disable{% else %}Enable{% endif %}</button>
+    </form>
+    <form method="post" action="{% url 'link_delete' link.code %}">
+      {% csrf_token %}<button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="card short-link-box">
+  <div class="small muted">SHORT LINK</div>
+  <div class="copy-row">
+    <span class="mono big-code">{{ request.scheme }}://{{ request.get_host }}{{ link.short_path }}</span>
+    <button class="btn btn-sm btn-secondary no-print" onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.short_path }}')">Copy</button>
+  </div>
+  <div class="small muted url-ellipsis">→ {{ link.target_url }}</div>
+  <a class="small" href="{% url 'link_preview' link.code %}">Preview the destination page first</a>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ stats.total }}</div><div class="stat-label">Total clicks</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.unique }}</div><div class="stat-label">Unique visitors</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.today }}</div><div class="stat-label">Clicks today</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.last_7 }}</div><div class="stat-label">Last 7 days</div></div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <h2 class="card-title">Clicks — last 14 days</h2>
+      <div class="bar-chart">
+        {% for point in series %}
+        <div class="bar-wrap" title="{{ point.date|date:'j M' }}: {{ point.count }} click{{ point.count|pluralize }}">
+          <div class="bar" style="height:{% widthratio point.count max_day 100 %}%"></div>
+          <div class="bar-label">{{ point.date|date:"d/m" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if not stats.total %}<p class="form-hint mb-0">No clicks yet — share the link to get started.</p>{% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Recent clicks</h2>
+      <table class="table">
+        <thead><tr><th>When</th><th>Referrer</th><th>Device</th><th>Visitor</th></tr></thead>
+        <tbody>
+        {% for click in clicks %}
+          <tr>
+            <td class="small">{{ click.created|date:"j M, H:i" }}</td>
+            <td class="small">{{ click.referrer|default:"direct" }}</td>
+            <td><span class="badge device-{{ click.device }}">{{ click.get_device_display }}</span></td>
+            <td class="mono small">{{ click.ip_hash|slice:":10" }}…</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No clicks recorded yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p class="form-hint mb-0">Visitor IDs are salted hashes of the IP address — never the address itself.</p>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Device mix</h2>
+      {% for device, count in stats.devices.items %}
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="badge device-{{ device }}">{{ device|title }}</span>
+        <strong>{{ count }}</strong>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No data yet.</p>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Top referrers</h2>
+      {% for row in stats.top_referrers %}
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="small">{{ row.referrer }}</span><strong>{{ row.n }}</strong>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No referrer data yet.</p>
+      {% endfor %}
+      {% if stats.first_click %}
+      <hr class="divider">
+      <div class="small muted">First click: {{ stats.first_click.created|date:"j M Y, H:i" }}<br>
+        Latest: {{ stats.last_click.created|date:"j M Y, H:i" }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Link health</h2>
+      <ul class="list-plain small">
+        <li><strong>Active:</strong> {{ link.active|yesno:"yes,no" }}</li>
+        <li><strong>Expired:</strong> {{ link.is_expired|yesno:"yes,no" }}</li>
+        <li><strong>Cap reached:</strong> {{ link.is_capped|yesno:"yes,no" }}</li>
+        <li><strong>Redirecting:</strong> {{ link.can_redirect|yesno:"yes,no" }}</li>
+      </ul>
+      {% if not link.can_redirect %}
+      <div class="alert alert-info">Visitors currently receive <strong>410 Gone</strong> for this link.</div>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

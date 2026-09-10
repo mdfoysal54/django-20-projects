@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}My kitchen · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My kitchen</h1>
+    <p class="lede mb-0">{{ recipes|length }} recipe{{ recipes|length|pluralize }} · drafts stay invisible to everyone else.</p></div>
+  <a class="btn btn-primary" href="{% url 'recipe_create' %}">+ New recipe</a>
+</div>
+
+<div class="grid grid-3">
+  {% for recipe in recipes %}
+  <div class="card recipe-card">
+    <div class="recipe-cover">{{ recipe.emoji }}</div>
+    <div class="recipe-body">
+      <div class="pill-row">
+        {% if recipe.is_published %}<span class="badge badge-ok">Published</span>{% else %}<span class="badge badge-warn">Draft</span>{% endif %}
+        {% if recipe.avg_rating %}<span class="badge badge-warn">★ {{ recipe.avg_rating|floatformat:1 }}</span>
+        {% else %}<span class="badge">unrated</span>{% endif %}
+        <span class="badge">❤ {{ recipe.n_favs }}</span>
+      </div>
+      <div class="card-title mb-0">
+        {% if recipe.is_published %}<a href="{{ recipe.get_absolute_url }}">{{ recipe.title }}</a>{% else %}{{ recipe.title }}{% endif %}
+      </div>
+      <div class="small muted">{{ recipe.total_minutes }} min · {{ recipe.servings }} servings ·
+        {{ recipe.n_ratings }} rating{{ recipe.rating_count|pluralize }}</div>
+      <div class="pill-row mt-1">
+        <a class="btn btn-sm btn-secondary" href="{% url 'recipe_edit' recipe.slug %}">Edit</a>
+        {% if recipe.is_published %}<a class="btn btn-sm btn-ghost" href="{{ recipe.get_absolute_url }}">View</a>{% endif %}
+        <form method="post" action="{% url 'recipe_delete' recipe.slug %}">
+          {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">👩‍🍳</div><h2>Your kitchen is empty</h2>
+    <p>Add the dish you cook best — someone is looking for exactly that.</p>
+    <a class="btn btn-primary" href="{% url 'recipe_create' %}">Share a recipe</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Collections · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Collections</h1>
+    <p class="lede mb-0">Group recipes for a week of cooking, a party, or a cuisine you're learning.</p></div>
+  <a class="btn btn-secondary" href="{% url 'favourites' %}">← Favourites</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="grid" style="gap:1rem">
+    {% for collection in collections %}
+    <div class="card">
+      <div class="pill-row" style="justify-content:space-between">
+        <div>
+          <div class="card-title mb-0">{{ collection.name }}</div>
+          <div class="small muted">{{ collection.description|default:"No description" }} ·
+            {{ collection.n }} recipe{{ collection.n|pluralize }}</div>
+        </div>
+      </div>
+      <div class="pill-row mt-1">
+        {% for recipe in collection.recipes.all %}
+          <a class="badge" href="{{ recipe.get_absolute_url }}">{{ recipe.emoji }} {{ recipe.title }}</a>
+        {% empty %}
+          <span class="muted small">Empty — add recipes from any recipe page.</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state"><div class="big">📚</div><h2>No collections yet</h2>
+      <p>Create one on the right, then add recipes from their pages.</p></div>
+    {% endfor %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">New collection</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Create collection</button>
+    </form>
+    <p class="form-hint mb-0">Names must be unique within your account.</p>
+  </aside>
+</div>
+{% endblock %}

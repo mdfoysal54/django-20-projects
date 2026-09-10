@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New link{% else %}Edit /s/{{ link.code }}{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:720px">
+  <nav class="breadcrumbs"><a href="{% url 'dashboard' %}">Links</a> ›
+    <strong>{% if mode == 'create' %}New{% else %}/s/{{ link.code }}{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Create a short link{% else %}Edit {{ link.code }}{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}The code is generated for you. Set an expiry or a click cap if the
+      campaign is temporary.{% else %}The code itself never changes — people may already be sharing it.{% endif %}</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Create link{% else %}Save changes{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'dashboard' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

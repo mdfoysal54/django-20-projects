@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.get_full_name|default:user.username }} 👋</p></div>
+</div>
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ clients }}</div><div class="stat-label">Clients</div></div>
+  <div class="card stat"><div class="stat-value">{{ invoices }}</div><div class="stat-label">Invoices</div></div>
+  <div class="card stat"><div class="stat-value mono">৳{{ outstanding|floatformat:2 }}</div><div class="stat-label">Outstanding</div></div>
+  <div class="card stat"><div class="stat-value">{{ paid }}</div><div class="stat-label">Paid in full</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'dashboard' %}">→ Dashboard</a></li>
+      <li><a href="{% url 'invoice_create' %}">→ New invoice</a></li>
+      <li><a href="{% url 'client_list' %}">→ Clients</a></li>
+      <li><a href="{% url 'aging' %}">→ Aging report</a></li>
+      <li><a href="{% url 'expenses' %}">→ Expenses</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

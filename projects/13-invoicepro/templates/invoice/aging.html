@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Aging report · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Aging report</h1>
+    <p class="lede mb-0">Total outstanding: <strong class="mono">৳{{ grand_total|floatformat:2 }}</strong></p></div>
+  <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Dashboard</a>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value mono">৳{{ totals.current|floatformat:2 }}</div>
+    <div class="stat-label">Current (not due)</div></div>
+  <div class="card stat"><div class="stat-value mono">৳{{ totals.1_30|floatformat:2 }}</div>
+    <div class="stat-label">1–30 days late</div></div>
+  <div class="card stat"><div class="stat-value mono">৳{{ totals.31_60|floatformat:2 }}</div>
+    <div class="stat-label">31–60 days late</div></div>
+  <div class="card stat stat-danger"><div class="stat-value mono">৳{{ totals.61_plus|floatformat:2 }}</div>
+    <div class="stat-label">61+ days late</div></div>
+</div>
+
+{% for key, bucket in buckets.items %}
+<div class="card">
+  <h2 class="card-title">
+    {% if key == 'current' %}Not yet due{% elif key == '1_30' %}1–30 days late
+    {% elif key == '31_60' %}31–60 days late{% else %}61+ days late{% endif %}
+    <span class="badge">{{ bucket|length }}</span></h2>
+  <table class="table">
+    <thead><tr><th>Number</th><th>Client</th><th>Due</th><th>Balance</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for invoice in bucket %}
+      <tr>
+        <td class="mono"><a href="{{ invoice.get_absolute_url }}">{{ invoice.number }}</a></td>
+        <td>{{ invoice.client.name }}</td>
+        <td class="small">{{ invoice.due_date|date:"j M Y" }}</td>
+        <td class="mono">৳{{ invoice.balance|floatformat:2 }}</td>
+        <td><span class="badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="muted">Nothing in this bucket. 🎉</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

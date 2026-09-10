@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Favourites · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Favourites</h1>
+    <p class="lede mb-0">{{ favourites|length }} saved recipe{{ favourites|length|pluralize }}</p></div>
+  <a class="btn btn-secondary" href="{% url 'collections' %}">Collections →</a>
+</div>
+
+<div class="grid grid-3">
+  {% for favourite in favourites %}
+  <div class="card recipe-card">
+    <div class="recipe-cover">{{ favourite.recipe.emoji }}</div>
+    <div class="recipe-body">
+      <div class="pill-row">
+        {% if favourite.avg %}<span class="badge badge-warn">★ {{ favourite.avg|floatformat:1 }}</span>{% endif %}
+        <span class="badge">{{ favourite.recipe.total_minutes }} min</span>
+      </div>
+      <div class="card-title mb-0"><a href="{{ favourite.recipe.get_absolute_url }}">{{ favourite.recipe.title }}</a></div>
+      <div class="small muted">by {{ favourite.recipe.author.username }} · saved {{ favourite.created|date:"j M" }}</div>
+      <form method="post" action="{% url 'toggle_favourite' favourite.recipe.slug %}" class="mt-1">
+        {% csrf_token %}<button class="btn btn-sm btn-secondary" type="submit">Remove</button>
+      </form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">♡</div><h2>Nothing saved yet</h2>
+    <p>Tap the heart on any recipe and it lands here.</p>
+    <a class="btn btn-primary" href="{% url 'recipe_list' %}">Browse recipes</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -23,6 +23,16 @@ jobs:
           - 04-devjobs
           - 05-taskflow
           - 06-fintrack
+          - 07-blogpress
+          - 08-eventtix
+          - 09-helpdesk
+          - 10-medcare
+          - 11-fittrack
+          - 12-recipebox
+          - 13-invoicepro
+          - 14-attendx
+          - 15-quizmaster
+          - 16-linkshort
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +49,12 @@ jobs:
       - name: Run test-suite (security + domain)
         working-directory: projects/${{ matrix.project }}
         run: python manage.py test
+
+      - name: Page smoke test (renders every route)
+        working-directory: projects/${{ matrix.project }}
+        run: |
+          python manage.py migrate -v 0
+          python ../tools/smoke_pages.py .
 
       - name: Production deploy check (fails if hardening regressed)
         working-directory: projects/${{ matrix.project }}
@@ -57,4 +73,4 @@ jobs:
     runs-on: ubuntu-latest
     needs: verify
     steps:
-      - run: echo "All six flagship projects passed their test-suites and deploy checks. ✅"
+      - run: echo "All sixteen projects passed their test-suites, page smoke tests and deploy checks. ✅"

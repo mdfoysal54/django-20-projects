@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Goals · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Goals</h1>
+    <p class="lede mb-0">Weekly session targets, monthly volume and distance — progress updates as you log.</p></div>
+  <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Dashboard</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="grid" style="gap:1rem">
+    <div class="card">
+      <h2 class="card-title">Active</h2>
+      {% for goal in active_goals %}
+      <div class="goal-row">
+        <div style="flex:1">
+          <div class="metric-label">
+            <span><strong>{{ goal.get_kind_display }}</strong> — target {{ goal.target|floatformat:0 }}</span>
+            <strong>{{ goal.current_value|floatformat:0 }} ({{ goal.progress_percent }}%)</strong>
+          </div>
+          <div class="capacity-bar"><span style="width:{{ goal.progress_percent }}%"></span></div>
+        </div>
+        <form method="post" action="{% url 'goal_close' goal.pk %}">
+          {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">Retire</button>
+        </form>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No active goals. Set one on the right.</p>
+      {% endfor %}
+    </div>
+
+    {% if past_goals %}
+    <div class="card">
+      <h2 class="card-title">Retired</h2>
+      <table class="table">
+        <thead><tr><th>Goal</th><th>Target</th><th>Final</th></tr></thead>
+        <tbody>
+        {% for goal in past_goals %}
+          <tr><td>{{ goal.get_kind_display }}</td><td>{{ goal.target|floatformat:0 }}</td>
+              <td class="mono">{{ goal.current_value|floatformat:0 }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Set a goal</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Save goal</button>
+    </form>
+    <p class="form-hint mb-0">Setting a goal of a kind you already track replaces the old one — one active target per type.</p>
+  </aside>
+</div>
+{% endblock %}

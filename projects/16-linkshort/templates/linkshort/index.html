@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — short links with real analytics{% endblock %}
+{% block content %}
+<section class="ls-hero">
+  <div>
+    <h1>Short links that tell you what happened.</h1>
+    <p class="lede">Six-character codes, click counts that never race, expiry and caps,
+      and analytics that respect your visitors' privacy.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'register' %}">Shorten a link →</a>
+      <a class="btn btn-lg btn-secondary" href="{% url 'login' %}">Log in</a>
+    </p>
+  </div>
+  <div class="hero-emoji">🔗</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_links }}</div><div class="stat-label">Links shortened</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_clicks }}</div><div class="stat-label">Clicks tracked</div></div>
+  <div class="card stat"><div class="stat-value">6</div><div class="stat-label">Characters per code</div></div>
+</div>
+
+<div class="grid grid-3">
+  <div class="card"><h2 class="card-title">🔒 Safe by default</h2>
+    <p class="small muted">Only http/https destinations. <span class="mono">javascript:</span> and
+      <span class="mono">data:</span> links are refused, and a link can never point back at LinkShort.</p></div>
+  <div class="card"><h2 class="card-title">📊 Honest analytics</h2>
+    <p class="small muted">Clicks per day, referrer hosts, device mix and unique visitors from hashed addresses —
+      raw IPs are never stored.</p></div>
+  <div class="card"><h2 class="card-title">⏳ Expiry &amp; caps</h2>
+    <p class="small muted">Set a deadline or a maximum click count; after that the link returns 410 Gone
+      instead of redirecting.</p></div>
+</div>
+{% endblock %}

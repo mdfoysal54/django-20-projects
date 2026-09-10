@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — book a doctor in seconds{% endblock %}
+{% block content %}
+
+<section class="med-hero">
+  <div>
+    <h1>Care that fits your day.</h1>
+    <p class="lede">See real availability, book the exact slot, and keep every visit in one place.
+      Slots can never be double-booked — the database enforces it.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'doctor_list' %}">Find a doctor →</a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'my_appointments' %}">My appointments</a>
+      {% else %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Create an account</a>
+      {% endif %}
+    </p>
+  </div>
+  <div class="hero-emoji">🩺</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_doctors }}</div><div class="stat-label">Doctors on the rota</div></div>
+  <div class="card stat"><div class="stat-value">{{ appointments_today }}</div><div class="stat-label">Booked today</div></div>
+  <div class="card stat"><div class="stat-value">{{ specialities|length }}</div><div class="stat-label">Specialities</div></div>
+</div>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Browse by speciality</h2></div>
+  <div class="grid grid-5">
+    {% for spec in specialities %}
+    <a class="card card-hover spec-card" style="color:inherit" href="{% url 'doctor_list' %}?speciality={{ spec.slug }}">
+      <div class="spec-emoji">{{ spec.emoji }}</div>
+      <div class="card-title mb-0">{{ spec.name }}</div>
+      <div class="small muted">{{ spec.n }} doctor{{ spec.n|pluralize }} taking bookings</div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🩺</div><h2>No specialities yet</h2>
+      <p>Run <span class="mono">python manage.py seed_demo</span>.</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">Accepting new patients</h2></div>
+    <a class="btn btn-secondary" href="{% url 'doctor_list' %}">All doctors →</a>
+  </div>
+  <div class="grid grid-4">
+    {% for doctor in doctors %}
+    <a class="card card-hover doctor-card" style="color:inherit" href="{{ doctor.get_absolute_url }}">
+      <div class="doctor-avatar">{{ doctor.user.first_name|default:doctor.user.username|slice:":1"|upper }}</div>
+      <div class="card-title mb-0">{{ doctor.display_name }}</div>
+      <div class="small muted">{{ doctor.speciality.emoji }} {{ doctor.speciality.name }}</div>
+      <div class="pill-row mt-1">
+        <span class="badge">৳{{ doctor.fee }}</span>
+        <span class="badge">{{ doctor.slot_minutes }} min</span>
+        {% if doctor.room %}<span class="badge">Room {{ doctor.room }}</span>{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

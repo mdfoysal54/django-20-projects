@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Support metrics · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Support metrics</h1>
+    <p class="lede mb-0">Live snapshot of queue health, SLA adherence and satisfaction.</p></div>
+  <a class="btn btn-secondary" href="{% url 'queue' %}">← Back to queue</a>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ open_count }}</div><div class="stat-label">Open tickets</div></div>
+  <div class="card stat"><div class="stat-value">{{ unassigned }}</div><div class="stat-label">Unassigned</div></div>
+  <div class="card stat {% if breached %}stat-danger{% endif %}"><div class="stat-value">{{ breached }}</div>
+    <div class="stat-label">Past SLA</div></div>
+  <div class="card stat"><div class="stat-value">{{ resolved_today }}</div><div class="stat-label">Resolved today</div></div>
+</div>
+
+<div class="grid grid-3">
+  <div class="card">
+    <h2 class="card-title">First response time</h2>
+    {% if avg_first_response_minutes %}
+      <div class="metric-big">{{ avg_first_response_minutes }}<span class="unit"> min</span></div>
+      <p class="small muted mb-0">Average across {{ total }} ticket{{ total|pluralize }}, measured from creation to first agent reply.</p>
+    {% else %}
+      <p class="muted mb-0">No agent replies recorded yet.</p>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Customer satisfaction</h2>
+    {% if csat %}
+      <div class="metric-big">{{ csat|floatformat:1 }}<span class="unit">/5</span></div>
+      <p class="small muted mb-0">Average from submitted ratings on resolved tickets.</p>
+    {% else %}
+      <p class="muted mb-0">No ratings submitted yet.</p>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Open by priority</h2>
+    {% for row in by_priority %}
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="badge priority-{{ row.key }}">{{ row.label }}</span><strong>{{ row.n }}</strong>
+      </div>
+    {% empty %}
+      <p class="muted mb-0">Nothing open.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Tickets by status</h2>
+  {% for row in by_status %}
+  <div class="metric-row">
+    <div class="metric-label"><span class="badge status-{{ row.key }}">{{ row.label }}</span> <strong>{{ row.n }}</strong></div>
+    <div class="capacity-bar"><span style="width:{{ row.pct }}%"></span></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <h2 class="card-title">Latest tickets</h2>
+  <table class="table">
+    <thead><tr><th>Ref</th><th>Subject</th><th>Requester</th><th>Department</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for ticket in recent %}
+      <tr>
+        <td class="mono"><a href="{{ ticket.get_absolute_url }}">{{ ticket.reference }}</a></td>
+        <td>{{ ticket.subject|truncatechars:48 }}</td>
+        <td>{{ ticket.requester.username }}</td>
+        <td>{{ ticket.department.name }}</td>
+        <td><span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+        <td class="small muted">{{ ticket.created|timesince }} ago</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="muted">No tickets yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

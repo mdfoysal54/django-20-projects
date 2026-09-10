@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Expenses · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Expenses</h1>
+    <p class="lede mb-0">This is what makes the net figure on your dashboard honest.</p></div>
+  <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Dashboard</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <h2 class="card-title">All expenses <span class="badge">৳{{ total|floatformat:2 }}</span></h2>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th></tr></thead>
+        <tbody>
+        {% for expense in expenses %}
+          <tr>
+            <td class="small">{{ expense.incurred_on|date:"j M Y" }}</td>
+            <td>{{ expense.description }}</td>
+            <td><span class="badge">{{ expense.category }}</span></td>
+            <td class="mono">৳{{ expense.amount|floatformat:2 }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No expenses logged.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">By category</h2>
+      {% for row in by_category %}
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="badge">{{ row.category }}</span>
+        <span><span class="muted small">{{ row.n }} item{{ row.n|pluralize }} · </span>
+          <strong class="mono">৳{{ row.total|floatformat:2 }}</strong></span>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">Nothing to break down yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Log an expense</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Add expense</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

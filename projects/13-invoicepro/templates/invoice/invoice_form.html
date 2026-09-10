@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{% if invoice %}Edit {{ invoice.number }}{% else %}New invoice{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:900px">
+  <nav class="breadcrumbs"><a href="{% url 'invoice_list' %}">Invoices</a> ›
+    <strong>{% if invoice %}{{ invoice.number }}{% else %}New{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if invoice %}Edit {{ invoice.number }}{% else %}New invoice{% endif %}</h1>
+    <p class="lede">Money is stored as exact decimals. Line totals are quantity × unit price, rounded half-up.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-3">
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <h2 class="card-title mt-3">Line items</h2>
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}<div class="alert alert-error">{{ formset.non_form_errors }}</div>{% endif %}
+      <table class="table">
+        <thead><tr><th>Description</th><th style="width:110px">Qty</th><th style="width:150px">Unit price</th><th style="width:90px">Remove</th></tr></thead>
+        <tbody>
+        {% for item_form in formset %}
+          <tr>
+            {{ item_form.id }}
+            <td>{{ item_form.description }}{% if item_form.description.errors %}
+              <ul class="field-errors">{% for e in item_form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}</td>
+            <td>{{ item_form.quantity }}{% if item_form.quantity.errors %}
+              <ul class="field-errors">{% for e in item_form.quantity.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}</td>
+            <td>{{ item_form.unit_price }}{% if item_form.unit_price.errors %}
+              <ul class="field-errors">{% for e in item_form.unit_price.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}</td>
+            <td>{% if item_form.DELETE %}{{ item_form.DELETE }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p class="form-hint">At least one line item is required before the invoice can be sent.</p>
+
+      <div class="pill-row mt-2">
+        <button class="btn btn-primary" type="submit">Save invoice</button>
+        <a class="btn btn-ghost" href="{% url 'invoice_list' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

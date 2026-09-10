@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# Start all six flagship dev servers at once (local development).
+# Start every project's dev server at once (local development).
 #
-#   bash tools/run_all.sh          # serve on ports 8000–8005
+#   bash tools/run_all.sh          # serve on ports 8000–8015
 #   Ctrl+C                          # stop everything
 #
 # Each project keeps its own SQLite database. If a project has never been
-# migrated/seeded on this machine, run its quickstart first:
-#   cd projects/<name> && python manage.py migrate && python manage.py seed_demo
+# migrated/seeded on this machine, this script does it automatically on first
+# run (migrate + seed_demo).
 # ---------------------------------------------------------------------------
 set -uo pipefail
 
@@ -20,6 +20,16 @@ PROJECTS=(
   "04-devjobs:8003:💼  DevJobs"
   "05-taskflow:8004:✅  TaskFlow"
   "06-fintrack:8005:💹  FinTrack"
+  "07-blogpress:8006:📰  BlogPress"
+  "08-eventtix:8007:🎟️  EventTix"
+  "09-helpdesk:8008:🎧  HelpDesk"
+  "10-medcare:8009:🩺  MedCare"
+  "11-fittrack:8010:🏋️  FitTrack"
+  "12-recipebox:8011:🍳  RecipeBox"
+  "13-invoicepro:8012:🧾  InvoicePro"
+  "14-attendx:8013:🗓️  AttendX"
+  "15-quizmaster:8014:🧠  QuizMaster"
+  "16-linkshort:8015:🔗  LinkShort"
 )
 
 PIDS=()

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Doctors · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Our doctors</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} clinician{{ page_obj.paginator.count|pluralize }} on the rota</p></div>
+  <form class="pill-row" method="get">
+    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search name or focus…" style="min-width:220px">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="pill-row mb-3">
+  <a class="badge {% if not speciality_slug %}badge-brand{% endif %}" href="{% url 'doctor_list' %}">All specialities</a>
+  {% for spec in specialities %}
+    <a class="badge {% if speciality_slug == spec.slug %}badge-brand{% endif %}" href="?speciality={{ spec.slug }}">{{ spec.emoji }} {{ spec.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="grid grid-3">
+  {% for doctor in page_obj %}
+  <a class="card card-hover doctor-card" style="color:inherit" href="{{ doctor.get_absolute_url }}">
+    <div class="doctor-avatar">{{ doctor.user.first_name|default:doctor.user.username|slice:":1"|upper }}</div>
+    <div class="card-title mb-0">{{ doctor.display_name }}</div>
+    <div class="small muted">{{ doctor.speciality.emoji }} {{ doctor.speciality.name }}</div>
+    <p class="small muted">{{ doctor.bio|truncatechars:110 }}</p>
+    <div class="pill-row">
+      <span class="badge">৳{{ doctor.fee }}</span>
+      <span class="badge">{{ doctor.slot_minutes }} min slots</span>
+      {% if doctor.accepting_new %}<span class="badge badge-ok">Accepting</span>
+      {% else %}<span class="badge badge-warn">Full</span>{% endif %}
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🔍</div><h2>No doctors match</h2>
+    <a class="btn btn-primary" href="{% url 'doctor_list' %}">Reset filters</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">← Previous</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

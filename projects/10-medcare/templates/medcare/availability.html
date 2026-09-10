@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}My availability · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Availability &amp; profile</h1>
+    <p class="lede mb-0">{{ doctor.display_name }} · {{ doctor.speciality.name }}</p></div>
+  <a class="btn btn-secondary" href="{% url 'schedule' %}">Clinic day →</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1fr 1fr; align-items:start">
+  <div class="grid" style="gap:1rem">
+    <div class="card">
+      <h2 class="card-title">Weekly rota</h2>
+      <table class="table">
+        <thead><tr><th>Day</th><th>Hours</th><th>Slots</th><th></th></tr></thead>
+        <tbody>
+        {% for block in blocks %}
+          <tr>
+            <td><strong>{{ block.get_weekday_display }}</strong></td>
+            <td class="mono">{{ block.start_time|time:"H:i" }}–{{ block.end_time|time:"H:i" }}</td>
+            <td class="small muted">
+              {% widthratio block.end_time.hour|add:"-0" 1 1 as _h %}{{ doctor.slot_minutes }}-min slots</td>
+            <td>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="block_id" value="{{ block.pk }}">
+                <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No rota yet — patients cannot book until you publish hours.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Add a block</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Publish block</button>
+      </form>
+      <p class="form-hint mb-0">Overlapping blocks on the same weekday are rejected.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Public profile</h2>
+    <form method="post" action="{% url 'update_doctor_profile' %}">
+      {% csrf_token %}
+      {% for field in doctor_form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Save profile</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

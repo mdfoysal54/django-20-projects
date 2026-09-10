@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My quizzes · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My quizzes</h1>
+    <p class="lede mb-0">{{ quizzes|length }} quiz{{ quizzes|length|pluralize:"zes" }} · drafts are private to you</p></div>
+  <a class="btn btn-primary" href="{% url 'quiz_create' %}">+ New quiz</a>
+</div>
+
+<div class="grid" style="gap:.9rem">
+  {% for quiz in quizzes %}
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="pill-row">
+        <span class="quiz-emoji">{{ quiz.emoji }}</span>
+        <div>
+          <strong><a href="{{ quiz.get_absolute_url }}">{{ quiz.title }}</a></strong>
+          <div class="small muted">{{ quiz.category.name|default:"Unfiled" }} ·
+            {{ quiz.n_questions }} question{{ quiz.n_questions|pluralize }} · {{ quiz.total_points }} points ·
+            {{ quiz.n_attempts }} attempt{{ quiz.n_attempts|pluralize }}</div>
+        </div>
+      </div>
+      <div class="pill-row">
+        {% if quiz.visibility == 'draft' %}<span class="badge badge-warn">Draft</span>
+        {% elif quiz.visibility == 'unlisted' %}<span class="badge">Unlisted</span>
+        {% else %}<span class="badge badge-ok">Public</span>{% endif %}
+        <span class="badge">pass {{ quiz.pass_mark }}%</span>
+        {% if quiz.one_attempt_only %}<span class="badge badge-warn">1 attempt</span>{% endif %}
+      </div>
+    </div>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-primary" href="{% url 'question_create' quiz.slug %}">+ Question</a>
+      <a class="btn btn-sm btn-secondary" href="{% url 'quiz_edit' quiz.slug %}">Settings</a>
+      <a class="btn btn-sm btn-secondary" href="{% url 'quiz_results' quiz.slug %}">Analytics</a>
+      <form method="post" action="{% url 'quiz_delete' quiz.slug %}">
+        {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state"><div class="big">🧪</div><h2>No quizzes yet</h2>
+    <p>Create one, add a few questions, then publish it.</p>
+    <a class="btn btn-primary" href="{% url 'quiz_create' %}">Create a quiz</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

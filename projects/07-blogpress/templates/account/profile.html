@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1><p class="lede mb-0">Hello {{ user.username }} 👋</p></div>
+</div>
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ post_count }}</div><div class="stat-label">Posts written</div></div>
+  <div class="card stat"><div class="stat-value">{{ published_count }}</div><div class="stat-label">Published</div></div>
+  <div class="card stat"><div class="stat-value">{{ comment_count }}</div><div class="stat-label">Comments left</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'dashboard' %}">→ My writing</a></li>
+      <li><a href="{% url 'post_create' %}">→ New post</a></li>
+      <li><a href="{% url 'post_list' %}">→ Browse all posts</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — train, log, progress{% endblock %}
+{% block content %}
+<section class="fit-hero">
+  <div>
+    <h1>Lift. Run. Repeat.</h1>
+    <p class="lede">Log every set, get personal-best detection for free, and watch your weekly volume climb.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'register' %}">Start tracking →</a>
+      <a class="btn btn-lg btn-secondary" href="{% url 'exercise_list' %}">Browse exercises</a>
+    </p>
+  </div>
+  <div class="hero-emoji">🏋️</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ exercise_count }}</div><div class="stat-label">Exercises in the library</div></div>
+  <div class="card stat"><div class="stat-value">{{ workouts_logged }}</div><div class="stat-label">Workouts logged</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_volume|floatformat:0 }}</div><div class="stat-label">kg lifted in total</div></div>
+</div>
+
+<section class="grid grid-3">
+  <div class="card"><h2 class="card-title">🏆 Personal bests, automatically</h2>
+    <p class="small muted">Every set you log is compared against your own history. Beat it and FitTrack flags the PR.</p></div>
+  <div class="card"><h2 class="card-title">📅 Weekly goals</h2>
+    <p class="small muted">Set session, volume or distance targets and watch them fill as you train.</p></div>
+  <div class="card"><h2 class="card-title">📈 Progress you can see</h2>
+    <p class="small muted">Per-exercise history and body-weight trends, charted from your own data.</p></div>
+</section>
+{% endblock %}

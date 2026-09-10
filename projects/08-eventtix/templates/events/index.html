@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — sell out your event{% endblock %}
+{% block content %}
+
+<section class="eve-hero">
+  <div>
+    <h1>Live experiences, zero overselling.</h1>
+    <p class="lede">Publish an event, define your tiers and watch the seats go — capacity is protected at the database level.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'event_list' %}">Browse events →</a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'event_create' %}">Host an event</a>
+      {% else %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Start selling</a>
+      {% endif %}
+    </p>
+  </div>
+  <div class="hero-emoji">🎟️</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_events }}</div><div class="stat-label">Events listed</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_tickets }}</div><div class="stat-label">Tickets sold</div></div>
+  <div class="card stat"><div class="stat-value">{{ venues }}</div><div class="stat-label">Venues</div></div>
+</div>
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">On sale now</h2></div>
+    <a class="btn btn-secondary" href="{% url 'event_list' %}">All events →</a>
+  </div>
+  <div class="grid grid-3">
+    {% for event in events %}
+    <a class="card card-hover event-card" href="{{ event.get_absolute_url }}">
+      <div class="event-cover">{{ event.cover_emoji }}</div>
+      <div class="event-body">
+        <div class="pill-row">
+          {% if event.status == 'soldout' %}<span class="badge badge-warn">Sold out</span>
+          {% elif event.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+          {% else %}<span class="badge badge-ok">On sale</span>{% endif %}
+          {% if event.remaining <= 10 and event.remaining > 0 %}<span class="badge badge-warn">Only {{ event.remaining }} left</span>{% endif %}
+        </div>
+        <h3 class="card-title mb-0">{{ event.title }}</h3>
+        <div class="small muted">📍 {{ event.venue }}</div>
+        <div class="small muted">🗓 {{ event.starts_at|date:"D, M j · g:i A" }}</div>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🎟️</div><h2>No upcoming events</h2>
+      <p>Seed the demo data with <span class="mono">python manage.py seed_demo</span>.</p></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

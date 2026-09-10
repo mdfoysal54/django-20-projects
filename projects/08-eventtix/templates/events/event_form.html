@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}New event · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:760px">
+  <nav class="breadcrumbs"><a href="{% url 'organiser_dashboard' %}">Organiser</a> › <strong>New event</strong></nav>
+  <div class="card">
+    <h1 class="page-title">Create an event</h1>
+    <p class="lede">Events start as drafts. Add ticket tiers, then switch it to “On sale” from the manage screen.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Create draft</button>
+      <a class="btn btn-ghost" href="{% url 'organiser_dashboard' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Agent queue · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Agent queue</h1>
+    <p class="lede mb-0">{{ tickets|length }} shown · {{ unassigned_count }} unassigned ·
+      <span class="{% if breached_count %}text-danger{% endif %}">{{ breached_count }} past SLA</span></p></div>
+  <a class="btn btn-secondary" href="{% url 'metrics' %}">Metrics →</a>
+</div>
+
+<form class="card filter-bar" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search reference, subject or customer…">
+  <select class="form-control" name="status">
+    <option value="active" {% if status == 'active' %}selected{% endif %}>Active (unresolved)</option>
+    <option value="" {% if status == '' %}selected{% endif %}>All statuses</option>
+    {% for value, label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select class="form-control" name="priority">
+    <option value="">Any priority</option>
+    {% for value, label in priorities %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select class="form-control" name="assignee">
+    <option value="">Anyone</option>
+    <option value="me" {% if assignee == 'me' %}selected{% endif %}>Assigned to me</option>
+    <option value="unassigned" {% if assignee == 'unassigned' %}selected{% endif %}>Unassigned</option>
+  </select>
+  <button class="btn btn-primary" type="submit">Filter</button>
+</form>
+
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Ref</th><th>Subject</th><th>Customer</th><th>Priority</th><th>Status</th><th>SLA</th><th>Agent</th><th></th></tr></thead>
+    <tbody>
+    {% for ticket in tickets %}
+      <tr class="{% if ticket.is_breached %}row-danger{% endif %}">
+        <td class="mono"><a href="{{ ticket.get_absolute_url }}">{{ ticket.reference }}</a></td>
+        <td><a href="{{ ticket.get_absolute_url }}">{{ ticket.subject|truncatechars:52 }}</a>
+          <div class="small muted">{{ ticket.department.emoji }} {{ ticket.department.name }} · 💬 {{ ticket.n_messages }}</div></td>
+        <td>{{ ticket.requester.username }}</td>
+        <td><span class="badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+        <td><span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+        <td class="small">
+          {% if ticket.is_breached %}<span class="text-danger">breached</span>
+          {% else %}due {{ ticket.sla_due|timeuntil }}{% endif %}
+        </td>
+        <td>{% if ticket.assignee %}{{ ticket.assignee.username }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>
+          {% if not ticket.assignee %}
+          <form method="post" action="{% url 'claim' ticket.reference %}">
+            {% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Claim</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="8" class="muted">Queue is clear. 🎉</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

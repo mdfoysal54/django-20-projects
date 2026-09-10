@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{{ cohort.name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'cohort_list' %}">Cohorts</a> › <strong>{{ cohort.name }}</strong></nav>
+
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">{{ cohort.name }}</h1>
+    <p class="lede mb-0">{{ cohort.subject|default:"—" }} · {{ cohort.room|default:"no room" }} ·
+      {{ cohort.meeting_note|default:"no schedule set" }}</p>
+  </div>
+  <div class="pill-row">
+    <span class="badge badge-lg mono">Join code: {{ cohort.code }}</span>
+    {% if is_teacher %}
+      <a class="btn btn-secondary" href="{% url 'report' cohort.pk %}">Report</a>
+      <a class="btn btn-secondary" href="{% url 'cohort_edit' cohort.pk %}">Edit</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.5fr 1fr; align-items:start">
+  <div>
+    {% if is_teacher %}
+    <div class="card">
+      <div class="page-head" style="margin-bottom:.4rem">
+        <h2 class="card-title mb-0">Sessions</h2>
+        <span class="small muted">{{ sessions|length }} total</span>
+      </div>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Topic</th><th>Status</th><th>Attendance</th><th></th></tr></thead>
+        <tbody>
+        {% for session in sessions %}
+          <tr>
+            <td class="small">{{ session.date|date:"D j M" }}{% if session.is_today %} <span class="badge badge-brand">today</span>{% endif %}</td>
+            <td>{{ session.topic|default:"—" }}</td>
+            <td><span class="badge status-{{ session.status }}">{{ session.get_status_display }}</span></td>
+            <td class="small">
+              {% if session.status == 'held' and session.attendance_rate is not None %}
+                {{ session.attendance_rate }}%
+              {% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td>
+              <a class="btn btn-sm btn-secondary" href="{{ session.get_absolute_url }}">
+                {% if session.can_mark %}Take register{% else %}Open{% endif %}</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="muted">No sessions yet — add the first one on the right.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card">
+      <h2 class="card-title">Your attendance in this class</h2>
+      {% for record in my_records %}
+      <div class="pill-row" style="justify-content:space-between">
+        <div><strong>{{ record.session.date|date:"D j M" }}</strong>
+          <div class="small muted">{{ record.session.topic|default:"No topic" }}</div></div>
+        <span class="badge status-{{ record.status }}">{{ record.get_status_display }}</span>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No attendance recorded for you yet.</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if summary %}
+    <div class="card">
+      <h2 class="card-title">Attendance by student <span class="badge">{{ summary.total_sessions }} held sessions</span></h2>
+      <table class="table">
+        <thead><tr><th>Student</th><th>Present</th><th>Late</th><th>Absent</th><th>Excused</th><th>Rate</th></tr></thead>
+        <tbody>
+        {% for row in summary.rows %}
+          <tr>
+            <td><strong>{{ row.student.get_full_name|default:row.student.username }}</strong>
+              {% if row.unmarked %}<span class="badge badge-warn">{{ row.unmarked }} unmarked</span>{% endif %}</td>
+            <td>{{ row.present }}</td><td>{{ row.late }}</td><td>{{ row.absent }}</td><td>{{ row.excused }}</td>
+            <td>
+              {% if row.rate is None %}<span class="muted">—</span>
+              {% else %}
+                <div class="pill-row">
+                  <strong>{% if row.rate >= 85 %}<span class="text-ok">{{ row.rate }}%</span>
+                    {% elif row.rate >= 70 %}<span class="text-warn">{{ row.rate }}%</span>
+                    {% else %}<span class="text-danger">{{ row.rate }}%</span>{% endif %}</strong>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="muted">No students enrolled yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p class="form-hint mb-0">Late counts as attending. Excused absences are excluded from the rate.</p>
+      {% if is_teacher %}
+      <form method="post" action="{% url 'cohort_remove_student' cohort.pk %}" class="pill-row mt-1">
+        {% csrf_token %}
+        <select class="form-control" name="student" style="max-width:240px">
+          {% for row in summary.rows %}<option value="{{ row.student.pk }}">{{ row.student.username }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-sm btn-danger" type="submit">Remove from roster</button>
+      </form>
+      <p class="form-hint mb-0">Removing keeps their past attendance records intact.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <aside>
+    {% if is_teacher %}
+    <div class="card">
+      <h2 class="card-title">Schedule a session</h2>
+      <form method="post" action="{% url 'session_create' cohort.pk %}">
+        {% csrf_token %}
+        {% for field in session_form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Add session</button>
+      </form>
+      <p class="form-hint mb-0">Attendance can only be taken for sessions marked “Held”.</p>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="card-title">Class info</h2>
+      {% if cohort.description %}<p class="small">{{ cohort.description }}</p>{% endif %}
+      <ul class="list-plain small">
+        <li><strong>Teacher:</strong> {{ cohort.teacher.get_full_name|default:cohort.teacher.username }}</li>
+        <li><strong>Students:</strong> {{ cohort.student_count }}</li>
+        <li><strong>Held sessions:</strong> {{ cohort.session_count }}</li>
+        <li><strong>Created:</strong> {{ cohort.created|date:"j M Y" }}</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}New session · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:640px">
+  <nav class="breadcrumbs"><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a> › <strong>New session</strong></nav>
+  <div class="card">
+    <h1 class="page-title">Schedule a session</h1>
+    <p class="lede">Sessions start as “Scheduled”. Once the class has happened, mark it “Held” and take the register.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Add session</button>
+      <a class="btn btn-ghost" href="{{ cohort.get_absolute_url }}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

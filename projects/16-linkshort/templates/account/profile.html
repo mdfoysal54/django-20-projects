@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1><p class="lede mb-0">Hello {{ user.username }} 👋</p></div>
+</div>
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ links }}</div><div class="stat-label">Links ({{ active_links }} active)</div></div>
+  <div class="card stat"><div class="stat-value">{{ clicks }}</div><div class="stat-label">Clicks tracked</div></div>
+  <div class="card stat"><div class="stat-value mono">{% if best %}/s/{{ best.code }}{% else %}—{% endif %}</div>
+    <div class="stat-label">Best performer{% if best %} ({{ best.click_count }} clicks){% endif %}</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'dashboard' %}">→ My links</a></li>
+      <li><a href="{% url 'link_create' %}">→ New link</a></li>
+      <li><a href="{% url 'analytics' %}">→ Analytics</a></li>
+    </ul>
+    <hr class="divider">
+    <p class="small muted mb-0">Privacy note: LinkShort stores a salted hash of each visitor's IP address,
+      never the address itself, and only the hostname of referring pages.</p>
+  </div>
+</div>
+{% endblock %}

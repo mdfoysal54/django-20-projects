@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1><p class="lede mb-0">Hello {{ user.username }} 👋</p></div>
+</div>
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ quizzes }}</div><div class="stat-label">Quizzes created</div></div>
+  <div class="card stat"><div class="stat-value">{{ published }}</div><div class="stat-label">Published</div></div>
+  <div class="card stat"><div class="stat-value">{{ attempts }}</div><div class="stat-label">Attempts taken</div></div>
+  <div class="card stat"><div class="stat-value">{% if average %}{{ average }}%{% else %}—{% endif %}</div>
+    <div class="stat-label">Average score</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+      {% if best %}<li><strong>Best score:</strong> {{ best }}%</li>{% endif %}
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'my_quizzes' %}">→ My quizzes</a></li>
+      <li><a href="{% url 'quiz_create' %}">→ Create a quiz</a></li>
+      <li><a href="{% url 'my_attempts' %}">→ My attempts</a></li>
+      <li><a href="{% url 'quiz_list' %}">→ Browse quizzes</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

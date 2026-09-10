@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New workout{% else %}Edit workout{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:680px">
+  <nav class="breadcrumbs"><a href="{% url 'workout_list' %}">My workouts</a> ›
+    <strong>{% if mode == 'create' %}New{% else %}Edit{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Log a workout{% else %}Edit workout{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}Name the session, then add sets on the next screen.{% else %}Update the session details.{% endif %}</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Start workout{% else %}Save changes{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'workout_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

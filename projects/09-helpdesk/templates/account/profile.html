@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1>
+    <p class="lede mb-0">Hello {{ user.username }} {% if is_agent %}<span class="badge badge-brand">agent</span>{% endif %}</p></div>
+</div>
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ opened }}</div><div class="stat-label">Tickets opened</div></div>
+  <div class="card stat"><div class="stat-value">{{ open_count }}</div><div class="stat-label">Still open</div></div>
+  {% if is_agent %}<div class="card stat"><div class="stat-value">{{ assigned }}</div><div class="stat-label">Assigned to me</div></div>{% endif %}
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'my_tickets' %}">→ My tickets</a></li>
+      <li><a href="{% url 'new_ticket' %}">→ Open a ticket</a></li>
+      {% if is_agent %}
+      <li><a href="{% url 'queue' %}">→ Agent queue</a></li>
+      <li><a href="{% url 'metrics' %}">→ Support metrics</a></li>
+      <li><a href="{% url 'departments' %}">→ Departments</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ workout.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'workout_list' %}">My workouts</a> › <strong>{{ workout.title }}</strong></nav>
+
+<div class="page-head">
+  <div><h1 class="page-title mb-0">{{ workout.title }}</h1>
+    <p class="lede mb-0">{{ workout.date|date:"D j M Y" }} · {{ workout.duration_minutes }} minutes ·
+      feel: {{ workout.get_feel_display }}</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'workout_edit' workout.pk %}">Edit details</a>
+    <form method="post" action="{% url 'delete_workout' workout.pk %}">
+      {% csrf_token %}<button class="btn btn-danger" type="submit">Delete workout</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ workout.exercise_count }}</div><div class="stat-label">Exercises</div></div>
+  <div class="card stat"><div class="stat-value">{{ workout.total_sets }}</div><div class="stat-label">Total sets</div></div>
+  <div class="card stat"><div class="stat-value">{{ workout.total_volume|floatformat:0 }}</div><div class="stat-label">Volume (kg)</div></div>
+  <div class="card stat"><div class="stat-value">{{ workout.pr_count }}</div><div class="stat-label">PRs 🏆</div></div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Sets</h2>
+    <table class="table">
+      <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Weight</th><th>Volume</th><th>Cardio</th><th></th></tr></thead>
+      <tbody>
+      {% for entry in workout.sets.all %}
+        <tr>
+          <td><a href="{{ entry.exercise.get_absolute_url }}">{{ entry.exercise.name }}</a>
+            {% if entry.is_personal_best %}<span class="badge badge-warn">🏆 PR</span>{% endif %}</td>
+          <td>{{ entry.sets }} × {{ entry.reps|default:"—" }}</td>
+          <td class="mono">{% if entry.weight_kg %}{{ entry.weight_kg }} kg{% else %}—{% endif %}</td>
+          <td class="mono">{% if entry.volume_kg %}{{ entry.volume_kg|floatformat:0 }} kg{% else %}—{% endif %}</td>
+          <td class="small muted">
+            {% if entry.distance_km %}{{ entry.distance_km }} km{% endif %}
+            {% if entry.duration_seconds %}{{ entry.duration_seconds }}s{% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'delete_set' entry.pk %}">
+              {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">✕</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="muted">No sets logged yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% if workout.notes %}
+    <hr class="divider"><div class="small muted">NOTES</div><p>{{ workout.notes|linebreaksbr }}</p>
+    {% endif %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Log a set</h2>
+    <form method="post" action="{% url 'add_set' workout.pk %}">
+      {% csrf_token %}
+      {% for field in set_form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      {% if set_form.non_field_errors %}<div class="alert alert-error">{{ set_form.non_field_errors }}</div>{% endif %}
+      <button class="btn btn-primary btn-block" type="submit">Log set</button>
+    </form>
+    <p class="form-hint mb-0">Leave weight empty for bodyweight or cardio work. Beat a previous effort and it's flagged
+      as a personal best automatically.</p>
+  </aside>
+</div>
+{% endblock %}

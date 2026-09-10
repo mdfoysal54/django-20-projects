@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Link unavailable · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:620px">
+  <div class="card gone-card">
+    <div class="big-emoji">🔗</div>
+    <h1 class="page-title">This link is no longer redirecting.</h1>
+    <p class="lede">
+      {% if link.status_label == 'expired' %}It expired on {{ link.expires_at|date:"j M Y, H:i" }}.
+      {% elif link.status_label == 'capped' %}It reached its limit of {{ link.max_clicks }} clicks.
+      {% else %}The owner has disabled it.{% endif %}
+    </p>
+    <p class="muted mono">/s/{{ link.code }}</p>
+    {% if link.title %}<p class="small muted">Originally pointed at: <span class="mono">{{ link.target_url|truncatechars:70 }}</span></p>{% endif %}
+    <a class="btn btn-primary" href="{% url 'home' %}">Shorten a link of your own</a>
+  </div>
+</div>
+{% endblock %}

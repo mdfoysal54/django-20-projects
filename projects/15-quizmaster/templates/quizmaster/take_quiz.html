@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} · in progress{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">{{ quiz.emoji }} {{ quiz.title }}</h1>
+    <p class="lede mb-0">{{ questions|length }} question{{ questions|length|pluralize }} ·
+      pass mark {{ quiz.pass_mark }}%</p></div>
+  {% if remaining_seconds %}
+  <div class="timer" id="timer" data-seconds="{{ remaining_seconds }}">⏱ <span id="timer-value">--:--</span></div>
+  {% endif %}
+</div>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="grid" style="gap:1rem">
+    {% for question, field in question_fields %}
+    <div class="card question-card">
+      <div class="pill-row" style="justify-content:space-between">
+        <span class="badge badge-brand">Question {{ forloop.counter }}</span>
+        <span class="badge">{{ question.points }} point{{ question.points|pluralize }} ·
+          {{ question.get_kind_display }}</span>
+      </div>
+      <h2 class="question-text">{{ question.text }}</h2>
+      {% if question.kind == 'multi' %}
+        <p class="form-hint">Select all that apply — partial credit is possible.</p>
+      {% elif question.kind == 'short' %}
+        <p class="form-hint">Type your answer exactly — spelling counts.</p>
+      {% endif %}
+      {{ field }}
+      {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="pill-row mt-3">
+    <button class="btn btn-primary btn-lg" type="submit">Submit answers</button>
+    <span class="small muted">Nothing is graded until you submit.</span>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_script %}
+{% if remaining_seconds %}
+<script nonce="{{ request.csp_nonce }}">
+  (function () {
+    var el = document.getElementById('timer');
+    var out = document.getElementById('timer-value');
+    var left = parseInt(el.dataset.seconds, 10);
+    function tick() {
+      if (left <= 0) { out.textContent = '00:00'; el.classList.add('timer-out'); return; }
+      var m = Math.floor(left / 60), s = left % 60;
+      out.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      left -= 1;
+      setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+</script>
+{% endif %}
+{% endblock %}

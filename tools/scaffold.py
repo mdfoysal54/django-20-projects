@@ -17,6 +17,8 @@ sys.path.insert(0, str(TOOLS))
 import canonical          # noqa: E402  (python code templates)
 import canonical_assets   # noqa: E402  (templates / css / assets)
 
+SKIP_EXISTING = "--force" not in sys.argv   # never clobber a built project
+
 
 def render(text: str, slug: str, title: str, tag: str) -> str:
     return (text.replace("__SLUG__", slug)
@@ -32,6 +34,9 @@ def write(rel_path: pathlib.Path, content: str, slug: str, title: str, tag: str)
 def make_project(meta: dict) -> None:
     slug, title, tag = meta["dir"], meta["title"], meta["tag"]
     base = ROOT / "projects" / slug
+    if SKIP_EXISTING and (base / "manage.py").exists():
+        print(f"[skip] {slug}  (already built — use --force to regenerate)")
+        return
     files = [
         ("manage.py", canonical.MANAGE),
         ("config/__init__.py", "# Django project package.\n"),

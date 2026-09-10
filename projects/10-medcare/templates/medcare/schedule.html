@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Clinic day · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Clinic day</h1>
+    <p class="lede mb-0">{{ doctor.display_name }} · {{ day|date:"l, j F Y" }}</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary btn-sm" href="?date={{ prev_day|date:'Y-m-d' }}">← {{ prev_day|date:"D j M" }}</a>
+    <a class="btn btn-secondary btn-sm" href="?date={{ next_day|date:'Y-m-d' }}">{{ next_day|date:"D j M" }} →</a>
+  </div>
+</div>
+
+<div class="pill-row mb-3">
+  {% for d in week %}
+    <a class="badge {% if d == day %}badge-brand{% endif %}" href="?date={{ d|date:'Y-m-d' }}">{{ d|date:"D j" }}</a>
+  {% endfor %}
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ stats.booked }}</div><div class="stat-label">Still booked</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.completed }}</div><div class="stat-label">Completed</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.no_show }}</div><div class="stat-label">No shows</div></div>
+  <div class="card stat"><div class="stat-value">{{ stats.cancelled }}</div><div class="stat-label">Cancelled</div></div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Slots</h2>
+  {% if slot_map %}
+  <table class="table">
+    <thead><tr><th style="width:120px">Time</th><th>Patient</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for row in slot_map %}
+      <tr class="{% if not row.appointment %}free-row{% endif %}">
+        <td class="mono">{{ row.slot|time:"H:i" }}</td>
+        {% if row.appointment %}
+          <td><strong>{{ row.appointment.patient.get_full_name|default:row.appointment.patient.username }}</strong></td>
+          <td class="small">{{ row.appointment.reason|truncatechars:60 }}</td>
+          <td>
+            {% if row.appointment.status == 'booked' %}<span class="badge badge-ok">Booked</span>
+            {% elif row.appointment.status == 'completed' %}<span class="badge badge-brand">Completed</span>
+            {% elif row.appointment.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+            {% else %}<span class="badge badge-warn">No show</span>{% endif %}
+          </td>
+          <td><a class="btn btn-sm btn-secondary" href="{{ row.appointment.get_absolute_url }}">Open</a></td>
+        {% else %}
+          <td colspan="3" class="muted">— free —</td>
+          <td></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="muted mb-0">No published hours on this weekday — nothing to show.</p>
+  {% endif %}
+</div>
+{% endblock %}

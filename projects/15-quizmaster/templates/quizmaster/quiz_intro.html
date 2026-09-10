@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Start {{ quiz.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:680px">
+  <div class="card">
+    <div class="quiz-hero">{{ quiz.emoji }}</div>
+    <h1 class="page-title">{{ quiz.title }}</h1>
+    <p class="lede">{{ quiz.description|default:"No description provided." }}</p>
+    <ul class="list-plain">
+      <li><strong>{{ quiz.question_count }}</strong> question{{ quiz.question_count|pluralize }} worth
+        <strong>{{ quiz.total_points }}</strong> point{{ quiz.total_points|pluralize }}</li>
+      <li>Pass mark: <strong>{{ quiz.pass_mark }}%</strong></li>
+      <li>{% if quiz.time_limit_minutes %}Time limit: <strong>{{ quiz.time_limit_minutes }} minutes</strong>
+          {% else %}No time limit{% endif %}</li>
+      <li>{% if quiz.one_attempt_only %}One attempt only{% else %}Retakes allowed{% endif %}</li>
+    </ul>
+    <form method="post" action="{% url 'start_attempt' quiz.slug %}">
+      {% csrf_token %}
+      <button class="btn btn-primary btn-lg btn-block" type="submit">Begin attempt</button>
+    </form>
+    <p class="form-hint mb-0">Answers are saved as you go and graded when you submit — you cannot see the answer key.</p>
+  </div>
+</div>
+{% endblock %}

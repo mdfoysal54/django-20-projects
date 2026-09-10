@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — quizzes that grade themselves{% endblock %}
+{% block content %}
+<section class="qm-hero">
+  <div>
+    <h1>Build a quiz. Watch it grade itself.</h1>
+    <p class="lede">Single choice, multiple choice, true/false and short answers — scored server-side,
+      with the answer key never leaving the server.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'quiz_list' %}">Take a quiz →</a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'quiz_create' %}">Create a quiz</a>
+      {% else %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Start creating</a>
+      {% endif %}
+    </p>
+  </div>
+  <div class="hero-emoji">🧠</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_quizzes }}</div><div class="stat-label">Public quizzes</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_attempts }}</div><div class="stat-label">Attempts graded</div></div>
+  <div class="card stat"><div class="stat-value">{{ categories|length }}</div><div class="stat-label">Categories</div></div>
+</div>
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">Most played</h2></div>
+    <a class="btn btn-secondary" href="{% url 'quiz_list' %}">All quizzes →</a>
+  </div>
+  <div class="grid grid-3">
+    {% for quiz in popular %}
+    <a class="card card-hover quiz-card" style="color:inherit" href="{{ quiz.get_absolute_url }}">
+      <div class="quiz-cover">{{ quiz.emoji }}</div>
+      <div class="quiz-body">
+        <div class="pill-row">
+          <span class="badge badge-brand">{{ quiz.category.name|default:"Unfiled" }}</span>
+          <span class="badge">{{ quiz.n_questions }} question{{ quiz.n_questions|pluralize }}</span>
+          {% if quiz.one_attempt_only %}<span class="badge badge-warn">one attempt</span>{% endif %}
+        </div>
+        <div class="card-title mb-0">{{ quiz.title }}</div>
+        <p class="small muted mb-0">{{ quiz.description|truncatechars:90 }}</p>
+        <div class="small muted">👥 {{ quiz.n_attempts }} attempt{{ quiz.n_attempts|pluralize }} ·
+          pass mark {{ quiz.pass_mark }}%</div>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🧠</div><h2>No quizzes yet</h2>
+      <p>Run <span class="mono">python manage.py seed_demo</span>.</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Browse by category</h2></div>
+  <div class="grid grid-5">
+    {% for category in categories %}
+    <a class="card card-hover" style="color:inherit;text-align:center" href="{% url 'quiz_list' %}?category={{ category.slug }}">
+      <div class="spec-emoji">{{ category.emoji }}</div>
+      <div class="card-title mb-0">{{ category.name }}</div>
+      <div class="small muted">{{ category.n }} quiz{{ category.n|pluralize:"zes" }}</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My writing · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">My writing</h1>
+    <p class="lede mb-0">{{ posts|length }} post{{ posts|length|pluralize }} · drafts stay private until you publish.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'post_create' %}">+ New post</a>
+</div>
+
+{% if posts %}
+<div class="grid" style="gap:.9rem">
+  {% for post in posts %}
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="pill-row">
+        <span class="post-emoji" style="font-size:1.6rem">{{ post.cover_emoji }}</span>
+        <div>
+          <strong>{% if post.is_published %}<a href="{{ post.get_absolute_url }}">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}</strong>
+          <div class="small muted">
+            {{ post.category.name|default:"Uncategorised" }} ·
+            {% if post.is_published %}published {{ post.published_at|date:"M j, Y" }} · 👁 {{ post.views_count }}{% else %}draft — not public{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="pill-row">
+        {% if post.is_published %}<span class="badge badge-ok">Published</span>{% else %}<span class="badge badge-warn">Draft</span>{% endif %}
+        <span class="badge">💬 {{ post.n_comments }}</span>
+        {% if post.n_pending %}<span class="badge badge-warn">{{ post.n_pending }} pending</span>{% endif %}
+      </div>
+    </div>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-secondary" href="{% url 'post_edit' post.slug %}">Edit</a>
+      <form method="post" action="{% url 'post_toggle_publish' post.slug %}">
+        {% csrf_token %}
+        <button class="btn btn-sm {% if post.is_published %}btn-ghost{% else %}btn-primary{% endif %}" type="submit">
+          {% if post.is_published %}Unpublish{% else %}Publish now{% endif %}
+        </button>
+      </form>
+      <form method="post" action="{% url 'post_delete' post.slug %}">
+        {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📝</div>
+  <h2>Nothing written yet</h2>
+  <p>Your first draft is one click away.</p>
+  <a class="btn btn-primary" href="{% url 'post_create' %}">Write a post</a>
+</div>
+{% endif %}
+{% endblock %}

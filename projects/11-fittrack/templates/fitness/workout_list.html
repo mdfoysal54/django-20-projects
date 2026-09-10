@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}My workouts · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My workouts</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} session{{ page_obj.paginator.count|pluralize }} logged</p></div>
+  <a class="btn btn-primary" href="{% url 'workout_create' %}">+ Log a workout</a>
+</div>
+
+<form class="card filter-bar mb-3" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search title or notes…">
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+<div class="grid" style="gap:.8rem">
+  {% for workout in page_obj %}
+  <div class="card workout-row-card">
+    <div>
+      <a href="{{ workout.get_absolute_url }}"><strong>{{ workout.title }}</strong></a>
+      <div class="small muted">{{ workout.date|date:"D j M Y" }} · {{ workout.duration_minutes }} min ·
+        {{ workout.n_sets }} sets · feel: {{ workout.get_feel_display }}</div>
+    </div>
+    <div class="pill-row">
+      {% if workout.pr_count %}<span class="badge badge-warn">🏆 {{ workout.pr_count }}</span>{% endif %}
+      <span class="badge">{{ workout.total_volume|floatformat:0 }} kg</span>
+      <a class="btn btn-sm btn-secondary" href="{{ workout.get_absolute_url }}">Open</a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state"><div class="big">🏋️</div><h2>No workouts logged yet</h2>
+    <p>Your first session is one click away.</p>
+    <a class="btn btn-primary" href="{% url 'workout_create' %}">Log a workout</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}">← Newer</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}">Older →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

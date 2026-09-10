@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — attendance without the paper{% endblock %}
+{% block content %}
+{% if public %}
+<section class="ax-hero">
+  <div>
+    <h1>Take the register in 30 seconds.</h1>
+    <p class="lede">Cohorts, sessions, one-tap registers and attendance rates teachers can actually use.</p>
+    <p><a class="btn btn-lg btn-primary" href="{% url 'register' %}">Create an account →</a>
+      <a class="btn btn-lg btn-secondary" href="{% url 'login' %}">Log in</a></p>
+  </div>
+  <div class="hero-emoji">📋</div>
+</section>
+<div class="grid grid-3">
+  <div class="card"><h2 class="card-title">⚡ Mark all present</h2>
+    <p class="small muted">One button marks the whole class, then you fix the exceptions.</p></div>
+  <div class="card"><h2 class="card-title">🔐 Teacher-scoped</h2>
+    <p class="small muted">Only the teacher of a cohort can open its register — everyone else gets a 404.</p></div>
+  <div class="card"><h2 class="card-title">📈 Rates that mean something</h2>
+    <p class="small muted">Late still counts as attending; excused absences leave the denominator.</p></div>
+</div>
+{% else %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Hello {{ user.first_name|default:user.username }} 👋</h1>
+    <p class="lede mb-0">{{ today_sessions|length }} session{{ today_sessions|length|pluralize }} today ·
+      your attendance rate: <strong>{{ report.overall_rate|default:"—" }}{% if report.overall_rate %}%{% endif %}</strong></p></div>
+  <a class="btn btn-primary" href="{% url 'cohort_create' %}">+ New cohort</a>
+</div>
+
+{% if today_sessions %}
+<div class="card" style="border-left:5px solid var(--brand)">
+  <h2 class="card-title">Today's register</h2>
+  {% for session in today_sessions %}
+  <div class="pill-row" style="justify-content:space-between">
+    <div><strong>{{ session.cohort.name }}</strong>
+      <div class="small muted">{{ session.topic|default:"No topic set" }} ·
+        {{ session.get_status_display }}</div></div>
+    <div class="pill-row">
+      {% if session.can_mark %}
+        <a class="btn btn-sm btn-primary" href="{% url 'take_attendance' session.pk %}">Take register</a>
+      {% else %}
+        <form method="post" action="{% url 'session_set_status' session.pk 'held' %}">
+          {% csrf_token %}<button class="btn btn-sm btn-secondary" type="submit">Mark held</button>
+        </form>
+      {% endif %}
+      <a class="btn btn-sm btn-ghost" href="{{ session.get_absolute_url }}">Open</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <div class="page-head" style="margin-bottom:.4rem">
+        <h2 class="card-title mb-0">Cohorts you teach</h2>
+        <a class="btn btn-ghost btn-sm" href="{% url 'cohort_list' %}">All →</a>
+      </div>
+      {% for cohort in teaching %}
+      <a class="workout-row" href="{{ cohort.get_absolute_url }}">
+        <div>
+          <strong>{{ cohort.name }}</strong>
+          <div class="small muted">{{ cohort.subject|default:"—" }} · {{ cohort.meeting_note|default:"no schedule set" }}</div>
+        </div>
+        <div class="pill-row">
+          <span class="badge mono">{{ cohort.code }}</span>
+          <span class="badge">👥 {{ cohort.n_students }}</span>
+          <span class="badge">📅 {{ cohort.n_sessions }}</span>
+        </div>
+      </a>
+      {% empty %}
+      <p class="muted mb-0">You have no cohorts yet — create one and share its code.</p>
+      {% endfor %}
+    </div>
+
+    {% if learning %}
+    <div class="card">
+      <h2 class="card-title">Classes you're enrolled in</h2>
+      {% for cohort in learning %}
+      <a class="workout-row" href="{{ cohort.get_absolute_url }}">
+        <div><strong>{{ cohort.name }}</strong>
+          <div class="small muted">Taught by {{ cohort.teacher.get_full_name|default:cohort.teacher.username }}</div></div>
+        <span class="badge">Open →</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Join a class</h2>
+      <form method="post" action="{% url 'cohort_join' %}">
+        {% csrf_token %}
+        <label class="form-label" for="{{ join_form.code.id_for_label }}">Cohort code</label>
+        {{ join_form.code }}
+        <button class="btn btn-primary btn-block mt-1" type="submit">Join</button>
+      </form>
+      <p class="form-hint mb-0">Your teacher shares a six-character code.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Your attendance</h2>
+      {% if report.rows %}
+        {% for row in report.rows %}
+        <div class="metric-row">
+          <div class="metric-label"><span>{{ row.cohort.name }}</span>
+            <strong>{% if row.rate is not None %}{{ row.rate }}%{% else %}—{% endif %}</strong></div>
+          <div class="capacity-bar"><span style="width:{{ row.rate|default:0 }}%"></span></div>
+          <div class="small muted">{{ row.present }} present · {{ row.late }} late · {{ row.absent }} absent ·
+            {{ row.excused }} excused</div>
+        </div>
+        {% endfor %}
+        <a class="btn btn-secondary btn-block" href="{% url 'my_attendance' %}">Full history →</a>
+      {% else %}
+        <p class="muted mb-0">Join a class to start tracking your attendance.</p>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

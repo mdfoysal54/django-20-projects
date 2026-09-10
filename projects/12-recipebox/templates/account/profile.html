@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My account · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My account</h1><p class="lede mb-0">Hello {{ user.username }} 👋</p></div>
+</div>
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ recipe_count }}</div><div class="stat-label">Recipes</div></div>
+  <div class="card stat"><div class="stat-value">{{ published_count }}</div><div class="stat-label">Published</div></div>
+  <div class="card stat"><div class="stat-value">{{ rating_count }}</div><div class="stat-label">Ratings given</div></div>
+  <div class="card stat"><div class="stat-value">{{ favourite_count }}</div><div class="stat-label">Saved recipes</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Profile</h2>
+    <ul class="list-plain">
+      <li><strong>Username:</strong> {{ user.username }}</li>
+      <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+      <li><strong>Member since:</strong> {{ user.date_joined|date:"M Y" }}</li>
+    </ul>
+    <a class="btn btn-secondary btn-block" href="{% url 'password_change' %}">Change password</a>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Shortcuts</h2>
+    <ul class="list-plain">
+      <li><a href="{% url 'my_recipes' %}">→ My kitchen</a></li>
+      <li><a href="{% url 'recipe_create' %}">→ Share a recipe</a></li>
+      <li><a href="{% url 'favourites' %}">→ Favourites</a></li>
+      <li><a href="{% url 'collections' %}">→ Collections</a></li>
+    </ul>
+    {% if collections %}
+    <hr class="divider">
+    {% for collection in collections %}
+    <div class="small">{{ collection.name }} <span class="muted">· {{ collection.n }} recipe{{ collection.n|pluralize }}</span></div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

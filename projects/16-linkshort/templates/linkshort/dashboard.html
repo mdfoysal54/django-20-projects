@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Your links</h1>
+    <p class="lede mb-0">{{ total_links }} link{{ total_links|pluralize }} ·
+      {{ total_clicks }} click{{ total_clicks|pluralize }} all-time · {{ last_week }} in the last 7 days</p></div>
+  <a class="btn btn-primary" href="{% url 'link_create' %}">+ New link</a>
+</div>
+
+<form class="card" method="post" action="{% url 'quick_shorten' %}">
+  {% csrf_token %}
+  <div class="filter-bar">
+    {{ quick_form.target_url }}
+    <button class="btn btn-primary" type="submit">Shorten it</button>
+    <span class="small muted">Paste any URL — a code is generated for you.</span>
+  </div>
+</form>
+
+<form class="card filter-bar mb-3" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search code, title, tag or target…">
+  <select class="form-control" name="status">
+    <option value="">Any status</option>
+    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+    <option value="disabled" {% if status == 'disabled' %}selected{% endif %}>Disabled</option>
+  </select>
+  <input class="form-control" type="text" name="tag" value="{{ tag }}" placeholder="Tag" style="max-width:140px">
+  <button class="btn btn-primary" type="submit">Filter</button>
+</form>
+
+<div class="grid" style="grid-template-columns:1.7fr 1fr; align-items:start">
+  <div class="grid" style="gap:.8rem">
+    {% for link in page_obj %}
+    <div class="card link-row">
+      <div style="flex:1;min-width:0">
+        <div class="pill-row">
+          {% if link.status_label == 'active' %}<span class="badge badge-ok">Active</span>
+          {% elif link.status_label == 'disabled' %}<span class="badge">Disabled</span>
+          {% elif link.status_label == 'expired' %}<span class="badge badge-danger">Expired</span>
+          {% else %}<span class="badge badge-warn">Cap reached</span>{% endif %}
+          <a class="mono short-code" href="{{ link.get_absolute_url }}">/s/{{ link.code }}</a>
+          {% for tag_name in link.tag_list %}<span class="badge">{{ tag_name }}</span>{% endfor %}
+        </div>
+        <div class="link-title">{{ link.title|default:"Untitled link" }}</div>
+        <div class="small muted url-ellipsis">→ {{ link.target_url }}</div>
+        <div class="small muted">Created {{ link.created|date:"j M Y" }}
+          {% if link.expires_at %}· expires {{ link.expires_at|date:"j M Y, H:i" }}{% endif %}
+          {% if link.max_clicks %}· cap {{ link.max_clicks }} clicks{% endif %}</div>
+      </div>
+      <div class="link-stats">
+        <div class="stat-value">{{ link.click_count }}</div>
+        <div class="stat-label">clicks</div>
+        <div class="small muted">{{ link.unique }} unique</div>
+      </div>
+      <div class="pill-row">
+        <a class="btn btn-sm btn-secondary" href="{{ link.get_absolute_url }}">Analytics</a>
+        <form method="post" action="{% url 'link_toggle' link.code %}">
+          {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">
+            {% if link.active %}Disable{% else %}Enable{% endif %}</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state"><div class="big">🔗</div><h2>No links yet</h2>
+      <p>Paste a URL in the box above and you're done.</p></div>
+    {% endfor %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Top performers</h2>
+      {% for link in top %}
+      <a class="workout-row" href="{{ link.get_absolute_url }}">
+        <div style="min-width:0">
+          <strong class="mono">/s/{{ link.code }}</strong>
+          <div class="small muted url-ellipsis">{{ link.title|default:link.target_url }}</div>
+        </div>
+        <span class="badge">{{ link.click_count }} ▲</span>
+      </a>
+      {% empty %}
+      <p class="muted mb-0">No links yet.</p>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Shortcuts</h2>
+      <ul class="list-plain">
+        <li><a href="{% url 'link_create' %}">→ New link with expiry or cap</a></li>
+        <li><a href="{% url 'analytics' %}">→ Account analytics</a></li>
+        <li><a href="{% url 'profile' %}">→ My account</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}">← Newer</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}">Older →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

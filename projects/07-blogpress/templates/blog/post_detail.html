@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'post_list' %}">Posts</a> › <strong>{{ post.title }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.7fr 1fr; align-items:start">
+  <article class="card">
+    <div class="post-hero">{{ post.cover_emoji }}</div>
+    <div class="pill-row mb-1">
+      {% if post.category %}<span class="badge badge-brand">{{ post.category.name }}</span>{% endif %}
+      <span class="badge">{{ post.reading_minutes }} min read</span>
+      <span class="badge">👁 {{ post.views_count }} views</span>
+    </div>
+    <h1 class="page-title">{{ post.title }}</h1>
+    <p class="muted">By <strong>{{ post.author.username }}</strong> · {{ post.published_at|date:"F j, Y" }}</p>
+    <hr class="divider">
+    <div class="post-body-text">{{ post.body|linebreaks }}</div>
+
+    {% if user.is_authenticated and user == post.author %}
+    <hr class="divider">
+    <div class="pill-row">
+      <a class="btn btn-secondary btn-sm" href="{% url 'post_edit' post.slug %}">Edit post</a>
+      <form method="post" action="{% url 'post_toggle_publish' post.slug %}">
+        {% csrf_token %}<button class="btn btn-ghost btn-sm" type="submit">Unpublish</button>
+      </form>
+    </div>
+    {% endif %}
+  </article>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Join the discussion</h2>
+      <p class="small muted">{{ comments|length }} comment{{ comments|length|pluralize }} · moderated by the author.</p>
+      {% if user.is_authenticated %}
+        <form method="post" action="{{ post.get_absolute_url }}">
+          {% csrf_token %}
+          {{ form.body }}
+          {% if form.body.errors %}<ul class="field-errors">{% for e in form.body.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          <button class="btn btn-primary btn-block mt-1" type="submit">Submit comment</button>
+          <p class="form-hint mb-0">Comments appear after the author approves them.</p>
+        </form>
+      {% else %}
+        <a class="btn btn-primary btn-block" href="{% url 'login' %}?next={{ post.get_absolute_url }}">Log in to comment</a>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Comments</h2>
+      {% for comment in comments %}
+      <div class="comment">
+        <span class="avatar">{{ comment.author.username|slice:":1"|upper }}</span>
+        <div style="flex:1">
+          <div class="small"><strong>{{ comment.author.username }}</strong>
+            <span class="muted">· {{ comment.created|date:"M j" }}</span>
+            {% if not comment.approved %}<span class="badge badge-warn">pending</span>{% endif %}</div>
+          <div>{{ comment.body }}</div>
+          {% if can_see_pending and not comment.approved %}
+          <div class="pill-row mt-1">
+            <form method="post" action="{% url 'comment_moderate' comment.pk 'approve' %}">
+              {% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Approve</button>
+            </form>
+            <form method="post" action="{% url 'comment_moderate' comment.pk 'delete' %}">
+              {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No comments yet — be the first.</p>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

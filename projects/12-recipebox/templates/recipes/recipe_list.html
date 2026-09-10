@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}All recipes · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">All recipes</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} recipe{{ page_obj.paginator.count|pluralize }}
+      {% if q %}matching “{{ q }}”{% endif %}</p></div>
+  <a class="btn btn-primary" href="{% url 'recipe_create' %}">+ Share a recipe</a>
+</div>
+
+<form class="card filter-bar mb-3" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search title, summary or ingredient…">
+  <select class="form-control" name="cuisine">
+    <option value="">Any cuisine</option>
+    {% for cuisine in cuisines %}<option value="{{ cuisine.slug }}" {% if cuisine_slug == cuisine.slug %}selected{% endif %}>{{ cuisine.emoji }} {{ cuisine.name }}</option>{% endfor %}
+  </select>
+  <select class="form-control" name="difficulty">
+    <option value="">Any difficulty</option>
+    {% for value, label in difficulties %}<option value="{{ value }}" {% if difficulty == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select class="form-control" name="max_time">
+    <option value="">Any time</option>
+    <option value="15" {% if max_time == '15' %}selected{% endif %}>≤ 15 min each stage</option>
+    <option value="30" {% if max_time == '30' %}selected{% endif %}>≤ 30 min each stage</option>
+    <option value="60" {% if max_time == '60' %}selected{% endif %}>≤ 60 min each stage</option>
+  </select>
+  <select class="form-control" name="sort">
+    {% for key, label in sorts %}<option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-primary" type="submit">Apply</button>
+</form>
+
+<div class="grid grid-3">
+  {% for recipe in page_obj %}
+  <a class="card card-hover recipe-card" style="color:inherit" href="{{ recipe.get_absolute_url }}">
+    <div class="recipe-cover">{{ recipe.emoji }}</div>
+    <div class="recipe-body">
+      <div class="pill-row">
+        {% if recipe.avg_rating %}<span class="badge badge-warn">★ {{ recipe.avg_rating|floatformat:1 }}
+          ({{ recipe.n_ratings }})</span>{% else %}<span class="badge">unrated</span>{% endif %}
+        <span class="badge">❤ {{ recipe.n_favs }}</span>
+      </div>
+      <div class="card-title mb-0">{{ recipe.title }}</div>
+      <p class="small muted mb-0">{{ recipe.summary|default:recipe.ingredients|truncatechars:90 }}</p>
+      <div class="small muted">{{ recipe.cuisine.name|default:"Unfiled" }} · {{ recipe.total_minutes }} min ·
+        {{ recipe.servings }} servings · {{ recipe.get_difficulty_display }}</div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🔍</div><h2>Nothing matched</h2>
+    <a class="btn btn-primary" href="{% url 'recipe_list' %}">Reset filters</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}">← Previous</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

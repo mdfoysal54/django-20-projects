@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Preview /s/{{ link.code }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:640px">
+  <div class="card">
+    <h1 class="page-title">Where does /s/{{ link.code }} go?</h1>
+    <p class="lede">Check the destination before you follow it.</p>
+    <div class="preview-target mono">{{ link.target_url }}</div>
+    {% if link.title %}<p class="small muted">{{ link.title }}</p>{% endif %}
+    <div class="pill-row">
+      <span class="badge {% if link.can_redirect %}badge-ok{% else %}badge-danger{% endif %}">
+        {{ link.status_label }}</span>
+      <span class="badge">{{ link.click_count }} click{{ link.click_count|pluralize }}</span>
+    </div>
+    {% if link.can_redirect %}
+    <a class="btn btn-primary btn-block mt-2" href="{{ link.short_path }}">Continue to the site</a>
+    <p class="form-hint mb-0">Following the link counts as a click and goes to a third-party site.</p>
+    {% else %}
+    <div class="alert alert-error">This link is not redirecting right now.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

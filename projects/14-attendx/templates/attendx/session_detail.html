@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ cohort.name }} — {{ session.date }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a> ›
+  <strong>{{ session.date|date:"j M Y" }}</strong></nav>
+
+<div class="page-head">
+  <div><h1 class="page-title mb-0">{{ session.topic|default:"Untitled session" }}</h1>
+    <p class="lede mb-0">{{ session.date|date:"l, j F Y" }}{% if session.starts_at %} ·
+      {{ session.starts_at|time:"H:i" }}{% if session.ends_at %}–{{ session.ends_at|time:"H:i" }}{% endif %}{% endif %} ·
+      <span class="badge status-{{ session.status }}">{{ session.get_status_display }}</span></p></div>
+  <div class="pill-row">
+    {% if is_teacher %}
+      {% if session.can_mark %}
+        <a class="btn btn-primary" href="{% url 'take_attendance' session.pk %}">Take register</a>
+      {% else %}
+        <form method="post" action="{% url 'session_set_status' session.pk 'held' %}">
+          {% csrf_token %}<button class="btn btn-primary" type="submit">Mark as held</button>
+        </form>
+      {% endif %}
+      <form method="post" action="{% url 'session_set_status' session.pk 'cancelled' %}">
+        {% csrf_token %}<button class="btn btn-ghost" type="submit">Cancel session</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if session.note %}<div class="alert alert-info">{{ session.note }}</div>{% endif %}
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">{% if is_teacher %}Register{% else %}Your record{% endif %}</h2>
+    {% if is_teacher %}
+      <table class="table">
+        <thead><tr><th>Student</th><th>Status</th><th>Marked by</th><th>Marked at</th></tr></thead>
+        <tbody>
+        {% for record in records %}
+          <tr>
+            <td>{{ record.student.get_full_name|default:record.student.username }}</td>
+            <td><span class="badge status-{{ record.status }}">{{ record.get_status_display }}</span></td>
+            <td class="small muted">{{ record.marked_by.username|default:"—" }}</td>
+            <td class="small muted">{{ record.marked_at|date:"j M, H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No attendance recorded for this session yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      {% if my_record %}
+        <p>You were marked <span class="badge status-{{ my_record.status }}">{{ my_record.get_status_display }}</span></p>
+      {% else %}
+        <p class="muted mb-0">No attendance recorded for you in this session.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <aside>
+    {% if counts %}
+    <div class="card">
+      <h2 class="card-title">Summary</h2>
+      <ul class="list-plain small">
+        <li><strong>Enrolled:</strong> {{ counts.enrolled }}</li>
+        <li><strong>Present:</strong> {{ counts.present }}</li>
+        <li><strong>Late:</strong> {{ counts.late }}</li>
+        <li><strong>Absent:</strong> {{ counts.absent }}</li>
+        <li><strong>Excused:</strong> {{ counts.excused }}</li>
+        <li><strong>Not marked:</strong> {{ counts.unmarked }}</li>
+        {% if session.attendance_rate is not None %}
+        <li><strong>Attendance rate:</strong> {{ session.attendance_rate }}%</li>{% endif %}
+      </ul>
+    </div>
+    {% endif %}
+    <div class="card">
+      <h2 class="card-title">Class</h2>
+      <ul class="list-plain small">
+        <li><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a></li>
+        <li>{{ cohort.teacher.get_full_name|default:cohort.teacher.username }}</li>
+        <li>{{ cohort.room|default:"no room" }}</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

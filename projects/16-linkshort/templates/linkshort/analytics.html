@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Analytics · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Account analytics</h1>
+    <p class="lede mb-0">Last 30 days across all your links · {{ unique_30d }} unique visitor{{ unique_30d|pluralize }}</p></div>
+  <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Links</a>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_links }}</div><div class="stat-label">Links</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_clicks }}</div><div class="stat-label">Clicks all-time</div></div>
+  <div class="card stat"><div class="stat-value">{{ clicks_30d }}</div><div class="stat-label">Clicks (30 days)</div></div>
+  <div class="card stat"><div class="stat-value">{{ unique_30d }}</div><div class="stat-label">Unique visitors</div></div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Clicks per day — last 14 days</h2>
+  <div class="bar-chart">
+    {% for point in series %}
+    <div class="bar-wrap" title="{{ point.date|date:'j M' }}: {{ point.count }} click{{ point.count|pluralize }}">
+      <div class="bar" style="height:{% widthratio point.count max_day 100 %}%"></div>
+      <div class="bar-label">{{ point.date|date:"d/m" }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.4fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Top links</h2>
+    <table class="table">
+      <thead><tr><th>Link</th><th>Clicks</th><th>Share</th></tr></thead>
+      <tbody>
+      {% for link in best_links %}
+        <tr>
+          <td><a class="mono" href="{{ link.get_absolute_url }}">/s/{{ link.code }}</a>
+            <div class="small muted url-ellipsis">{{ link.title|default:link.target_url }}</div></td>
+          <td class="mono">{{ link.click_count }}</td>
+          <td style="width:40%">
+            <div class="capacity-bar"><span style="width:{% widthratio link.click_count total_clicks 100 %}%"></span></div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3" class="muted">No links yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Where clicks come from</h2>
+    {% for row in referrers %}
+    <div class="pill-row" style="justify-content:space-between">
+      <span class="small">{{ row.referrer }}</span><strong>{{ row.n }}</strong>
+    </div>
+    {% empty %}
+    <p class="muted mb-0">No referrer data in the last 30 days.</p>
+    {% endfor %}
+
+    <hr class="divider">
+    <h2 class="card-title">Devices</h2>
+    {% for device, count in devices.items %}
+    <div class="pill-row" style="justify-content:space-between">
+      <span class="badge device-{{ device }}">{{ device|title }}</span><strong>{{ count }}</strong>
+    </div>
+    {% empty %}
+    <p class="muted mb-0">No clicks yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

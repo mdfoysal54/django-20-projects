@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Manage {{ event.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'organiser_dashboard' %}">Organiser</a> › <strong>{{ event.title }}</strong></nav>
+<div class="page-head">
+  <div><h1 class="page-title mb-0">{{ event.cover_emoji }} {{ event.title }}</h1>
+    <p class="lede mb-0">{{ event.starts_at|date:"D, M j, Y · g:i A" }} · {{ event.venue }}</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{{ event.get_absolute_url }}">View public page</a>
+    <a class="btn btn-secondary" href="{% url 'event_attendees' event.slug %}">Attendees</a>
+    <a class="btn btn-primary" href="{% url 'door_scan' event.slug %}">Door check-in</a>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.5fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Ticket tiers</h2>
+    {% if tiers %}
+    <table class="table">
+      <thead><tr><th>Tier</th><th>Price</th><th>Sold</th><th>Capacity</th><th></th></tr></thead>
+      <tbody>
+      {% for tier in tiers %}
+      <tr>
+        <td><strong>{{ tier.name }}</strong></td>
+        <td class="mono">৳{{ tier.price }}</td>
+        <td>{{ tier.sold }}</td>
+        <td>{{ tier.capacity }}</td>
+        <td><div class="capacity-bar" style="min-width:90px"><span style="width:{% widthratio tier.sold tier.capacity 100 %}%"></span></div></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p class="form-hint mb-0">Capacity can never be reduced below what has already sold — the form blocks it.</p>
+    {% else %}
+    <p class="muted">No tiers yet. Add one on the right before going on sale.</p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Event status</h2>
+      <p>Currently <span class="badge {% if event.status == 'onsale' %}badge-ok{% elif event.status == 'cancelled' %}badge-danger{% else %}badge-warn{% endif %}">{{ event.get_status_display }}</span></p>
+      <form method="post" action="{% url 'event_set_status' event.slug %}">
+        {% csrf_token %}
+        <select class="form-control" name="status">
+          {% for value, label in status_choices %}<option value="{{ value }}" {% if event.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-primary btn-block mt-1" type="submit">Update status</button>
+      </form>
+      <p class="form-hint mb-0">“On sale” requires at least one tier.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Add a tier</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in tier_form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Add tier</button>
+      </form>
+    </div>
+  </aside>
+</div>
+{% endblock %}

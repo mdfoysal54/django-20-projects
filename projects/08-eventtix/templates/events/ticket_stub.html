@@ -1,0 +1,33 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ticket {{ booking.reference }} · {{ APP_NAME }}</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="stub-page">
+<div class="stub">
+  <div class="stub-head">
+    <div>
+      <div class="small muted">E-TICKET</div>
+      <h1>{{ booking.event.title }}</h1>
+    </div>
+    <div class="stub-emoji">{{ booking.event.cover_emoji }}</div>
+  </div>
+  <div class="grid grid-2" style="gap:.4rem">
+    <div><div class="small muted">When</div><strong>{{ booking.event.starts_at|date:"D, M j, Y · g:i A" }}</strong></div>
+    <div><div class="small muted">Where</div><strong>{{ booking.event.venue }}</strong></div>
+    <div><div class="small muted">Holder</div><strong>{{ booking.customer.username }}</strong></div>
+    <div><div class="small muted">Admits</div><strong>{{ booking.quantity }} person{{ booking.quantity|pluralize }}</strong></div>
+  </div>
+  <div class="stub-ref">
+    <div class="small muted">REFERENCE</div>
+    <div class="mono stub-ref-value">{{ booking.reference }}</div>
+    <div class="small muted mono">{{ booking.qr_token }}</div>
+  </div>
+  <p class="small muted">Present this stub at the gate. Status: {{ booking.get_status_display }}.
+    Paid total ৳{{ booking.total }}.</p>
+  <button class="btn btn-primary no-print" onclick="window.print()">Print this stub</button>
+</div>
+</body>
+</html>

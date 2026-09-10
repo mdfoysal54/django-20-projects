@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Attendance report · {{ cohort.name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a> › <strong>Report</strong></nav>
+
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Attendance report</h1>
+    <p class="lede mb-0">{{ summary.total_sessions }} held session{{ summary.total_sessions|pluralize }} ·
+      {{ summary.rows|length }} student{{ summary.rows|length|pluralize }} · worst attendance first</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{{ cohort.get_absolute_url }}">← Cohort</a>
+    <button class="btn btn-ghost" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Summary by student</h2>
+  <table class="table">
+    <thead><tr><th>Student</th><th>Present</th><th>Late</th><th>Absent</th><th>Excused</th><th>Unmarked</th><th>Rate</th></tr></thead>
+    <tbody>
+    {% for row in summary.rows %}
+      <tr class="{% if row.band == 'danger' %}row-danger{% endif %}">
+        <td><strong>{{ row.student.get_full_name|default:row.student.username }}</strong>
+          <div class="small muted mono">{{ row.student.username }}</div></td>
+        <td>{{ row.present }}</td><td>{{ row.late }}</td><td>{{ row.absent }}</td><td>{{ row.excused }}</td>
+        <td>{% if row.unmarked %}<span class="badge badge-warn">{{ row.unmarked }}</span>{% else %}0{% endif %}</td>
+        <td>
+          {% if row.rate is None %}<span class="muted">—</span>
+          {% elif row.band == 'ok' %}<strong class="text-ok">{{ row.rate }}%</strong>
+          {% elif row.band == 'warn' %}<strong class="text-warn">{{ row.rate }}%</strong>
+          {% else %}<strong class="text-danger">{{ row.rate }}%</strong>{% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7" class="muted">No students enrolled.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="form-hint mb-0">Green ≥ 85%, amber ≥ 70%, red below. Late counts as attended; excused is excluded.</p>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Session matrix</h2>
+  <div class="table-scroll">
+    <table class="table matrix">
+      <thead>
+        <tr><th>Student</th>
+          {% for session in sessions %}<th class="small">{{ session.date|date:"j M" }}</th>{% endfor %}
+          <th>Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in grid %}
+        <tr>
+          <td><strong>{{ row.student.username }}</strong></td>
+          {% for cell in row.cells %}
+            <td class="cell">
+              {% if cell.record %}
+                <span class="badge status-{{ cell.record.status }}">{{ cell.record.status|slice:":1"|upper }}</span>
+              {% else %}<span class="muted">·</span>{% endif %}
+            </td>
+          {% endfor %}
+          <td>{% if row.rate is not None %}{{ row.rate }}%{% else %}—{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

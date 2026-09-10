@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}New ticket · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:760px">
+  <nav class="breadcrumbs"><a href="{% url 'my_tickets' %}">My tickets</a> › <strong>New ticket</strong></nav>
+  <div class="card">
+    <h1 class="page-title">Open a support ticket</h1>
+    <p class="lede">Give us the detail up front and we can usually solve it in the first reply.
+      Your first response deadline is set automatically from the priority.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Submit ticket</button>
+      <a class="btn btn-ghost" href="{% url 'my_tickets' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

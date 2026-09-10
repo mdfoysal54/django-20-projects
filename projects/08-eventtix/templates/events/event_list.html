@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}All events · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">All events</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} event{{ page_obj.paginator.count|pluralize }}{% if q %} matching “{{ q }}”{% endif %}</p></div>
+  <form class="pill-row" method="get">
+    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search title or venue…" style="min-width:220px">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="pill-row mb-3">
+  <a class="badge {% if not status %}badge-brand{% endif %}" href="{% url 'event_list' %}{% if q %}?q={{ q }}{% endif %}">All</a>
+  {% for value, label in statuses %}
+    {% if value != 'draft' %}
+    <a class="badge {% if status == value %}badge-brand{% endif %}" href="?status={{ value }}{% if q %}&q={{ q }}{% endif %}">{{ label }}</a>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<div class="grid grid-3">
+  {% for event in page_obj %}
+  <a class="card card-hover event-card" href="{{ event.get_absolute_url }}">
+    <div class="event-cover">{{ event.cover_emoji }}</div>
+    <div class="event-body">
+      <div class="pill-row">
+        {% if event.status == 'soldout' %}<span class="badge badge-warn">Sold out</span>
+        {% elif event.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+        {% else %}<span class="badge badge-ok">On sale</span>{% endif %}
+        <span class="badge">{{ event.sold_total|default:0 }}/{{ event.capacity|default:0 }} sold</span>
+      </div>
+      <h3 class="card-title mb-0">{{ event.title }}</h3>
+      <div class="small muted">📍 {{ event.venue }} · 🗓 {{ event.starts_at|date:"M j, Y" }}</div>
+      <div class="capacity-bar"><span style="width:{% widthratio event.sold_total|default:0 event.capacity|default:1 100 %}%"></span></div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🔍</div><h2>Nothing found</h2>
+    <a class="btn btn-primary" href="{% url 'event_list' %}">Reset filters</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">← Previous</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

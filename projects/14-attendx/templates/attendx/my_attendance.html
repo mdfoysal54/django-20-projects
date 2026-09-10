@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}My attendance · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My attendance</h1>
+    <p class="lede mb-0">Overall rate:
+      {% if report.overall_rate is not None %}<strong>{{ report.overall_rate }}%</strong>
+        ({{ report.total_attended }} of {{ report.total_counted }} counted sessions)
+      {% else %}no counted sessions yet{% endif %}</p></div>
+</div>
+
+<div class="grid grid-3">
+  {% for row in report.rows %}
+  <div class="card">
+    <div class="card-title mb-0"><a href="{{ row.cohort.get_absolute_url }}">{{ row.cohort.name }}</a></div>
+    <div class="small muted">{{ row.held }} session{{ row.held|pluralize }} held</div>
+    <div class="metric-row mt-1">
+      <div class="metric-label"><span>Attendance rate</span>
+        <strong>{% if row.rate is not None %}{{ row.rate }}%{% else %}—{% endif %}</strong></div>
+      <div class="capacity-bar"><span style="width:{{ row.rate|default:0 }}%"></span></div>
+    </div>
+    <div class="pill-row">
+      <span class="badge status-present">{{ row.present }} present</span>
+      <span class="badge status-late">{{ row.late }} late</span>
+      <span class="badge status-absent">{{ row.absent }} absent</span>
+      <span class="badge status-excused">{{ row.excused }} excused</span>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">📋</div><h2>You're not enrolled yet</h2>
+    <p>Ask your teacher for the cohort code, then join from your dashboard.</p></div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <h2 class="card-title">Recent records</h2>
+  <table class="table">
+    <thead><tr><th>Date</th><th>Class</th><th>Topic</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for record in records %}
+      <tr>
+        <td class="small">{{ record.session.date|date:"D j M Y" }}</td>
+        <td>{{ record.session.cohort.name }}</td>
+        <td class="small">{{ record.session.topic|default:"—" }}</td>
+        <td><span class="badge status-{{ record.status }}">{{ record.get_status_display }}</span></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" class="muted">Nothing recorded yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

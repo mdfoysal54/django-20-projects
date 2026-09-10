@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My cohorts · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My cohorts</h1>
+    <p class="lede mb-0">{{ cohorts|length }} class{{ cohorts|length|pluralize }}</p></div>
+  <a class="btn btn-primary" href="{% url 'cohort_create' %}">+ New cohort</a>
+</div>
+
+<div class="grid grid-3">
+  {% for cohort in cohorts %}
+  <div class="card">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="card-title mb-0"><a href="{{ cohort.get_absolute_url }}">{{ cohort.name }}</a></div>
+      <span class="badge mono">{{ cohort.code }}</span>
+    </div>
+    <div class="small muted">{{ cohort.subject|default:"—" }} · {{ cohort.room|default:"no room" }}</div>
+    <div class="small muted">{{ cohort.meeting_note|default:"No meeting schedule set" }}</div>
+    <div class="pill-row mt-1">
+      <span class="badge">👥 {{ cohort.n_students }} student{{ cohort.n_students|pluralize }}</span>
+      <span class="badge">📅 {{ cohort.n_sessions }} session{{ cohort.n_sessions|pluralize }}</span>
+    </div>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-secondary" href="{{ cohort.get_absolute_url }}">Open</a>
+      <a class="btn btn-sm btn-ghost" href="{% url 'report' cohort.pk %}">Report</a>
+      <a class="btn btn-sm btn-ghost" href="{% url 'cohort_edit' cohort.pk %}">Edit</a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🎓</div><h2>No cohorts yet</h2>
+    <p>Create a class, share the code, and start taking registers.</p>
+    <a class="btn btn-primary" href="{% url 'cohort_create' %}">Create a cohort</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

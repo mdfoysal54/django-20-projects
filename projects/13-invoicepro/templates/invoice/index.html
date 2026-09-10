@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — invoicing for freelancers{% endblock %}
+{% block content %}
+<section class="inv-hero">
+  <div>
+    <h1>Invoice like a studio.</h1>
+    <p class="lede">Clients, line items, taxes, payments and aging — with money handled in exact decimals,
+      never floats.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'register' %}">Start invoicing →</a>
+      <a class="btn btn-lg btn-secondary" href="{% url 'login' %}">Log in</a>
+    </p>
+  </div>
+  <div class="hero-emoji">🧾</div>
+</section>
+
+<div class="grid grid-3">
+  <div class="card"><h2 class="card-title">💯 Exact money maths</h2>
+    <p class="small muted">Every total is a Decimal rounded half-up — the way invoices are actually counted.</p></div>
+  <div class="card"><h2 class="card-title">⏱ Aging at a glance</h2>
+    <p class="small muted">See what's current, what's 30 days late and what needs a phone call.</p></div>
+  <div class="card"><h2 class="card-title">🔒 Owner-scoped</h2>
+    <p class="small muted">Every query is filtered to your account — someone else's invoice is a 404.</p></div>
+</div>
+{% endblock %}

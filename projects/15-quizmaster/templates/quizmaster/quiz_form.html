@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New quiz{% else %}Edit {{ quiz.title }}{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:860px">
+  <nav class="breadcrumbs"><a href="{% url 'my_quizzes' %}">My quizzes</a> ›
+    <strong>{% if mode == 'create' %}New{% else %}Edit{% endif %}</strong></nav>
+
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Create a quiz{% else %}Edit “{{ quiz.title }}”{% endif %}</h1>
+    <p class="lede">{% if mode == 'create' %}It starts as a draft. Add questions, then set it to Public.
+      {% else %}The public link is <span class="mono">{{ request.scheme }}://{{ request.get_host }}{{ quiz.get_absolute_url }}</span>{% endif %}</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-2">
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Create quiz{% else %}Save settings{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'my_quizzes' %}">Cancel</a>
+    </form>
+  </div>
+
+  {% if quiz %}
+  <div class="card">
+    <div class="page-head" style="margin-bottom:.4rem">
+      <h2 class="card-title mb-0">Questions</h2>
+      <a class="btn btn-primary btn-sm" href="{% url 'question_create' quiz.slug %}">+ Add question</a>
+    </div>
+    {% for question in questions %}
+    <div class="question-row">
+      <div style="flex:1">
+        <strong>{{ forloop.counter }}. {{ question.text }}</strong>
+        <div class="small muted">{{ question.get_kind_display }} · {{ question.points }} point{{ question.points|pluralize }} ·
+          {{ question.correct_options|length }} correct option{{ question.correct_options|length|pluralize }}
+          {% if not question.active %}· <span class="badge badge-warn">inactive</span>{% endif %}</div>
+        <ul class="option-list">
+          {% for option in question.options.all %}
+          <li class="{% if option.is_correct %}correct{% endif %}">{{ option.text }}
+            {% if option.is_correct %}<span class="badge badge-ok">correct</span>{% endif %}</li>
+          {% empty %}
+          <li class="muted">Short-answer question — accepted text is the answer key.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="pill-row">
+        <a class="btn btn-sm btn-secondary" href="{% url 'question_edit' quiz.slug question.pk %}">Edit</a>
+        <form method="post" action="{% url 'question_delete' quiz.slug question.pk %}">
+          {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <p class="muted mb-0">No questions yet — a quiz needs at least one before it can be published.</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

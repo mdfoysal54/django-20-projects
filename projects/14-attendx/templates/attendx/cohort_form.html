@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{% if cohort %}Edit cohort{% else %}New cohort{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:680px">
+  <nav class="breadcrumbs"><a href="{% url 'cohort_list' %}">Cohorts</a> ›
+    <strong>{% if cohort %}Edit{% else %}New{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if cohort %}Edit {{ cohort.name }}{% else %}Create a cohort{% endif %}</h1>
+    <p class="lede">{% if cohort %}Share code <strong class="mono">{{ cohort.code }}</strong> with students so they can join.
+      {% else %}A six-character join code is generated automatically.{% endif %}</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if cohort %}Save changes{% else %}Create cohort{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'cohort_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

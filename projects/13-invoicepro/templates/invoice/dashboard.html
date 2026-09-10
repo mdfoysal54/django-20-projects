@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Hey {{ user.first_name|default:user.username }} 👋</h1>
+    <p class="lede mb-0">{{ clients }} client{{ clients|pluralize }} · {{ draft_count }} draft{{ draft_count|pluralize }} waiting to send</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'client_create' %}">+ Client</a>
+    <a class="btn btn-primary" href="{% url 'invoice_create' %}">+ Invoice</a>
+  </div>
+</div>
+
+<div class="grid grid-4 mb-3">
+  <div class="card stat"><div class="stat-value mono">৳{{ outstanding|floatformat:2 }}</div>
+    <div class="stat-label">Outstanding</div></div>
+  <div class="card stat stat-danger"><div class="stat-value mono">৳{{ overdue_total|floatformat:2 }}</div>
+    <div class="stat-label">{{ overdue|length }} overdue invoice{{ overdue|length|pluralize }}</div></div>
+  <div class="card stat"><div class="stat-value mono">৳{{ paid_this_month|floatformat:2 }}</div>
+    <div class="stat-label">Collected this month</div></div>
+  <div class="card stat"><div class="stat-value mono">৳{{ net_this_month|floatformat:2 }}</div>
+    <div class="stat-label">Net of ৳{{ expenses_this_month|floatformat:2 }} expenses</div></div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.7fr 1fr; align-items:start">
+  <div>
+    {% if overdue %}
+    <div class="card" style="border-left:5px solid var(--danger)">
+      <h2 class="card-title">Chase these first</h2>
+      {% for invoice in overdue %}
+      <div class="pill-row" style="justify-content:space-between">
+        <div>
+          <a href="{{ invoice.get_absolute_url }}"><strong class="mono">{{ invoice.number }}</strong></a>
+          <div class="small muted">{{ invoice.client.name }} · due {{ invoice.due_date|date:"j M Y" }}</div>
+        </div>
+        <div class="pill-row">
+          <span class="badge badge-danger">{{ invoice.days_overdue }} day{{ invoice.days_overdue|pluralize }} late</span>
+          <span class="mono">৳{{ invoice.balance|floatformat:2 }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="page-head" style="margin-bottom:.4rem">
+        <h2 class="card-title mb-0">Recent invoices</h2>
+        <a class="btn btn-ghost btn-sm" href="{% url 'invoice_list' %}">All →</a>
+      </div>
+      <table class="table">
+        <thead><tr><th>Number</th><th>Client</th><th>Due</th><th>Total</th><th>Balance</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for invoice in invoices %}
+          <tr>
+            <td class="mono"><a href="{{ invoice.get_absolute_url }}">{{ invoice.number }}</a></td>
+            <td>{{ invoice.client.name }}</td>
+            <td class="small">{{ invoice.due_date|date:"j M" }}</td>
+            <td class="mono">৳{{ invoice.total|floatformat:2 }}</td>
+            <td class="mono">৳{{ invoice.balance|floatformat:2 }}</td>
+            <td><span class="badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="muted">No invoices yet — <a href="{% url 'invoice_create' %}">create one</a>.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Recent payments</h2>
+      <table class="table">
+        <thead><tr><th>Invoice</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for payment in payments %}
+          <tr><td class="mono">{{ payment.invoice.number }}</td>
+              <td class="mono">৳{{ payment.amount|floatformat:2 }}</td>
+              <td>{{ payment.get_method_display }}</td>
+              <td class="small">{{ payment.paid_on|date:"j M Y" }}</td></tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No payments recorded.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Log an expense</h2>
+      <form method="post" action="{% url 'expenses' %}">
+        {% csrf_token %}
+        {% for field in expense_form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Add expense</button>
+      </form>
+      <hr class="divider">
+      <a class="btn btn-secondary btn-block" href="{% url 'aging' %}">Aging report →</a>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Shortcuts</h2>
+      <ul class="list-plain">
+        <li><a href="{% url 'invoice_create' %}">→ New invoice</a></li>
+        <li><a href="{% url 'client_list' %}">→ Clients</a></li>
+        <li><a href="{% url 'invoice_list' %}?status=overdue">→ Overdue invoices</a></li>
+        <li><a href="{% url 'expenses' %}">→ Expenses</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

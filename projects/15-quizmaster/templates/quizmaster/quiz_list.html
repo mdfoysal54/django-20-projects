@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}All quizzes · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">All quizzes</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} quiz{{ page_obj.paginator.count|pluralize:"zes" }}
+      {% if q %}matching “{{ q }}”{% endif %}</p></div>
+  <a class="btn btn-primary" href="{% url 'quiz_create' %}">+ Create a quiz</a>
+</div>
+
+<form class="card filter-bar mb-3" method="get">
+  <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search quizzes…">
+  <select class="form-control" name="category">
+    <option value="">Any category</option>
+    {% for category in categories %}<option value="{{ category.slug }}" {% if category_slug == category.slug %}selected{% endif %}>{{ category.emoji }} {{ category.name }}</option>{% endfor %}
+  </select>
+  <select class="form-control" name="sort">
+    <option value="new" {% if sort == 'new' %}selected{% endif %}>Newest</option>
+    <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most played</option>
+    <option value="short" {% if sort == 'short' %}selected{% endif %}>Fewest questions</option>
+  </select>
+  <button class="btn btn-primary" type="submit">Filter</button>
+</form>
+
+<div class="grid grid-3">
+  {% for quiz in page_obj %}
+  <a class="card card-hover quiz-card" style="color:inherit" href="{{ quiz.get_absolute_url }}">
+    <div class="quiz-cover">{{ quiz.emoji }}</div>
+    <div class="quiz-body">
+      <div class="pill-row">
+        <span class="badge badge-brand">{{ quiz.category.name|default:"Unfiled" }}</span>
+        <span class="badge">{{ quiz.pass_mark }}% to pass</span>
+        {% if quiz.time_limit_minutes %}<span class="badge">⏱ {{ quiz.time_limit_minutes }} min</span>{% endif %}
+      </div>
+      <div class="card-title mb-0">{{ quiz.title }}</div>
+      <p class="small muted mb-0">{{ quiz.description|truncatechars:95 }}</p>
+      <div class="small muted">by {{ quiz.author.username }} · {{ quiz.n_questions }} question{{ quiz.n_questions|pluralize }}</div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty-state" style="grid-column:1/-1"><div class="big">🔍</div><h2>Nothing matched</h2>
+    <a class="btn btn-primary" href="{% url 'quiz_list' %}">Reset filters</a></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pill-row mt-3" style="justify-content:center">
+  {% if page_obj.has_previous %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}">← Previous</a>{% endif %}
+  <span class="small muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-secondary btn-sm" href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

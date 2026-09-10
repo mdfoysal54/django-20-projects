@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — cook something good{% endblock %}
+{% block content %}
+
+<section class="rb-hero">
+  <div>
+    <h1>Cook something worth repeating.</h1>
+    <p class="lede">{{ total_recipes }} recipes with scalable ingredients, honest ratings and a kitchen you can call your own.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'recipe_list' %}">Browse recipes →</a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'recipe_create' %}">Share a recipe</a>
+      {% else %}
+        <a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Join RecipeBox</a>
+      {% endif %}
+    </p>
+  </div>
+  <div class="hero-emoji">🥘</div>
+</section>
+
+<div class="grid grid-3 mb-3">
+  <div class="card stat"><div class="stat-value">{{ total_recipes }}</div><div class="stat-label">Published recipes</div></div>
+  <div class="card stat"><div class="stat-value">{{ total_ratings }}</div><div class="stat-label">Ratings left</div></div>
+  <div class="card stat"><div class="stat-value">{{ cuisines|length }}</div><div class="stat-label">Cuisines</div></div>
+</div>
+
+{% if featured %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Top rated right now</h2></div>
+  <div class="grid grid-3">
+    {% for recipe in featured %}
+    <a class="card card-hover recipe-card" style="color:inherit" href="{{ recipe.get_absolute_url }}">
+      <div class="recipe-cover">{{ recipe.emoji }}</div>
+      <div class="recipe-body">
+        <div class="pill-row">
+          {% if recipe.avg_rating %}<span class="badge badge-warn">★ {{ recipe.avg_rating|floatformat:1 }}</span>{% endif %}
+          <span class="badge">{{ recipe.total_minutes }} min</span>
+          <span class="badge">{{ recipe.servings }} servings</span>
+        </div>
+        <div class="card-title mb-0">{{ recipe.title }}</div>
+        <p class="small muted mb-0">{{ recipe.summary|default:recipe.ingredients|truncatechars:100 }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">Fresh from the kitchen</h2></div>
+    <a class="btn btn-secondary" href="{% url 'recipe_list' %}">All recipes →</a>
+  </div>
+  <div class="grid grid-3">
+    {% for recipe in latest %}
+    <a class="card card-hover recipe-card" style="color:inherit" href="{{ recipe.get_absolute_url }}">
+      <div class="recipe-cover">{{ recipe.emoji }}</div>
+      <div class="recipe-body">
+        <div class="pill-row">
+          <span class="badge badge-brand">{{ recipe.cuisine.name|default:"Unfiled" }}</span>
+          <span class="badge">{{ recipe.get_difficulty_display }}</span>
+        </div>
+        <div class="card-title mb-0">{{ recipe.title }}</div>
+        <div class="small muted">by {{ recipe.author.username }} · {{ recipe.total_minutes }} min</div>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🍳</div><h2>No recipes yet</h2>
+      <p>Run <span class="mono">python manage.py seed_demo</span>.</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="section-title"><h2 class="mb-0">Browse by cuisine</h2></div>
+  <div class="grid grid-5">
+    {% for cuisine in cuisines %}
+    <a class="card card-hover" style="color:inherit;text-align:center" href="{% url 'recipe_list' %}?cuisine={{ cuisine.slug }}">
+      <div class="spec-emoji">{{ cuisine.emoji }}</div>
+      <div class="card-title mb-0">{{ cuisine.name }}</div>
+      <div class="small muted">{{ cuisine.n }} recipe{{ cuisine.n|pluralize }}</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

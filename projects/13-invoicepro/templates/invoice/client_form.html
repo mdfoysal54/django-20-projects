@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{% if client %}Edit{% else %}New{% endif %} client · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:680px">
+  <nav class="breadcrumbs"><a href="{% url 'client_list' %}">Clients</a> ›
+    <strong>{% if client %}Edit{% else %}New{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if client %}Edit {{ client.name }}{% else %}Add a client{% endif %}</h1>
+    <p class="lede">Tax rate and payment terms become the defaults for every new invoice to this client.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Save client</button>
+      <a class="btn btn-ghost" href="{% url 'client_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

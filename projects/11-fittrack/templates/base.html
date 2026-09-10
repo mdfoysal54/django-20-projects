@@ -1,0 +1,64 @@
+
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ APP_NAME }}{% endblock %} · {{ APP_NAME }}</title>
+<meta name="description" content="{% block meta_description %}{{ APP_TAGLINE }}{% endblock %}">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav" aria-label="Main navigation">
+    <a class="brand" href="{% url 'home' %}">
+      <span class="brand-badge">{{ APP_NAME|slice:":1" }}</span>
+      <span>{{ APP_NAME }}</span>
+    </a>
+    <div class="nav-links">
+      {% block nav_links %}
+      {% endblock %}
+    </div>
+    <div class="nav-right">
+      {% block nav_right %}
+      {% if user.is_authenticated %}
+        {% url 'profile' as profile_url %}
+        <span class="small muted hide-sm">Hi, <strong>{{ user.username }}</strong></span>
+        {% if profile_url %}
+        <a class="btn btn-sm btn-ghost" href="{{ profile_url }}">My profile</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-secondary" type="submit">Log out</button>
+        </form>
+      {% else %}
+        <a class="btn btn-sm btn-ghost" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-sm btn-primary" href="{% url 'register' %}">Sign up</a>
+      {% endif %}
+      {% endblock %}
+    </div>
+  </nav>
+</header>
+
+<main class="site-main">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>&copy; {% now "Y" %} {{ APP_NAME }} — {{ APP_TAGLINE }}</div>
+    <div><span class="heart">&#9829;</span> Built with Django 5.2</div>
+  </div>
+</footer>
+{% block extra_script %}{% endblock %}
+</body>
+</html>

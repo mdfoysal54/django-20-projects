@@ -4,33 +4,42 @@
 [![Django](https://img.shields.io/badge/Django-5.2%20LTS-092E20)](https://docs.djangoproject.com/en/5.2/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Six flagship Django 5.2 projects** — each with its own database models,
-backend logic, first-party HTML/CSS frontend, admin panel, canonical
-security hardening and a full automated test-suite. One monorepo, one
-shared, secure-by-default baseline.
+**Sixteen deep Django 5.2 projects** — each with its own database models,
+backend logic, first-party HTML/CSS frontend, admin panel, canonical security
+hardening and a full automated test-suite. One monorepo, one shared,
+secure-by-default baseline, **559 automated tests passing**.
 
 > Scope note: this repository was commissioned as a "20 projects" portfolio.
-> We built it as **6 deep flagship projects** instead of 20 shallow ones — a
-> deliberate trade-off for quality (see [docs/PORTFOLIO.md](docs/PORTFOLIO.md)).
-> The architecture scales down cleanly to 20 apps if you prefer breadth:
-> every project below is a drop-in template for a new one.
+> We built it as **16 deep projects instead of 20 shallow ones** — six
+> flagships, then ten more to the same bar — a deliberate trade-off for quality
+> (see [docs/PORTFOLIO.md](docs/PORTFOLIO.md)). Everything is a drop-in
+> template for project #17.
 
-## The projects
+## The sixteen projects
 
-| # | Project            | Theme                                  | Status |
-|---|--------------------|----------------------------------------|--------|
-| 1 | **ShopNest**       | Full-featured e-commerce platform      | ✅ built · 29 tests green |
-| 2 | **LearnHub**       | Online learning platform (LMS)         | ✅ built · 29 tests green |
-| 3 | **StayHub**        | Hotel & room booking engine            | ✅ built · 33 tests green |
-| 4 | **DevJobs**        | Job board & recruitment portal         | ✅ built · 34 tests green |
-| 5 | **TaskFlow**       | Team projects & kanban task manager    | ✅ built · 33 tests green |
-| 6 | **FinTrack**       | Personal finance & budget dashboard    | ✅ built · 41 tests green |
+| # | Project | Directory | Theme | Tests |
+|---|---------|-----------|-------|-------|
+| 1 | **ShopNest** | `01-shopnest` | Full-featured e-commerce platform | 29 ✅ |
+| 2 | **LearnHub** | `02-learnhub` | Online learning platform (LMS) | 29 ✅ |
+| 3 | **StayHub** | `03-stayhub` | Hotel & room booking engine | 33 ✅ |
+| 4 | **DevJobs** | `04-devjobs` | Job board & recruitment portal | 34 ✅ |
+| 5 | **TaskFlow** | `05-taskflow` | Team projects & kanban task manager | 33 ✅ |
+| 6 | **FinTrack** | `06-fintrack` | Personal finance & budget dashboard | 41 ✅ |
+| 7 | **BlogPress** | `07-blogpress` | Blog & publishing platform with comments | 26 ✅ |
+| 8 | **EventTix** | `08-eventtix` | Ticketing with capacity control | 28 ✅ |
+| 9 | **HelpDesk** | `09-helpdesk` | Support ticket desk & agent queue | 39 ✅ |
+| 10 | **MedCare** | `10-medcare` | Clinic appointments & doctor availability | 34 ✅ |
+| 11 | **FitTrack** | `11-fittrack` | Workout tracker with personal records | 36 ✅ |
+| 12 | **RecipeBox** | `12-recipebox` | Recipes, ratings & favourites | 37 ✅ |
+| 13 | **InvoicePro** | `13-invoicepro` | Freelancer invoicing & payments | 37 ✅ |
+| 14 | **AttendX** | `14-attendx` | Attendance tracking & reports | 44 ✅ |
+| 15 | **QuizMaster** | `15-quizmaster` | Quizzes with auto-grading | 37 ✅ |
+| 16 | **LinkShort** | `16-linkshort` | URL shortener & click analytics | 42 ✅ |
 
-*(This README is updated as each flagship lands — statuses here are the source of truth.)*
-
-Each project lives in `projects/XX-name/`, is fully self-contained, and can
-be run independently. They share the same security backbone but **not** the
-same codebase — every model, view, template and stylesheet is project-specific.
+Each project lives in `projects/XX-name/`, is fully self-contained (own
+migrations, own SQLite database, own templates and stylesheet), and can be run
+independently. They share the same security backbone but **not** the same
+codebase — every model, view, template and stylesheet is project-specific.
 
 ## Run any project in ~60 seconds
 
@@ -48,28 +57,60 @@ python manage.py runserver                            # http://127.0.0.1:8000
 Every project ships demo seeders and a passing test-suite:
 
 ```bash
-python manage.py test          # inside one project
-bash tools/verify_all.sh       # verify all six at once from the repo root
+python manage.py test               # inside one project
+bash tools/verify_all.sh            # verify all sixteen at once from the repo root
+python tools/smoke_pages.py projects/16-linkshort   # render every route, report failures
 ```
 
-**Verified baseline:** 6/6 projects green — 199 automated tests in total
-(72 canonical security tests + 127 domain tests). CI runs the same suites plus
+**Verified baseline:** 16/16 projects green — **559 automated tests** (176
+canonical security tests + 383 domain tests) and **291 pages smoke-rendered**
+from seeded databases. CI runs the same suites plus the page smoke test and
 `check --deploy` in production mode on every push
 ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)).
 
-### Run all six locally at once
+### Run all sixteen locally at once
 
 ```bash
-bash tools/run_all.sh          # serves 8000–8005 (auto-migrates/seeds new clones)
+bash tools/run_all.sh          # serves 8000–8015 (auto-migrates/seeds new clones)
 ```
 
 | Port | Project | | Port | Project |
 |---|---|---|---|---|
-| 8000 | 🛍️ ShopNest | | 8003 | 💼 DevJobs |
-| 8001 | 🎓 LearnHub | | 8004 | ✅ TaskFlow |
-| 8002 | 🛎️ StayHub | | 8005 | 💹 FinTrack |
+| 8000 | 🛍️ ShopNest | | 8008 | 🎧 HelpDesk |
+| 8001 | 🎓 LearnHub | | 8009 | 🩺 MedCare |
+| 8002 | 🛎️ StayHub | | 8010 | 🏋️ FitTrack |
+| 8003 | 💼 DevJobs | | 8011 | 🍳 RecipeBox |
+| 8004 | ✅ TaskFlow | | 8012 | 🧾 InvoicePro |
+| 8005 | 💹 FinTrack | | 8013 | 🗓️ AttendX |
+| 8006 | 📰 BlogPress | | 8014 | 🧠 QuizMaster |
+| 8007 | 🎟️ EventTix | | 8015 | 🔗 LinkShort |
 
-Demo logins everywhere: `alice` / `DemoPass123!` · admin panels: `admin` / `DemoPass123!`
+Demo logins: `alice` / `DemoPass123!` (ShopNest superuser: `admin` / `admin`).
+Admin panels: `admin` / `DemoPass123!` unless a project's README says otherwise.
+
+## Domain rules worth a look
+
+The interesting part of each project is the rule that keeps its data honest —
+every one of these is enforced in code or in the database, and covered by tests:
+
+| Project | The rule |
+|---|---|
+| ShopNest | Stock is decremented inside a transaction; order lines snapshot the price paid |
+| LearnHub | Lessons unlock in order; certificates only after every required lesson is complete |
+| StayHub | Room availability is range-checked; overlapping bookings are rejected |
+| DevJobs | One application per candidate per job; employers only see their own postings |
+| TaskFlow | Board membership gates every action; task order stays gap-based and stable |
+| FinTrack | Recurring transactions and budgets roll up per category; overspend is flagged |
+| BlogPress | Drafts 404 for strangers; only the author or a moderator can publish |
+| EventTix | Ticket inventory per tier can never oversell; each ticket checks in once |
+| HelpDesk | Status transitions are validated; first response time is measured per ticket |
+| MedCare | A filtered unique constraint makes a doctor's double-booking impossible |
+| FitTrack | A PR is only recorded when it beats *your own* history, per exercise |
+| RecipeBox | Authors cannot rate their own recipe; scaling clamps at 1–99 servings |
+| InvoicePro | Status is derived from payments; overpayment and voiding-with-payments are refused |
+| AttendX | Attendance only on held, non-future sessions; excused absences leave the denominator |
+| QuizMaster | Partial credit only when nothing wrong was picked; the answer key never reaches the player |
+| LinkShort | Clicks increment atomically in SQL; expired/capped links answer `410 Gone` |
 
 ## What "high security" means here
 
@@ -105,9 +146,9 @@ django-20-projects/
 │   │   ├── templates/      first-party pages (no framework)
 │   │   ├── static/css/     first-party stylesheet
 │   │   └── docs/           per-project notes
-│   ├── 02-learnhub/  …     (each project identical in shape)
-├── docs/                   monorepo-wide guides (SECURITY, PORTFOLIO)
-└── tools/                  scaffold + GitHub push scripts
+│   ├── 02-learnhub/  … 16-linkshort/   (every project identical in shape)
+├── docs/                   monorepo-wide guides (SECURITY, PORTFOLIO, PUSH-TO-GITHUB)
+└── tools/                  scaffold · canonical sources · verify_all · run_all · smoke_pages · push_to_github
 ```
 
 ## Tech stack
@@ -120,8 +161,11 @@ frameworks, no CDNs, no build step — the frontends are hand-built with
 ## Pushing to GitHub
 
 See **[docs/PUSH-TO-GITHUB.md](docs/PUSH-TO-GITHUB.md)** — one-command script
-(`tools/push_to_github.sh`) or plain copy-paste commands. Secrets, databases
-and media files are git-ignored by construction.
+(`tools/push_to_github.sh`) or plain copy-paste commands. The monorepo pushes
+as one repository, and each project also has everything it needs (its own
+`requirements.txt`, `.env.example`, README) to be published under its own
+project name. Secrets, databases and media files are git-ignored by
+construction.
 
 ## License
 

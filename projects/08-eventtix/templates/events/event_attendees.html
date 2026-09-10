@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Attendees · {{ event.title }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'organiser_dashboard' %}">Organiser</a> ›
+  <a href="{% url 'event_manage' event.slug %}">{{ event.title }}</a> › <strong>Attendees</strong></nav>
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Attendees</h1>
+    <p class="lede mb-0">{{ bookings|length }} booking{{ bookings|length|pluralize }} ·
+      {{ seats }} seat{{ seats|pluralize }} sold · {{ checked_in }} checked in</p></div>
+  <a class="btn btn-primary" href="{% url 'door_scan' event.slug %}">Door check-in</a>
+</div>
+
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Reference</th><th>Customer</th><th>Tier</th><th>Qty</th><th>Paid</th><th>Checked in</th><th></th></tr></thead>
+    <tbody>
+    {% for booking in bookings %}
+      <tr>
+        <td class="mono">{{ booking.reference }}</td>
+        <td>{{ booking.customer.username }}</td>
+        <td>{% for line in booking.booking_lines.all %}{{ line.tier.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        <td>{{ booking.quantity }}</td>
+        <td class="mono">৳{{ booking.total }}</td>
+        <td>
+          {% if booking.checked_in >= booking.quantity %}<span class="badge badge-ok">{{ booking.checked_in }}/{{ booking.quantity }}</span>
+          {% elif booking.checked_in %}<span class="badge badge-warn">{{ booking.checked_in }}/{{ booking.quantity }}</span>
+          {% else %}<span class="muted">0/{{ booking.quantity }}</span>{% endif %}
+        </td>
+        <td>
+          {% if booking.checked_in < booking.quantity %}
+          <form method="post" action="{% url 'door_check_in' event.slug booking.reference %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="event_attendees">
+            <button class="btn btn-sm btn-primary" type="submit">Check in</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7" class="muted">No confirmed bookings yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

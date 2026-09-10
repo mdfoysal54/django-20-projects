@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}New exercise · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:640px">
+  <nav class="breadcrumbs"><a href="{% url 'exercise_list' %}">Exercises</a> › <strong>New</strong></nav>
+  <div class="card">
+    <h1 class="page-title">Add an exercise</h1>
+    <p class="lede">Custom movements appear in the library alongside the built-in ones.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Add exercise</button>
+      <a class="btn btn-ghost" href="{% url 'exercise_list' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

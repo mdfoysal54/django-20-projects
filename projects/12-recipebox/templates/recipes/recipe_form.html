@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New recipe{% else %}Edit recipe{% endif %} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="container-narrow" style="max-width:820px">
+  <nav class="breadcrumbs"><a href="{% url 'my_recipes' %}">My kitchen</a> ›
+    <strong>{% if mode == 'create' %}New{% else %}Edit{% endif %}</strong></nav>
+  <div class="card">
+    <h1 class="page-title">{% if mode == 'create' %}Share a recipe{% else %}Edit “{{ recipe.title }}”{% endif %}</h1>
+    <p class="lede">One ingredient per line, starting with the quantity — RecipeBox scales them automatically
+      when readers change the serving count.</p>
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if field.help_text and not field.errors %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">{% if mode == 'create' %}Save recipe{% else %}Save changes{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'my_recipes' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

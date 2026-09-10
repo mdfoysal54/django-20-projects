@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ ticket.reference }} · {{ ticket.subject }}{% endblock %}
+{% block content %}
+{% if user.is_staff %}<nav class="breadcrumbs"><a href="{% url 'queue' %}">Agent queue</a> › <strong>{{ ticket.reference }}</strong></nav>
+{% else %}<nav class="breadcrumbs"><a href="{% url 'my_tickets' %}">My tickets</a> › <strong>{{ ticket.reference }}</strong></nav>{% endif %}
+
+<div class="grid" style="grid-template-columns:1.7fr 1fr; align-items:start">
+  <div>
+    <div class="card">
+      <div class="pill-row">
+        <span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+        <span class="badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+        <span class="mono small muted">{{ ticket.reference }}</span>
+        {% if ticket.is_breached %}<span class="badge badge-danger">SLA breached</span>{% endif %}
+      </div>
+      <h1 class="page-title">{{ ticket.subject }}</h1>
+      <p class="muted">{{ ticket.department.emoji }} {{ ticket.department.name }} ·
+        opened {{ ticket.created|date:"M j, Y · g:i A" }} by {{ ticket.requester.username }}</p>
+      <div class="ticket-body">{{ ticket.body|linebreaks }}</div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Conversation</h2>
+      {% for message in ticket_messages %}
+      <div class="thread-item {% if message.internal %}internal{% endif %}">
+        <span class="avatar">{{ message.author.username|slice:":1"|upper }}</span>
+        <div style="flex:1">
+          <div class="small">
+            <strong>{{ message.author.username }}</strong>
+            {% if message.author.is_staff %}<span class="badge badge-brand">agent</span>{% endif %}
+            <span class="muted">· {{ message.created|date:"M j, H:i" }}</span>
+            {% if message.internal %}<span class="badge badge-warn">internal note — agents only</span>{% endif %}
+          </div>
+          <div>{{ message.body|linebreaksbr }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="muted mb-0">No replies yet.</p>
+      {% endfor %}
+
+      {% if ticket.status != 'closed' %}
+      <hr class="divider">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reply">
+        <label class="form-label" for="{{ reply_form.body.id_for_label }}">
+          {% if user.is_staff %}Add a reply or internal note{% else %}Add a reply{% endif %}</label>
+        {{ reply_form.body }}
+        {% if reply_form.body.errors %}<ul class="field-errors">{% for e in reply_form.body.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if user.is_staff %}
+        <label class="check-row">{{ reply_form.internal }} <span>Internal note (never shown to the customer)</span></label>
+        {% endif %}
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+      {% else %}
+      <p class="form-hint">This ticket is closed. {% if is_requester %}Reopen it below to reply again.{% endif %}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside>
+    {% if user.is_staff and triage_form %}
+    <div class="card">
+      <h2 class="card-title">Triage</h2>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="triage">
+        {% for field in triage_form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Apply changes</button>
+      </form>
+      <p class="form-hint mb-0">Only legal status transitions are offered for this ticket.</p>
+      {% if not ticket.assignee or ticket.assignee != user %}
+      <form method="post" action="{% url 'claim' ticket.reference %}" class="mt-1">
+        {% csrf_token %}<button class="btn btn-secondary btn-block" type="submit">Claim this ticket</button>
+      </form>
+      {% endif %}
+      <div class="pill-row mt-1">
+        <form method="post" action="{% url 'quick_status' ticket.reference 'resolved' %}">
+          {% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Resolve</button></form>
+        <form method="post" action="{% url 'quick_status' ticket.reference 'closed' %}">
+          {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">Close</button></form>
+        <form method="post" action="{% url 'quick_status' ticket.reference 'in_progress' %}">
+          {% csrf_token %}<button class="btn btn-sm btn-secondary" type="submit">In progress</button></form>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="card-title">Details</h2>
+      <ul class="list-plain small">
+        <li><strong>Status:</strong> {{ ticket.get_status_display }}</li>
+        <li><strong>Priority:</strong> {{ ticket.get_priority_display }}</li>
+        <li><strong>Assignee:</strong> {{ ticket.assignee.username|default:"— unassigned —" }}</li>
+        <li><strong>First response due:</strong> {{ ticket.sla_due|date:"M j, H:i" }}</li>
+        <li><strong>First response:</strong>
+          {% if ticket.first_response_at %}{{ ticket.first_response_at|date:"M j, H:i" }}
+            ({{ ticket.minutes_to_first_response }} min){% else %}— awaiting{% endif %}</li>
+        {% if ticket.resolved_at %}<li><strong>Resolved:</strong> {{ ticket.resolved_at|date:"M j, H:i" }}</li>{% endif %}
+      </ul>
+      {% if is_requester and ticket.status == 'resolved' or is_requester and ticket.status == 'closed' %}
+        {% if ticket.feedback %}
+          <div class="alert alert-info">You rated this {{ ticket.feedback.score }}/5. Thanks!</div>
+        {% else %}
+          <form method="post" action="{% url 'give_feedback' ticket.reference %}">
+            {% csrf_token %}
+            <label class="form-label" for="id_score">How did we do?</label>
+            <select class="form-control" name="score" id="id_score">
+              <option value="5">5 — ★★★★★</option><option value="4">4 — ★★★★</option>
+              <option value="3">3 — ★★★</option><option value="2">2 — ★★</option><option value="1">1 — ★</option>
+            </select>
+            <input class="form-control mt-1" name="comment" placeholder="Anything else? (optional)">
+            <button class="btn btn-primary btn-block mt-1" type="submit">Submit rating</button>
+          </form>
+        {% endif %}
+      {% endif %}
+      {% if is_requester and not ticket.is_open %}
+      <form method="post" class="mt-1">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reopen">
+        <button class="btn btn-secondary btn-block" type="submit">Reopen ticket</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if user.is_staff and events %}
+    <div class="card">
+      <h2 class="card-title">Audit trail</h2>
+      <ul class="timeline">
+        {% for event in events %}
+        <li><span class="small muted">{{ event.created|date:"M j, H:i" }}</span>
+          <div class="small"><strong>{{ event.kind }}</strong> — {{ event.detail }}
+          {% if event.actor %}<span class="muted">by {{ event.actor.username }}</span>{% endif %}</div></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

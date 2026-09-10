@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Appointment {{ appointment.reference }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs">
+  {% if is_doctor %}<a href="{% url 'schedule' %}">Today's schedule</a>
+  {% else %}<a href="{% url 'my_appointments' %}">My appointments</a>{% endif %}
+  › <strong>{{ appointment.reference }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.4fr 1fr; align-items:start">
+  <div class="card">
+    <div class="pill-row">
+      {% if appointment.status == 'booked' %}<span class="badge badge-ok">Booked</span>
+      {% elif appointment.status == 'completed' %}<span class="badge badge-brand">Completed</span>
+      {% elif appointment.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+      {% else %}<span class="badge badge-warn">No show</span>{% endif %}
+      <span class="mono small muted">{{ appointment.reference }}</span>
+      {% if appointment.is_today %}<span class="badge badge-brand">today</span>{% endif %}
+    </div>
+    <h1 class="page-title">{{ appointment.doctor.display_name }}</h1>
+    <p class="muted">{{ appointment.doctor.speciality.emoji }} {{ appointment.doctor.speciality.name }}
+      {% if appointment.doctor.room %}· Room {{ appointment.doctor.room }}{% endif %}</p>
+    <div class="appt-when big">🗓 {{ appointment.starts_at|date:"l, j F Y" }} at {{ appointment.starts_at|time:"H:i" }}</div>
+    <div class="small muted">Duration {{ appointment.doctor.slot_minutes }} minutes ·
+      booked {{ appointment.created|date:"j M Y" }}</div>
+    <hr class="divider">
+    <div class="small muted">REASON FOR VISIT</div>
+    <p>{{ appointment.reason }}</p>
+    {% if appointment.status == 'booked' %}
+    <form method="post" action="{% url 'cancel' appointment.reference %}">
+      {% csrf_token %}<button class="btn btn-danger" type="submit">Cancel this appointment</button>
+    </form>
+    <p class="form-hint">Cancelling frees the slot for other patients immediately.</p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Patient</h2>
+      <div class="pill-row"><span class="avatar">{{ appointment.patient.username|slice:":1"|upper }}</span>
+        <div><strong>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</strong>
+          <div class="small muted">Member since {{ appointment.patient.date_joined|date:"M Y" }}</div></div></div>
+    </div>
+
+    {% if is_doctor and note_form %}
+    <div class="card">
+      <h2 class="card-title">Consultation note <span class="badge badge-warn">doctor only</span></h2>
+      <form method="post" action="{% url 'update_note' appointment.reference %}">
+        {% csrf_token %}
+        <label class="form-label" for="{{ note_form.clinical_note.id_for_label }}">Findings &amp; follow-up</label>
+        {{ note_form.clinical_note }}
+        <label class="form-label mt-1" for="{{ note_form.status.id_for_label }}">Outcome</label>
+        {{ note_form.status }}
+        <button class="btn btn-primary btn-block mt-1" type="submit">Save note</button>
+      </form>
+      <p class="form-hint mb-0">This note is never shown to the patient.</p>
+    </div>
+    {% elif can_see_note %}
+    <div class="card">
+      <h2 class="card-title">Consultation note <span class="badge badge-warn">staff view</span></h2>
+      <p class="mb-0">{{ appointment.clinical_note|default:"No note recorded."|linebreaksbr }}</p>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Departments · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Departments</h1>
+    <p class="lede mb-0">Where tickets land, and how busy each desk is.</p></div>
+  <a class="btn btn-secondary" href="{% url 'queue' %}">← Queue</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="grid grid-2">
+    {% for dept in departments %}
+    <div class="card">
+      <div class="dept-emoji">{{ dept.emoji }}</div>
+      <div class="card-title mb-0">{{ dept.name }}</div>
+      <p class="small muted">{{ dept.description }}</p>
+      <div class="pill-row">
+        <span class="badge">{{ dept.open_count }} open</span>
+        <span class="badge">{{ dept.total }} total</span>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🏷️</div><h2>No departments</h2></div>
+    {% endfor %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Add a department</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Create department</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

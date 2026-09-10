@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ doctor.display_name }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'doctor_list' %}">Doctors</a> › <strong>{{ doctor.display_name }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.4fr 1fr; align-items:start">
+  <div class="card">
+    <div class="pill-row">
+      <div class="doctor-avatar lg">{{ doctor.user.first_name|default:doctor.user.username|slice:":1"|upper }}</div>
+      <div>
+        <h1 class="page-title mb-0">{{ doctor.display_name }}</h1>
+        <p class="muted mb-0">{{ doctor.speciality.emoji }} {{ doctor.speciality.name }}
+          {% if doctor.room %}· Room {{ doctor.room }}{% endif %}</p>
+      </div>
+    </div>
+    <div class="pill-row mt-1">
+      <span class="badge">Consultation ৳{{ doctor.fee }}</span>
+      <span class="badge">{{ doctor.slot_minutes }}-minute slots</span>
+      {% if doctor.accepting_new %}<span class="badge badge-ok">Accepting new patients</span>
+      {% else %}<span class="badge badge-warn">Existing patients only</span>{% endif %}
+    </div>
+    <hr class="divider">
+    <p>{{ doctor.bio|default:"No biography provided yet." }}</p>
+
+    <h2 class="card-title mt-3">Weekly hours</h2>
+    <table class="table">
+      <tbody>
+      {% for block in doctor.availability.all %}
+        <tr><td><strong>{{ block.get_weekday_display }}</strong></td>
+            <td class="mono">{{ block.start_time|time:"H:i" }}–{{ block.end_time|time:"H:i" }}</td>
+            <td>{% if not block.active %}<span class="badge badge-warn">paused</span>{% endif %}</td></tr>
+      {% empty %}
+        <tr><td class="muted">No published hours — this doctor takes appointments by referral.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_this_doctor %}
+    <hr class="divider">
+    <div class="pill-row">
+      <a class="btn btn-secondary btn-sm" href="{% url 'schedule' %}">Today's schedule</a>
+      <a class="btn btn-secondary btn-sm" href="{% url 'availability' %}">Manage availability</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Book an appointment</h2>
+      <div class="pill-row" style="justify-content:space-between">
+        <a class="btn btn-sm btn-ghost" href="?date={{ prev_day|date:'Y-m-d' }}">← {{ prev_day|date:"D j M" }}</a>
+        <strong>{{ day|date:"D, j M Y" }}</strong>
+        <a class="btn btn-sm btn-ghost" href="?date={{ next_day|date:'Y-m-d' }}">{{ next_day|date:"D j M" }} →</a>
+      </div>
+      <hr class="divider">
+      {% if not user.is_authenticated %}
+        <p class="small muted">Log in to reserve one of these slots.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'login' %}?next={{ doctor.get_absolute_url }}">Log in to book</a>
+      {% elif slots %}
+        <p class="small muted mb-1">{{ slots|length }} slot{{ slots|length|pluralize }} free on this day.</p>
+        <div class="slot-grid">
+          {% for slot in slots %}
+          <form method="post" action="{% url 'book' doctor.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="doctor" value="{{ doctor.pk }}">
+            <input type="hidden" name="starts_at" value="{{ slot.isoformat }}">
+            <input type="hidden" name="reason" value="Booked online — reason to be confirmed">
+            <button class="btn btn-sm btn-secondary slot-btn" type="submit">{{ slot|time:"H:i" }}</button>
+          </form>
+          {% endfor %}
+        </div>
+        <p class="form-hint">Clicking a time books it immediately. <a href="{{ doctor.get_absolute_url }}">Reload</a> to refresh.</p>
+      {% else %}
+        <p class="muted mb-0">No free slots on this day. Try another date.</p>
+      {% endif %}
+    </div>
+
+    {% if my_upcoming %}
+    <div class="card">
+      <h2 class="card-title">Already booked with {{ doctor.display_name }}</h2>
+      {% for appointment in my_upcoming %}
+      <div class="small mb-1">
+        <strong class="mono">{{ appointment.reference }}</strong> ·
+        {{ appointment.starts_at|date:"D j M, H:i" }}
+        <div class="muted">{{ appointment.reason|truncatechars:60 }}</div>
+      </div>
+      {% endfor %}
+      <a class="btn btn-secondary btn-sm" href="{% url 'my_appointments' %}">Manage my appointments</a>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

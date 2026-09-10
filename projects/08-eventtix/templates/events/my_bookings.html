@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My tickets · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My tickets</h1>
+    <p class="lede mb-0">{{ active|length }} active booking{{ active|length|pluralize }}.</p></div>
+  <a class="btn btn-secondary" href="{% url 'event_list' %}">Find more events</a>
+</div>
+
+{% if bookings %}
+<div class="grid" style="gap:.9rem">
+  {% for booking in bookings %}
+  <div class="card {% if not booking.is_active %}muted{% endif %}">
+    <div class="pill-row" style="justify-content:space-between">
+      <div class="pill-row">
+        <span class="event-emoji">{{ booking.event.cover_emoji }}</span>
+        <div>
+          <strong><a href="{{ booking.event.get_absolute_url }}">{{ booking.event.title }}</a></strong>
+          <div class="small muted">{{ booking.event.starts_at|date:"D, M j, Y · g:i A" }} · {{ booking.event.venue }}</div>
+          <div class="small mono">Ref {{ booking.reference }}</div>
+        </div>
+      </div>
+      <div class="pill-row">
+        {% if booking.is_active %}<span class="badge badge-ok">Confirmed</span>{% else %}<span class="badge badge-danger">Cancelled</span>{% endif %}
+        <span class="badge">{{ booking.quantity }} × ৳{{ booking.unit_price }}</span>
+        {% if booking.checked_in %}<span class="badge badge-warn">✓ {{ booking.checked_in }} checked in</span>{% endif %}
+      </div>
+    </div>
+    <div class="pill-row mt-1">
+      <a class="btn btn-sm btn-secondary" href="{{ booking.get_absolute_url }}">Ticket details</a>
+      <a class="btn btn-sm btn-ghost" href="{% url 'ticket_stub' booking.reference %}">Printable stub</a>
+      {% if booking.is_active %}
+      <form method="post" action="{% url 'booking_cancel' booking.reference %}">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-danger" type="submit">Cancel booking</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">🎫</div><h2>No tickets yet</h2>
+  <p>Find something happening and grab a seat.</p>
+  <a class="btn btn-primary" href="{% url 'event_list' %}">Browse events</a>
+</div>
+{% endif %}
+{% endblock %}

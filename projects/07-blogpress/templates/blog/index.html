@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — writing worth reading{% endblock %}
+{% block content %}
+
+<section class="blog-hero">
+  <div>
+    <h1>Writing worth reading.</h1>
+    <p class="lede">Engineering notes, product decisions and tutorials from people
+       who actually ship — {{ total_posts }} posts and counting.</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'post_list' %}">Browse all posts →</a>
+      {% if not user.is_authenticated %}<a class="btn btn-lg btn-secondary" href="{% url 'register' %}">Become an author</a>{% endif %}
+    </p>
+  </div>
+  <div class="hero-emoji">✍️</div>
+</section>
+
+{% if featured %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Featured</h2></div>
+  <div class="grid grid-3">
+    {% for post in featured %}
+    <article class="card card-hover post-card">
+      <div class="post-cover">{{ post.cover_emoji }}</div>
+      <div class="post-body">
+        <div class="pill-row"><span class="badge badge-brand">{{ post.category.name|default:"Uncategorised" }}</span>
+          <span class="small muted">{{ post.reading_minutes }} min read</span></div>
+        <h3 class="post-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p class="small muted">{{ post.excerpt|default:post.body|truncatechars:110 }}</p>
+        <div class="post-meta small muted">✍️ {{ post.author.username }} · {{ post.published_at|date:"M j, Y" }} · 👁 {{ post.views_count }}</div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="page-head">
+    <div class="section-title"><h2 class="mb-0">Latest posts</h2></div>
+    <a class="btn btn-secondary" href="{% url 'post_list' %}">See everything →</a>
+  </div>
+  <div class="grid grid-2">
+    {% for post in latest %}
+    <article class="card post-row">
+      <span class="post-emoji">{{ post.cover_emoji }}</span>
+      <div>
+        <h3 class="post-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p class="small muted mb-1">{{ post.excerpt|default:post.body|truncatechars:150 }}</p>
+        <div class="small muted">{{ post.category.name|default:"Uncategorised" }} · {{ post.author.username }} ·
+          {{ post.published_at|date:"M j" }} · {{ post.reading_minutes }} min</div>
+      </div>
+    </article>
+    {% empty %}
+    <div class="empty-state"><div class="big">📭</div><h2>No posts yet</h2><p>Run <span class="mono">python manage.py seed_demo</span>.</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+{% if categories %}
+<section>
+  <div class="section-title"><h2 class="mb-0">Browse by topic</h2></div>
+  <div class="grid grid-4">
+    {% for category in categories %}
+    <a class="card card-hover" href="{% url 'post_list' %}?category={{ category.slug }}" style="color:inherit">
+      <div class="card-title mb-0">{{ category.name }}</div>
+      <div class="small muted">{{ category.n }} post{{ category.n|pluralize }}</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

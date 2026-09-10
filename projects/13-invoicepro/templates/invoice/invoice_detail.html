@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.number }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'invoice_list' %}">Invoices</a> › <strong>{{ invoice.number }}</strong></nav>
+
+<div class="page-head">
+  <div>
+    <h1 class="page-title mb-0">{{ invoice.number }}</h1>
+    <p class="lede mb-0">{{ invoice.client.name }}{% if invoice.client.company %} · {{ invoice.client.company }}{% endif %} ·
+      issued {{ invoice.issue_date|date:"j M Y" }} · due {{ invoice.due_date|date:"j M Y" }}</p>
+  </div>
+  <div class="pill-row">
+    <span class="badge badge-lg status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+    {% if invoice.is_overdue %}<span class="badge badge-danger">{{ invoice.days_overdue }} days late</span>{% endif %}
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div>
+    <div class="card invoice-paper">
+      <div class="invoice-head">
+        <div>
+          <div class="small muted">FROM</div>
+          <strong>{{ invoice.owner.get_full_name|default:invoice.owner.username }}</strong>
+          <div class="small muted">{{ invoice.owner.email }}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small muted">BILL TO</div>
+          <strong>{{ invoice.client.company|default:invoice.client.name }}</strong>
+          <div class="small muted">{{ invoice.client.email }}</div>
+          {% if invoice.client.tax_id %}<div class="small muted">Tax ID: {{ invoice.client.tax_id }}</div>{% endif %}
+        </div>
+      </div>
+      <hr class="divider">
+      <table class="table">
+        <thead><tr><th>Description</th><th>Qty</th><th>Unit price</th><th>Amount</th></tr></thead>
+        <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.description }}</td>
+            <td class="mono">{{ item.quantity }}</td>
+            <td class="mono">৳{{ item.unit_price|floatformat:2 }}</td>
+            <td class="mono">৳{{ item.line_total|floatformat:2 }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted">No line items yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="totals">
+        <div class="pill-row" style="justify-content:space-between"><span>Subtotal</span>
+          <span class="mono">৳{{ invoice.subtotal|floatformat:2 }}</span></div>
+        {% if invoice.discount %}
+        <div class="pill-row" style="justify-content:space-between"><span>Discount</span>
+          <span class="mono">−৳{{ invoice.discount|floatformat:2 }}</span></div>
+        {% endif %}
+        <div class="pill-row" style="justify-content:space-between"><span>Tax ({{ invoice.tax_rate }}%)</span>
+          <span class="mono">৳{{ invoice.tax_amount|floatformat:2 }}</span></div>
+        <div class="pill-row total" style="justify-content:space-between"><strong>Total</strong>
+          <strong class="mono">৳{{ invoice.total|floatformat:2 }}</strong></div>
+        <div class="pill-row" style="justify-content:space-between"><span>Paid</span>
+          <span class="mono">−৳{{ invoice.paid_total|floatformat:2 }}</span></div>
+        <div class="pill-row balance" style="justify-content:space-between"><strong>Balance due</strong>
+          <strong class="mono">৳{{ invoice.balance|floatformat:2 }}</strong></div>
+      </div>
+      {% if invoice.notes %}
+      <hr class="divider"><div class="small muted">{{ invoice.notes|linebreaksbr }}</div>
+      {% endif %}
+      <div class="pill-row mt-3 no-print">
+        <button class="btn btn-secondary btn-sm" onclick="window.print()">Print / save as PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Payment history</h2>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th></th></tr></thead>
+        <tbody>
+        {% for payment in payments %}
+          <tr>
+            <td>{{ payment.paid_on|date:"j M Y" }}</td>
+            <td class="mono">৳{{ payment.amount|floatformat:2 }}</td>
+            <td>{{ payment.get_method_display }}</td>
+            <td class="small muted">{{ payment.reference|default:"—" }}</td>
+            <td>
+              <form method="post" action="{% url 'payment_delete' payment.pk %}">
+                {% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit">Reverse</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="muted">No payments recorded yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside>
+    {% if invoice.status == 'draft' %}
+    <div class="card">
+      <h2 class="card-title">Draft</h2>
+      <p class="small muted">Drafts are private to you. Send it to start the clock and enable payments.</p>
+      <form method="post" action="{% url 'invoice_send' invoice.number %}">
+        {% csrf_token %}<button class="btn btn-primary btn-block" type="submit">Mark as sent</button>
+      </form>
+      <div class="pill-row mt-1">
+        <a class="btn btn-secondary btn-sm" href="{% url 'invoice_edit' invoice.number %}">Edit</a>
+        <form method="post" action="{% url 'invoice_delete' invoice.number %}">
+          {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Delete draft</button>
+        </form>
+      </div>
+    </div>
+    {% elif invoice.balance > 0 %}
+    <div class="card">
+      <h2 class="card-title">Record a payment</h2>
+      <p class="small muted">Outstanding balance: <strong class="mono">৳{{ invoice.balance|floatformat:2 }}</strong></p>
+      <form method="post" action="{% url 'invoice_pay' invoice.number %}">
+        {% csrf_token %}
+        {% for field in payment_form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Record payment</button>
+      </form>
+      <p class="form-hint mb-0">Overpayments are refused — the balance can never go negative.</p>
+    </div>
+    {% else %}
+    <div class="card">
+      <h2 class="card-title">Settled 🎉</h2>
+      <p class="small muted">Paid in full{% if invoice.paid_at %} on {{ invoice.paid_at|date:"j M Y" }}{% endif %}.</p>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="card-title">Status</h2>
+      <ul class="list-plain small">
+        <li><strong>Status:</strong> {{ invoice.get_status_display }}</li>
+        <li><strong>Sent:</strong> {{ invoice.sent_at|date:"j M Y, H:i"|default:"not sent" }}</li>
+        <li><strong>Paid:</strong> {{ invoice.paid_at|date:"j M Y, H:i"|default:"—" }}</li>
+        <li><strong>Tax rate:</strong> {{ invoice.tax_rate }}%</li>
+      </ul>
+      {% if invoice.status != 'draft' and invoice.status != 'void' %}
+      <form method="post" action="{% url 'invoice_void' invoice.number %}">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-block" type="submit"
+                {% if invoice.paid_total > 0 %}disabled title="Reverse payments first"{% endif %}>Void invoice</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Client</h2>
+      <ul class="list-plain small">
+        <li><strong>{{ invoice.client.name }}</strong></li>
+        <li>{{ invoice.client.email|default:"—" }}</li>
+        <li>{{ invoice.client.address|linebreaksbr|default:"—" }}</li>
+        <li><a href="{% url 'client_edit' invoice.client.pk %}">Edit client</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

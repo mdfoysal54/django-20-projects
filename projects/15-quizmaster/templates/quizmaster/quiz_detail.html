@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'quiz_list' %}">Quizzes</a> › <strong>{{ quiz.title }}</strong></nav>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="card">
+    <div class="quiz-hero">{{ quiz.emoji }}</div>
+    <div class="pill-row mb-1">
+      <span class="badge badge-brand">{{ quiz.category.name|default:"Unfiled" }}</span>
+      <span class="badge">{{ quiz.question_count }} question{{ quiz.question_count|pluralize }}</span>
+      <span class="badge">{{ quiz.total_points }} point{{ quiz.total_points|pluralize }}</span>
+      <span class="badge">{{ quiz.pass_mark }}% to pass</span>
+      {% if quiz.time_limit_minutes %}<span class="badge badge-warn">⏱ {{ quiz.time_limit_minutes }} minutes</span>{% endif %}
+      {% if quiz.one_attempt_only %}<span class="badge badge-warn">one attempt only</span>{% endif %}
+      {% if quiz.visibility == 'draft' %}<span class="badge badge-warn">draft</span>{% endif %}
+    </div>
+    <h1 class="page-title">{{ quiz.title }}</h1>
+    <p class="muted">by {{ quiz.author.username }} · created {{ quiz.created|date:"j M Y" }}</p>
+    {% if quiz.description %}<p>{{ quiz.description }}</p>{% endif %}
+
+    {% if can_edit %}
+    <hr class="divider">
+    <div class="pill-row">
+      <a class="btn btn-secondary btn-sm" href="{% url 'quiz_edit' quiz.slug %}">Edit quiz</a>
+      <a class="btn btn-secondary btn-sm" href="{% url 'quiz_results' quiz.slug %}">Analytics</a>
+      <a class="btn btn-primary btn-sm" href="{% url 'question_create' quiz.slug %}">+ Add question</a>
+    </div>
+    <p class="form-hint mb-0">The answer key is stored server-side only — a draft quiz is invisible to players.
+      {% if quiz.visibility == 'draft' %} Publish it from the edit screen when it's ready.{% endif %}</p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2 class="card-title">Ready?</h2>
+      {% if not user.is_authenticated %}
+        <p class="small muted">Log in to take this quiz — results are saved to your account.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'login' %}?next={{ quiz.get_absolute_url }}">Log in</a>
+      {% elif in_progress %}
+        <p class="small muted">You have an attempt in progress.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'take_quiz' pk=in_progress.pk %}">Resume attempt</a>
+      {% elif not attempts_left %}
+        <p class="small muted">You have used your single attempt on this quiz.</p>
+        <a class="btn btn-secondary btn-block" href="{{ my_attempts.0.get_absolute_url }}">See your result</a>
+      {% else %}
+        <form method="post" action="{% url 'start_attempt' quiz.slug %}">
+          {% csrf_token %}
+          <button class="btn btn-primary btn-block" type="submit">Start quiz</button>
+        </form>
+        <p class="form-hint mb-0">{% if quiz.time_limit_minutes %}You'll have {{ quiz.time_limit_minutes }} minutes.
+          {% else %}No time limit.{% endif %} Answers are graded when you submit.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Stats</h2>
+      {% if stats.count %}
+      <ul class="list-plain small">
+        <li><strong>Attempts:</strong> {{ stats.count }}</li>
+        <li><strong>Average score:</strong> {{ stats.average }}%</li>
+        <li><strong>Pass rate:</strong> {{ stats.pass_rate }}%</li>
+        <li><strong>Best:</strong> {{ stats.best }}% · <strong>Worst:</strong> {{ stats.worst }}%</li>
+      </ul>
+      {% else %}
+      <p class="muted mb-0">Nobody has taken this quiz yet — be the first.</p>
+      {% endif %}
+    </div>
+
+    {% if my_attempts %}
+    <div class="card">
+      <h2 class="card-title">Your attempts</h2>
+      {% for attempt in my_attempts %}
+      <div class="pill-row" style="justify-content:space-between">
+        <div class="small">
+          {{ attempt.started_at|date:"j M Y, H:i" }}
+          <div class="muted">{% if attempt.is_submitted %}{{ attempt.score }}/{{ attempt.max_score }}
+            ({{ attempt.percent }}%){% else %}in progress{% endif %}</div>
+        </div>
+        {% if attempt.is_submitted %}
+          {% if attempt.passed %}<span class="badge badge-ok">Passed</span>
+          {% else %}<span class="badge badge-danger">Failed</span>{% endif %}
+          <a class="btn btn-sm btn-ghost" href="{{ attempt.get_absolute_url }}">Review</a>
+        {% else %}
+          <a class="btn btn-sm btn-primary" href="{% url 'take_quiz' attempt.pk %}">Resume</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

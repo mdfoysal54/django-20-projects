@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Body weight · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Body weight log</h1>
+    <p class="lede mb-0">{% if change is not None %}Net change over your log:
+      <strong class="{% if change < 0 %}text-ok{% else %}text-warn{% endif %}">{{ change|floatformat:1 }} kg</strong>
+      {% else %}Log at least two entries to see a trend.{% endif %}</p></div>
+  <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Dashboard</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="card">
+    <h2 class="card-title">Trend</h2>
+    {% if chart %}
+    <div class="bar-chart tall">
+      {% for point in chart %}
+      <div class="bar-wrap" title="{{ point.date|date:'j M' }}: {{ point.value }} kg">
+        <div class="bar alt" style="height:{{ point.value }}%"></div>
+        <div class="bar-label">{{ point.date|date:"d/m" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="form-hint mb-0">Bars are scaled to your logged range ({{ chart_min|floatformat:1 }}–{{ chart_max|floatformat:1 }} kg).</p>
+    {% else %}
+    <p class="muted mb-0">No weigh-ins logged yet.</p>
+    {% endif %}
+
+    <table class="table mt-3">
+      <thead><tr><th>Date</th><th>Weight</th><th>Δ vs previous</th></tr></thead>
+      <tbody>
+      {% for entry in entries %}
+        <tr>
+          <td>{{ entry.date|date:"D j M Y" }}</td>
+          <td class="mono">{{ entry.weight_kg }} kg</td>
+          <td class="small muted">
+            {% if forloop.last %}—{% else %}{{ entry.weight_kg|floatformat:1 }} vs next entry{% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3" class="muted">Nothing logged yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Log today's weight</h2>
+    <form method="post" action="{% url 'log_weight' %}">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Save</button>
+    </form>
+    <p class="form-hint mb-0">One entry per day — logging the same date again updates it.</p>
+  </aside>
+</div>
+{% endblock %}

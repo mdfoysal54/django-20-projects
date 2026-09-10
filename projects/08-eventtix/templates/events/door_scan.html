@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Door check-in · {{ event.title }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{% url 'organiser_dashboard' %}">Organiser</a> ›
+  <a href="{% url 'event_manage' event.slug %}">{{ event.title }}</a> › <strong>Door</strong></nav>
+<div class="container-narrow" style="max-width:720px">
+  <div class="card door-card">
+    <h1 class="page-title">Door check-in</h1>
+    <p class="lede">{{ event.cover_emoji }} {{ event.title }} · {{ event.venue }}</p>
+    <form method="post" action="{% url 'door_lookup' event.slug %}">
+      {% csrf_token %}
+      <label class="form-label" for="{{ form.reference.id_for_label }}">Scan or type the booking reference</label>
+      {{ form.reference }}
+      <button class="btn btn-primary btn-block mt-1" type="submit">Look up &amp; admit</button>
+    </form>
+    <p class="form-hint">Each reference admits up to its paid quantity — extra scans are refused with a warning.</p>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Recent bookings</h2>
+    <table class="table">
+      <thead><tr><th>Reference</th><th>Customer</th><th>Qty</th><th></th></tr></thead>
+      <tbody>
+      {% for booking in recent %}
+        <tr>
+          <td class="mono">{{ booking.reference }}</td>
+          <td>{{ booking.customer.username }}</td>
+          <td>{{ booking.quantity }}</td>
+          <td>
+            {% if booking.checked_in >= booking.quantity %}<span class="badge badge-ok">In ({{ booking.checked_in }}/{{ booking.quantity }})</span>
+            {% else %}
+            <form method="post" action="{% url 'door_check_in' event.slug booking.reference %}">
+              {% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Check in</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="muted">No bookings yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My tickets · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">My tickets</h1>
+    <p class="lede mb-0">{{ page_obj.paginator.count }} ticket{{ page_obj.paginator.count|pluralize }}</p></div>
+  <a class="btn btn-primary" href="{% url 'new_ticket' %}">+ New ticket</a>
+</div>
+
+<div class="pill-row mb-3">
+  <a class="badge {% if not status %}badge-brand{% endif %}" href="{% url 'my_tickets' %}{% if q %}?q={{ q }}{% endif %}">All</a>
+  {% for value, label in statuses %}
+    <a class="badge {% if status == value %}badge-brand{% endif %}" href="?status={{ value }}{% if q %}&q={{ q }}{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if page_obj %}
+<div class="grid" style="gap:.8rem">
+  {% for ticket in page_obj %}
+  <a class="card card-hover ticket-row" style="color:inherit" href="{{ ticket.get_absolute_url }}">
+    <div>
+      <div class="pill-row">
+        <span class="badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+        <span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+        <span class="mono small muted">{{ ticket.reference }}</span>
+      </div>
+      <div class="card-title mt-1 mb-0">{{ ticket.subject }}</div>
+      <div class="small muted">{{ ticket.department.name }} · updated {{ ticket.updated|timesince }} ago ·
+        💬 {{ ticket.n_messages }} message{{ ticket.n_messages|pluralize }}</div>
+    </div>
+    <div class="ticket-side">
+      {% if ticket.assignee %}<div class="small muted">Agent</div><strong>{{ ticket.assignee.username }}</strong>
+      {% else %}<span class="badge">Unassigned</span>{% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big">📭</div><h2>No tickets here</h2>
+  <p>Everything is quiet. If something breaks, we're one click away.</p>
+  <a class="btn btn-primary" href="{% url 'new_ticket' %}">Open a ticket</a>
+</div>
+{% endif %}
+{% endblock %}

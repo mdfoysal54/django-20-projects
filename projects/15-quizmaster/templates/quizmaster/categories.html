@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Categories · {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title mb-0">Categories</h1>
+    <p class="lede mb-0">How quizzes are filed for browsing.</p></div>
+  <a class="btn btn-secondary" href="{% url 'quiz_list' %}">← Browse quizzes</a>
+</div>
+
+<div class="grid" style="grid-template-columns:1.6fr 1fr; align-items:start">
+  <div class="grid grid-3">
+    {% for category in categories %}
+    <a class="card card-hover" style="color:inherit;text-align:center" href="{% url 'quiz_list' %}?category={{ category.slug }}">
+      <div class="spec-emoji">{{ category.emoji }}</div>
+      <div class="card-title mb-0">{{ category.name }}</div>
+      <div class="small muted">{{ category.n_public }} public · {{ category.n }} total</div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1"><div class="big">🏷️</div><h2>No categories yet</h2></div>
+    {% endfor %}
+  </div>
+
+  <aside class="card">
+    <h2 class="card-title">Add a category</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Create category</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}
