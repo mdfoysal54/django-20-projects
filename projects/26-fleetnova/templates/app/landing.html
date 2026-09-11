@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">F</span><span>FleetNova</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Fleet OS</div>
   <h1>One vehicle, one driver, one <em>open</em> trip.</h1>
-  <p class="lede">Odometers never rewind. Vehicles and drivers cannot double-dispatch.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">FleetNova is a yard that only moves forward. Odometers never rewind. A vehicle or driver already on a trip cannot be double-dispatched.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the yard</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Yard</h3><p class="muted">Plates and km.</p></div>
-<div class="card"><h3>Trip</h3><p class="muted">One open run.</p></div>
-<div class="card"><h3>Fuel</h3><p class="muted">Litres vs km.</p></div>
-<div class="card"><h3>Close</h3><p class="muted">End km ≥ start.</p></div>
+  <div class="card"><h3>Yard</h3><p class="muted">Plates and km.</p></div>
+  <div class="card"><h3>Trip</h3><p class="muted">One open run.</p></div>
+  <div class="card"><h3>Fuel</h3><p class="muted">Litres vs km.</p></div>
+  <div class="card"><h3>Close</h3><p class="muted">End km ≥ start.</p></div>
 </div>
-
 {% endblock %}

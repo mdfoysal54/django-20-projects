@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="en" data-theme="{ ui_theme|default:'void' }">
+<html lang="en" data-theme="{{ ui_theme|default:'void' }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +9,7 @@
 <meta name="color-scheme" content="dark light">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body class="{% if user.is_authenticated %}app-shell{% endif %}">
+<body class="{% if user.is_authenticated %}app-shell{% endif %}{% block body_class %}{% endblock %}">
 {% if user.is_authenticated %}
 <aside class="rail">
   <a class="brand" href="{% url 'dashboard' %}"><span class="brand-badge">A</span><span>AuroraRealty</span></a>
@@ -46,5 +46,6 @@
   <footer class="site-footer">© {% now "Y" %} {{ APP_NAME }} — keys, viewings, close.</footer>
   {% endif %}
 </div>
+{% block extra_script %}{% endblock %}
 </body>
 </html>

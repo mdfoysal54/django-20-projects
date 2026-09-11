@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">P</span><span>Parcelio</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Courier OS</div>
-  <h1>Every parcel has a number, a hub and a <em>honest</em> last mile.</h1>
-  <p class="lede">Weight cap 30 kg. Courier required before out-for-delivery. Delivered stays delivered.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <h1>Every parcel has a number, a hub and an <em>honest</em> last mile.</h1>
+  <p class="lede">Parcelio is last-mile operations: waybills, hub scans, COD and a 30 kg ceiling. Out-for-delivery never leaves without a named courier. Delivered stays delivered.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the hub</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Scan</h3><p class="muted">Every state change is a scan.</p></div>
-<div class="card"><h3>Hubs</h3><p class="muted">Stations own the fleet.</p></div>
-<div class="card"><h3>COD</h3><p class="muted">Cash on delivery tracked.</p></div>
-<div class="card"><h3>Cap</h3><p class="muted">30 kg last-mile ceiling.</p></div>
+  <div class="card"><h3>Scan</h3><p class="muted">Every state change is a scan.</p></div>
+  <div class="card"><h3>Hubs</h3><p class="muted">Stations own the fleet.</p></div>
+  <div class="card"><h3>COD</h3><p class="muted">Cash on delivery tracked.</p></div>
+  <div class="card"><h3>Cap</h3><p class="muted">30 kg last-mile ceiling.</p></div>
 </div>
-
 {% endblock %}

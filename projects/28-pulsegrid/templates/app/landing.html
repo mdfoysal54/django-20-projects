@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">G</span><span>PulseGrid</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">SRE OS</div>
   <h1>Incidents that <em>dedupe</em> themselves.</h1>
-  <p class="lede">Same open title on a monitor cannot page twice. Ack only from open.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">PulseGrid is the on-call grid. Same open title on a monitor cannot page twice. Ack only from open. Resolve is terminal.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the grid</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Sites</h3><p class="muted">Named edges.</p></div>
-<div class="card"><h3>Monitors</h3><p class="muted">HTTP / latency.</p></div>
-<div class="card"><h3>Page</h3><p class="muted">No duplicate opens.</p></div>
-<div class="card"><h3>Ack</h3><p class="muted">Then resolve.</p></div>
+  <div class="card"><h3>Sites</h3><p class="muted">Named edges.</p></div>
+  <div class="card"><h3>Monitors</h3><p class="muted">HTTP / latency.</p></div>
+  <div class="card"><h3>Page</h3><p class="muted">No duplicate opens.</p></div>
+  <div class="card"><h3>Ack</h3><p class="muted">Then resolve.</p></div>
 </div>
-
 {% endblock %}

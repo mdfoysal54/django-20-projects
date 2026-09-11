@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">S</span><span>Salonova</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Salon OS</div>
   <h1>A chair is a calendar — never two clients in one <em>block</em>.</h1>
-  <p class="lede">Overlapping services on the same stylist are refused. Completing a cancelled chair is refused.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">Salonova keeps the floor honest. Stylist calendars cannot overlap, the past cannot be booked, and a cancelled chair cannot be marked done.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the floor</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Chair</h3><p class="muted">Stylist calendars.</p></div>
-<div class="card"><h3>Menu</h3><p class="muted">Minutes + price.</p></div>
-<div class="card"><h3>Clash</h3><p class="muted">No overlapping blocks.</p></div>
-<div class="card"><h3>Done</h3><p class="muted">Status you can trust.</p></div>
+  <div class="card"><h3>Chair</h3><p class="muted">Stylist calendars.</p></div>
+  <div class="card"><h3>Menu</h3><p class="muted">Minutes + price.</p></div>
+  <div class="card"><h3>Clash</h3><p class="muted">No overlapping blocks.</p></div>
+  <div class="card"><h3>Done</h3><p class="muted">Status you can trust.</p></div>
 </div>
-
 {% endblock %}

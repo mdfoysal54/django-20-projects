@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">O</span><span>OrbitPay</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Payments OS</div>
   <h1>Wallets with a ledger that <em>never</em> overdrafts.</h1>
-  <p class="lede">Every send is two entries. Voids reverse both. No self-pay.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">OrbitPay is double-entry money. Every send is two lines. Voids reverse both. You cannot pay yourself. Insufficient funds are refused, not rounded.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the orbit</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Wallets</h3><p class="muted">One per user.</p></div>
-<div class="card"><h3>Send</h3><p class="muted">Balance checked.</p></div>
-<div class="card"><h3>Void</h3><p class="muted">Reversing entries.</p></div>
-<div class="card"><h3>Seed</h3><p class="muted">Genesis credits.</p></div>
+  <div class="card"><h3>Wallets</h3><p class="muted">One per user.</p></div>
+  <div class="card"><h3>Send</h3><p class="muted">Balance checked.</p></div>
+  <div class="card"><h3>Void</h3><p class="muted">Reversing entries.</p></div>
+  <div class="card"><h3>Seed</h3><p class="muted">Genesis credits.</p></div>
 </div>
-
 {% endblock %}

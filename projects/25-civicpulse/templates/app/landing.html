@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">C</span><span>CivicPulse</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Civic OS</div>
   <h1>Wards, issues and crews — a city that <em>closes</em> its loops.</h1>
-  <p class="lede">No resolve without a crew. One open work order at a time.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">CivicPulse is the municipal ticket desk. Issues are numbered. A crew must be dispatched before resolve. One open work order at a time.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the pulse</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Wards</h3><p class="muted">Geography first.</p></div>
-<div class="card"><h3>Issues</h3><p class="muted">Numbered tickets.</p></div>
-<div class="card"><h3>Crews</h3><p class="muted">One open order.</p></div>
-<div class="card"><h3>Close</h3><p class="muted">Resolve only after dispatch.</p></div>
+  <div class="card"><h3>Wards</h3><p class="muted">Geography first.</p></div>
+  <div class="card"><h3>Issues</h3><p class="muted">Numbered tickets.</p></div>
+  <div class="card"><h3>Crews</h3><p class="muted">One open order.</p></div>
+  <div class="card"><h3>Close</h3><p class="muted">Resolve only after dispatch.</p></div>
 </div>
-
 {% endblock %}

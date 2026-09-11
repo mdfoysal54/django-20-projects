@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block body_class %} landing{% endblock %}
 {% block content %}
-
+<div class="landing-nav">
+  <a class="brand" href="{% url 'home' %}"><span class="brand-badge">V</span><span>VaultSign</span></a>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+    <a class="btn btn-primary" href="{% url 'register' %}">Create an account</a>
+  </div>
+</div>
 <div class="hero-block">
   <div class="kicker">Signature OS</div>
   <h1>Envelopes that cannot be <em>rewritten</em> once complete.</h1>
-  <p class="lede">Drafts need a signer before send. Completed envelopes cannot be voided.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+  <p class="lede">VaultSign is a contract vault: rooms, named signers, send-then-sign. Completed envelopes are immutable. Void is allowed only before the seal.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the vault</a>
      <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
 </div>
 <div class="feature-grid">
-<div class="card"><h3>Rooms</h3><p class="muted">Vaults per team.</p></div>
-<div class="card"><h3>Signers</h3><p class="muted">Named, unique emails.</p></div>
-<div class="card"><h3>Seal</h3><p class="muted">All must sign.</p></div>
-<div class="card"><h3>Void</h3><p class="muted">Never after complete.</p></div>
+  <div class="card"><h3>Rooms</h3><p class="muted">Vaults per team.</p></div>
+  <div class="card"><h3>Signers</h3><p class="muted">Named, unique emails.</p></div>
+  <div class="card"><h3>Seal</h3><p class="muted">All must sign.</p></div>
+  <div class="card"><h3>Void</h3><p class="muted">Never after complete.</p></div>
 </div>
-
 {% endblock %}
