@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ title }}</h1></div>
+{% if kind == "veh" %}<form method="post" class="card">{% csrf_token %}
+  <select name="vehicle">{% for r in rows %}<option value="{{ r.pk }}">{{ r.plate }} ({{ r.odometer }} km)</option>{% endfor %}</select>
+  <input name="litres" placeholder="L" size="4"> <input name="km" placeholder="km" size="6">
+  <button class="btn btn-primary">Log fuel</button></form>{% endif %}
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td>{% if r.get_absolute_url %}<a href="{{ r.get_absolute_url }}">{{ r }}</a>{% else %}{{ r }}{% endif %}</td><td class="muted">{% if r.odometer %}{{ r.odometer }} km{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ trip.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ trip.number }}</h1>
+<p>{{ trip.vehicle }} · {{ trip.driver }} · {{ trip.origin }} → {{ trip.dest }} · {{ trip.start_km }} km</p>
+<form method="post">{% csrf_token %}<input name="end_km" placeholder="End km" class="form-control">
+  <button class="btn btn-primary mt-2">Close trip</button></form></div>
+
+{% endblock %}

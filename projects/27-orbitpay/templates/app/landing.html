@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Payments OS</div>
+  <h1>Wallets with a ledger that <em>never</em> overdrafts.</h1>
+  <p class="lede">Every send is two entries. Voids reverse both. No self-pay.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Wallets</h3><p class="muted">One per user.</p></div>
+<div class="card"><h3>Send</h3><p class="muted">Balance checked.</p></div>
+<div class="card"><h3>Void</h3><p class="muted">Reversing entries.</p></div>
+<div class="card"><h3>Seed</h3><p class="muted">Genesis credits.</p></div>
+</div>
+
+{% endblock %}

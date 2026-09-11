@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Civic OS</div>
+  <h1>Wards, issues and crews — a city that <em>closes</em> its loops.</h1>
+  <p class="lede">No resolve without a crew. One open work order at a time.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Wards</h3><p class="muted">Geography first.</p></div>
+<div class="card"><h3>Issues</h3><p class="muted">Numbered tickets.</p></div>
+<div class="card"><h3>Crews</h3><p class="muted">One open order.</p></div>
+<div class="card"><h3>Close</h3><p class="muted">Resolve only after dispatch.</p></div>
+</div>
+
+{% endblock %}

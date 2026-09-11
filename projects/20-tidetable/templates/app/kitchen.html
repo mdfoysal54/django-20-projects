@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Kitchen{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>The pass</h1></div>
+{% for t in tickets %}<div class="card"><strong>{{ t.reservation.number }}</strong> · {{ t.reservation.table }}
+  <ul>{% for l in t.lines.all %}<li>{{ l.qty }} × {{ l.item }}</li>{% endfor %}</ul></div>{% empty %}
+<p class="muted">No tickets.</p>{% endfor %}
+
+{% endblock %}

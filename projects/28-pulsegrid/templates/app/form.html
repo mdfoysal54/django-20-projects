@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Page{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <select name="monitor" class="form-control">{% for m in monitors %}<option value="{{ m.pk }}">{{ m }}</option>{% endfor %}</select>
+  <input name="title" class="form-control mt-1" placeholder="Signal">
+  <input name="sev" class="form-control mt-1" value="sev2">
+  <button class="btn btn-primary mt-2">Open incident</button>
+</form></div>
+
+{% endblock %}

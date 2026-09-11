@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Send{% endblock %}
+{% block content %}
+
+<div class="card"><p class="muted">Balance ৳ {{ bal }}</p>
+<form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">To handle</label><input class="form-control" name="handle" placeholder="orbit" required></div>
+  <div class="form-group"><label class="form-label">Amount</label><input class="form-control" name="amount" required></div>
+  <input class="form-control" name="memo" placeholder="Memo">
+  <button class="btn btn-primary mt-2">Transmit</button>
+</form></div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Chairs{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>The floor</h1><a class="btn btn-primary" href="{% url 'appointment_new' %}">Book</a></div>
+<div class="grid grid-2"><div class="card stat"><div class="stat-label">On the book</div><div class="stat-value">{{ live }}</div></div>
+<div class="card stat"><div class="stat-label">Today</div><div class="stat-value">{{ n }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.client }} · {{ r.stylist }}</td><td>{{ r.service }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

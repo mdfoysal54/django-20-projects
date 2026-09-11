@@ -1,10 +1,9 @@
-# Why 16 deep projects instead of 20 shallow ones
+# Why deep projects instead of shallow ones
 
-The commission was "20 Python/Django projects", later expanded to *sixteen
-genuinely finished applications*: six flagships first, then ten more built to
-exactly the same bar. We deliberately traded breadth for depth — sixteen
-complete, hardened, tested products beat twenty half-built clones, for a
-portfolio, for learning, and for an interview walkthrough.
+The commission was "20 Python/Django projects", then more. We kept trading
+breadth for depth: six flagships, ten more to the same bar, three sellable
+operating systems, then **ten distinct deployable websites**. Twenty-nine
+complete, hardened, tested products beat a pile of half-built clones.
 
 Nothing here is a tutorial clone. Each project owns its domain model, its
 invariants, its tests and its frontend.
@@ -28,9 +27,11 @@ invariants, its tests and its frontend.
 | Wave 2 | 07 BlogPress · 08 EventTix · 09 HelpDesk · 10 MedCare · 11 FitTrack | Publishing, ticketing, support, clinics, fitness |
 | Wave 2 | 12 RecipeBox · 13 InvoicePro · 14 AttendX · 15 QuizMaster · 16 LinkShort | Recipes, invoicing, attendance, quizzes, link analytics |
 | Wave 3 | 17 Nexora · 18 CampusOS · 19 AetherHR | Retail OS, school OS, people OS — sellable products |
+| Wave 4 | 20 TideTable · 21 Parcelio · 22 AuroraRealty · 23 Salonova · 24 VaultSign | Restaurant, courier, property, salon, e-sign |
+| Wave 4 | 25 CivicPulse · 26 FleetNova · 27 OrbitPay · 28 PulseGrid · 29 Lexora | Civic, fleet, wallet, SRE, legal practice |
 
-Verified baseline: **19/19 green — 633 automated tests** (209 canonical
-security + 424 domain) plus **432 pages smoke-rendered** from a seeded database.
+Verified baseline: **29/29 green — 797 automated tests** (319 canonical
+security + 478 domain) plus **553 pages smoke-rendered** from a seeded database.
 
 Depth per project is not decoration. Examples of rules that are enforced in the
 database or in guarded model methods, and covered by tests:
@@ -56,6 +57,14 @@ database or in guarded model methods, and covered by tests:
   refused; exam grades are derived from marks; library loans cannot over-issue.
 - **AetherHR** — house rent is 50% of basic; leave cannot overlap or overdraw;
   clock-out cannot precede clock-in; unpaid days prorate against a 30-day month.
+- **TideTable** — a table never takes a party larger than its seats; two covers
+  cannot share a 90-minute window.
+- **Parcelio** — last-mile parcels cap at 30 kg; out-for-delivery needs a courier.
+- **AuroraRealty** — offers below 80% of asking are refused; accepting one offer
+  sells the listing and declines the rest.
+- **VaultSign** — completed envelopes are immutable; only listed emails can sign.
+- **OrbitPay** — every send is two ledger entries; voids reverse both sides.
+- **Lexora** — time is billed in six-minute slices; closed matters refuse time.
 
 ## Scaling further is a copy job, not a rewrite
 
@@ -71,4 +80,4 @@ python ../tools/smoke_pages.py .   # every route renders
 
 A new project immediately inherits the CSP/nonce middleware, login throttling,
 hardened settings, branded error pages, auth templates and the canonical
-security suite. The nineteen projects here show how to finish the job properly.
+security suite. The twenty-nine projects here show how to finish the job properly.

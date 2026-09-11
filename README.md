@@ -4,18 +4,17 @@
 [![Django](https://img.shields.io/badge/Django-5.2%20LTS-092E20)](https://docs.djangoproject.com/en/5.2/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Nineteen deep Django 5.2 projects** — each with its own database models,
+**Twenty-nine deep Django 5.2 projects** — each with its own database models,
 backend logic, first-party HTML/CSS frontend, admin panel, canonical security
 hardening and a full automated test-suite. One monorepo, one shared,
-secure-by-default baseline, **633 automated tests passing**.
+secure-by-default baseline, **797 automated tests passing**.
 
 > Scope note: this repository was commissioned as a "20 projects" portfolio.
-> We built it as **16 deep projects instead of 20 shallow ones** — six
-> flagships, then ten more to the same bar — a deliberate trade-off for quality
-> (see [docs/PORTFOLIO.md](docs/PORTFOLIO.md)). Everything is a drop-in
-> template for project #17.
+> We built it as **deep products instead of shallow clones** — six flagships,
+> ten more to the same bar, three sellable operating systems, then ten distinct
+> deployable websites (see [docs/PORTFOLIO.md](docs/PORTFOLIO.md)).
 
-## The nineteen projects
+## The twenty-nine projects
 
 | # | Project | Directory | Theme | Tests |
 |---|---------|-----------|-------|-------|
@@ -38,6 +37,16 @@ secure-by-default baseline, **633 automated tests passing**.
 | 17 | **Nexora** | `17-nexora` | Retail OS — POS, stock, accounts, কিস্তি, warranty | 36 ✅ |
 | 18 | **CampusOS** | `18-campusos` | School OS — admissions, fees, exams, timetable | 20 ✅ |
 | 19 | **AetherHR** | `19-aetherhr` | People OS — HRIS, leave, BD payroll, recruiting | 18 ✅ |
+| 20 | **TideTable** | `20-tidetable` | Restaurant OS — floor, reservations, kitchen | 17 ✅ |
+| 21 | **Parcelio** | `21-parcelio` | Courier OS — waybills, scans, last-mile, COD | 17 ✅ |
+| 22 | **AuroraRealty** | `22-aurorarealty` | Property OS — listings, viewings, offers | 17 ✅ |
+| 23 | **Salonova** | `23-salonova` | Salon OS — stylists, chairs, service menu | 16 ✅ |
+| 24 | **VaultSign** | `24-vaultsign` | Contract OS — rooms, envelopes, e-sign | 16 ✅ |
+| 25 | **CivicPulse** | `25-civicpulse` | Civic OS — wards, issues, work orders | 15 ✅ |
+| 26 | **FleetNova** | `26-fleetnova` | Fleet OS — vehicles, trips, odometer, fuel | 16 ✅ |
+| 27 | **OrbitPay** | `27-orbitpay` | Wallet OS — double-entry ledger, P2P | 17 ✅ |
+| 28 | **PulseGrid** | `28-pulsegrid` | SRE OS — sites, monitors, incidents | 16 ✅ |
+| 29 | **Lexora** | `29-lexora` | Practice OS — matters, time, retainers | 17 ✅ |
 
 Each project lives in `projects/XX-name/`, is fully self-contained (own
 migrations, own SQLite database, own templates and stylesheet), and can be run
@@ -61,20 +70,20 @@ Every project ships demo seeders and a passing test-suite:
 
 ```bash
 python manage.py test               # inside one project
-bash tools/verify_all.sh            # verify all nineteen at once from the repo root
+bash tools/verify_all.sh            # verify all twenty-nine at once from the repo root
 python tools/smoke_pages.py projects/16-linkshort   # render every route, report failures
 ```
 
-**Verified baseline:** 19/19 projects green — **633 automated tests** (209
-canonical security tests + 424 domain tests) and **432 pages smoke-rendered**
+**Verified baseline:** 29/29 projects green — **797 automated tests** (319
+canonical security tests + 478 domain tests) and **553 pages smoke-rendered**
 from seeded databases. CI runs the same suites plus the page smoke test and
 `check --deploy` in production mode on every push
 ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)).
 
-### Run all nineteen locally at once
+### Run all twenty-nine locally at once
 
 ```bash
-bash tools/run_all.sh          # serves 8000–8018 (auto-migrates/seeds new clones)
+bash tools/run_all.sh          # serves 8000–8028 (auto-migrates/seeds new clones)
 ```
 
 | Port | Project | | Port | Project |
@@ -88,7 +97,12 @@ bash tools/run_all.sh          # serves 8000–8018 (auto-migrates/seeds new clo
 | 8006 | 📰 BlogPress | | 8014 | 🧠 QuizMaster |
 | 8007 | 🎟️ EventTix | | 8015 | 🔗 LinkShort |
 | 8016 | ◈ Nexora | | 8017 | 🏛 CampusOS |
-| 8018 | ✦ AetherHR | | | |
+| 8018 | ✦ AetherHR | | 8019 | 🍽 TideTable |
+| 8020 | 📦 Parcelio | | 8021 | 🏠 AuroraRealty |
+| 8022 | ✂ Salonova | | 8023 | 🖋 VaultSign |
+| 8024 | 🏛 CivicPulse | | 8025 | 🚚 FleetNova |
+| 8026 | ◈ OrbitPay | | 8027 | ⚡ PulseGrid |
+| 8028 | ⚖ Lexora | | | |
 
 Demo logins: `alice` / `DemoPass123!` (ShopNest superuser: `admin` / `admin`).
 Admin panels: `admin` / `DemoPass123!` unless a project's README says otherwise.
@@ -154,7 +168,7 @@ django-20-projects/
 │   │   ├── templates/      first-party pages (no framework)
 │   │   ├── static/css/     first-party stylesheet
 │   │   └── docs/           per-project notes
-│   ├── 02-learnhub/  … 19-aetherhr/   (every project identical in shape)
+│   ├── 02-learnhub/  … 29-lexora/     (every project identical in shape)
 ├── docs/                   monorepo-wide guides (SECURITY, PORTFOLIO, PUSH-TO-GITHUB)
 └── tools/                  scaffold · canonical sources · verify_all · run_all · smoke_pages · push_to_github
 ```

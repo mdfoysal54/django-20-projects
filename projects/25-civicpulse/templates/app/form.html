@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}File{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Title</label><input class="form-control" name="title" required></div>
+  <select name="ward" class="form-control">{% for w in wards %}<option value="{{ w.pk }}">{{ w }}</option>{% endfor %}</select>
+  <input name="cat" class="form-control mt-1" value="roads">
+  <input name="reporter" class="form-control mt-1" placeholder="Reporter">
+  <button class="btn btn-primary mt-2">File</button>
+</form></div>
+
+{% endblock %}

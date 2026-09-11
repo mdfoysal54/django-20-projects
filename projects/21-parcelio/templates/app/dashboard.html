@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Hub{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Tonight's bag</h1><a class="btn btn-primary" href="{% url 'parcel_new' %}">Intake</a></div>
+<div class="grid grid-3"><div class="card stat"><div class="stat-label">Parcels</div><div class="stat-value">{{ n }}</div></div>
+<div class="card stat"><div class="stat-label">Out</div><div class="stat-value">{{ out }}</div></div>
+<div class="card stat"><div class="stat-label">Delivered</div><div class="stat-value">{{ done }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>No.</th><th>To</th><th></th></tr></thead>
+<tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.recipient }} · {{ r.dest_city }}</td><td>{{ r.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

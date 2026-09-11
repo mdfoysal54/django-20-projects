@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Book{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Client</label><input class="form-control" name="name" required></div>
+  <select name="stylist" class="form-control">{% for s in stylists %}<option value="{{ s.pk }}">{{ s }}</option>{% endfor %}</select>
+  <select name="service" class="form-control mt-1">{% for s in services %}<option value="{{ s.pk }}">{{ s }} ({{ s.minutes }}m)</option>{% endfor %}</select>
+  <input type="datetime-local" name="start" class="form-control mt-1">
+  <button class="btn btn-primary mt-2" type="submit">Hold the chair</button>
+</form></div>
+
+{% endblock %}

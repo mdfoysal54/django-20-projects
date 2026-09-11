@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Signature OS</div>
+  <h1>Envelopes that cannot be <em>rewritten</em> once complete.</h1>
+  <p class="lede">Drafts need a signer before send. Completed envelopes cannot be voided.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Rooms</h3><p class="muted">Vaults per team.</p></div>
+<div class="card"><h3>Signers</h3><p class="muted">Named, unique emails.</p></div>
+<div class="card"><h3>Seal</h3><p class="muted">All must sign.</p></div>
+<div class="card"><h3>Void</h3><p class="muted">Never after complete.</p></div>
+</div>
+
+{% endblock %}

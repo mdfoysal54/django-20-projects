@@ -94,7 +94,7 @@ def sample_for(param: str, url_name: str):
 
     ordered = sorted(models, key=lambda m: not name_matches(m))
     for model in ordered:
-        if param in ("slug", "code", "reference", "number", "token"):
+        if param in ("slug", "code", "reference", "number", "token", "handle"):
             field_names = {f.name for f in model._meta.get_fields() if hasattr(f, "attname")}
             if param not in field_names:
                 continue

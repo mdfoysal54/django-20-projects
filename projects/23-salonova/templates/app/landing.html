@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Salon OS</div>
+  <h1>A chair is a calendar — never two clients in one <em>block</em>.</h1>
+  <p class="lede">Overlapping services on the same stylist are refused. Completing a cancelled chair is refused.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Chair</h3><p class="muted">Stylist calendars.</p></div>
+<div class="card"><h3>Menu</h3><p class="muted">Minutes + price.</p></div>
+<div class="card"><h3>Clash</h3><p class="muted">No overlapping blocks.</p></div>
+<div class="card"><h3>Done</h3><p class="muted">Status you can trust.</p></div>
+</div>
+
+{% endblock %}

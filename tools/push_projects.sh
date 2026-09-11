@@ -64,6 +64,16 @@ declare -A DESC=(
   [nexora]="Nexora — retail operating system: POS, stock, purchase, accounts, warranty, কিস্তি."
   [campusos]="CampusOS — school operating system: admissions, fees, exams, timetable, library."
   [aetherhr]="AetherHR — people operating system: HRIS, leave, Bangladesh payroll, recruiting."
+  [tidetable]="TideTable — restaurant OS: floor, reservations, kitchen tickets."
+  [parcelio]="Parcelio — courier OS: waybills, hub scans, last-mile, COD."
+  [aurorarealty]="AuroraRealty — property OS: listings, viewings, offers."
+  [salonova]="Salonova — salon OS: stylists, chairs, service menu."
+  [vaultsign]="VaultSign — contract OS: rooms, envelopes, multi-party e-sign."
+  [civicpulse]="CivicPulse — civic OS: wards, issues, work orders."
+  [fleetnova]="FleetNova — fleet OS: vehicles, trips, odometer, fuel."
+  [orbitpay]="OrbitPay — wallet OS: double-entry ledger, P2P transfers."
+  [pulsegrid]="PulseGrid — SRE OS: sites, monitors, deduped incidents."
+  [lexora]="Lexora — practice OS: matters, six-minute time, retainers, invoices."
 )
 
 TOKEN_LOGIN="$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \

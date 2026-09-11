@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Pipeline{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Pipeline</h1><a class="btn btn-primary" href="{% url 'listing_new' %}">New listing</a></div>
+<div class="grid grid-3"><div class="card stat"><div class="stat-label">Live</div><div class="stat-value">{{ live }}</div></div>
+<div class="card stat"><div class="stat-label">Hold</div><div class="stat-value">{{ hold }}</div></div>
+<div class="card stat"><div class="stat-label">Sold</div><div class="stat-value">{{ sold }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.code }}</a></td><td>{{ r.title }}</td><td class="num">৳ {{ r.price }}</td><td>{{ r.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

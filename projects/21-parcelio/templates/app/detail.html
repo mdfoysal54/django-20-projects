@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ p.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ p.number }}</h1>
+<p>{{ p.sender }} → {{ p.recipient }} · {{ p.weight_kg }} kg · {{ p.get_status_display }}</p>
+<form method="post">{% csrf_token %}
+  <select name="courier" class="form-control">{% for c in couriers %}<option value="{{ c.pk }}">{{ c }}</option>{% endfor %}</select>
+  <button class="btn btn-primary mt-2" type="submit">Advance</button>
+</form>
+<ul>{% for s in p.scans.all %}<li>{{ s.at }} · {{ s.kind }}</li>{% endfor %}</ul></div>
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ issue.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ issue.title }}</h1>
+<p>{{ issue.number }} · {{ issue.ward }} · {{ issue.get_status_display }}</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="dispatch">
+  <input name="crew" placeholder="Crew" class="form-control">
+  <input name="note" placeholder="Note" class="form-control mt-1">
+  <button class="btn btn-primary mt-2">Dispatch</button></form>
+<form method="post">{% csrf_token %}<button class="btn btn-secondary">Resolve</button></form>
+</div>
+
+{% endblock %}

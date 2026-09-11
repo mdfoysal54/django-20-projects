@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ rsv.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ rsv.number }}</h1>
+<p>{{ rsv.guest }} · {{ rsv.table }} · party {{ rsv.party_size }} · {{ rsv.get_status_display }}</p>
+<form method="post">{% csrf_token %}
+  {% for m in menu %}<div class="cart-row"><span>{{ m.name }} ৳ {{ m.price }}</span><input name="q_{{ m.pk }}" value="0" size="3"></div>{% endfor %}
+  <button class="btn btn-primary mt-2" type="submit">Fire kitchen ticket</button>
+</form></div>
+
+{% endblock %}

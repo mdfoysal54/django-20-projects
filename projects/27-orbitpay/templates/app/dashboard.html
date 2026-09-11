@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Orbit{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>@{{ acct.handle }}</h1><a class="btn btn-primary" href="{% url 'transfer_new' %}">Send</a></div>
+<div class="card stat"><div class="stat-label">Balance</div><div class="stat-value num">৳ {{ bal }}</div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.src }} → {{ r.dst }}</td><td class="num">{{ r.amount }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

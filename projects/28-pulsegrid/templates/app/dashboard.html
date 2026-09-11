@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Pulse{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>Grid</h1><a class="btn btn-primary" href="{% url 'incident_new' %}">Page</a></div>
+<div class="grid grid-2"><div class="card stat"><div class="stat-label">Open</div><div class="stat-value">{{ open }}</div></div>
+<div class="card stat"><div class="stat-label">Acked</div><div class="stat-value">{{ ack }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.monitor }}</td><td>{{ r.title }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

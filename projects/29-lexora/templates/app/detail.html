@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ matter.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ matter.title }}</h1>
+<p>{{ matter.client }} · ৳ {{ matter.rate }}/h · retainer ৳ {{ matter.retainer }} · unbilled {{ unbilled }}m</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="time">
+  <input name="minutes" placeholder="Minutes" class="form-control">
+  <input name="note" placeholder="Note" class="form-control mt-1">
+  <button class="btn btn-secondary mt-2">Log time</button></form>
+<form method="post">{% csrf_token %}<button class="btn btn-primary">Issue invoice</button></form>
+<ul>{% for e in matter.entries.all %}<li>{{ e.minutes }}m {{ e.note }} {% if e.billed %}billed{% endif %}</li>{% endfor %}</ul>
+</div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>The vault</h1><a class="btn btn-primary" href="{% url 'envelope_new' %}">New envelope</a></div>
+<div class="grid grid-2"><div class="card stat"><div class="stat-label">Sent</div><div class="stat-value">{{ sent }}</div></div>
+<div class="card stat"><div class="stat-label">Sealed</div><div class="stat-value">{{ signed }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.title }}</td><td>{{ r.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

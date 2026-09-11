@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}New listing{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Title</label><input class="form-control" name="title" required></div>
+  <div class="form-group"><label class="form-label">Suburb</label><input class="form-control" name="suburb"></div>
+  <div class="form-group"><label class="form-label">Price</label><input class="form-control" name="price"></div>
+  <div class="form-group"><label class="form-label">Beds</label><input class="form-control" name="beds" value="3"></div>
+  <select name="agent" class="form-control">{% for a in agents %}<option value="{{ a.pk }}">{{ a }}</option>{% endfor %}</select>
+  <button class="btn btn-primary mt-2" type="submit">Publish</button>
+</form></div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ listing.code }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ listing.title }}</h1>
+<p>{{ listing.suburb }} · {{ listing.beds }} beds · ৳ {{ listing.price }} · {{ listing.get_status_display }}</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="view">
+  <input name="visitor" placeholder="Visitor" class="form-control">
+  <input type="datetime-local" name="when" class="form-control mt-1">
+  <button class="btn btn-secondary mt-2" type="submit">Book viewing</button></form>
+<form method="post" class="mt-2">{% csrf_token %}<input type="hidden" name="act" value="offer">
+  <input name="buyer" placeholder="Buyer" class="form-control">
+  <input name="amount" placeholder="Amount" class="form-control mt-1">
+  <button class="btn btn-primary mt-2" type="submit">Place offer</button></form>
+{% for o in listing.offers.all %}
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="accept"><input type="hidden" name="offer" value="{{ o.pk }}">
+  {{ o.buyer }} ৳ {{ o.amount }} {{ o.status }} <button class="btn btn-sm btn-primary">Accept</button></form>
+{% endfor %}</div>
+
+{% endblock %}

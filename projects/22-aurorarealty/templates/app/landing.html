@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Property OS</div>
+  <h1>Listings that know when they are <em>under offer</em>.</h1>
+  <p class="lede">80% floor on offers. Accepting one offer sells the home and declines the rest.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Live</h3><p class="muted">Only live homes take viewings.</p></div>
+<div class="card"><h3>Floor</h3><p class="muted">No 80% lowballs.</p></div>
+<div class="card"><h3>Close</h3><p class="muted">One accepted offer, rest lose.</p></div>
+<div class="card"><h3>Past</h3><p class="muted">No retro viewings.</p></div>
+</div>
+
+{% endblock %}

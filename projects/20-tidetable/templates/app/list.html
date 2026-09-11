@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ title }}</h1>{% if kind == "rsv" %}<a class="btn btn-primary" href="{% url 'reservation_new' %}">New</a>{% endif %}</div>
+<div class="table-wrap"><table class="tbl"><thead><tr><th>Item</th><th></th></tr></thead>
+<tbody>{% for r in rows %}<tr><td>{% if r.get_absolute_url %}<a href="{{ r.get_absolute_url }}">{{ r }}</a>{% else %}{{ r }}{% endif %}</td><td class="muted">{% if r.seats %}{{ r.seats }} seats · {{ r.zone }}{% elif r.price %}৳ {{ r.price }}{% elif r.start %}{{ r.start }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

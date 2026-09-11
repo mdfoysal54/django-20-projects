@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ env.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ env.title }}</h1><p>{{ env.number }} · {{ env.get_status_display }}</p>
+<ul>{% for s in env.signers.all %}<li>{{ s.name }} {{ s.email }} {% if s.signed_at %}✓{% endif %}</li>{% endfor %}</ul>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="add">
+  <input name="name" placeholder="Name" class="form-control"><input name="email" placeholder="email" class="form-control mt-1">
+  <button class="btn btn-secondary mt-2">Add signer</button></form>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="send"><button class="btn btn-primary">Send</button></form>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="sign"><input name="email" value="{{ user.email }}" class="form-control"><button class="btn btn-primary mt-1">Sign</button></form>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="void"><button class="btn btn-danger">Void</button></form>
+</div>
+
+{% endblock %}

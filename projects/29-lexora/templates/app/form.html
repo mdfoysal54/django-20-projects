@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Open matter{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Title</label><input class="form-control" name="title" required></div>
+  <input class="form-control" name="client" placeholder="Client">
+  <input class="form-control mt-1" name="rate" value="8000">
+  <input class="form-control mt-1" name="retainer" value="0">
+  <button class="btn btn-primary mt-2">Open</button>
+</form></div>
+
+{% endblock %}

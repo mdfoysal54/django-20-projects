@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">SRE OS</div>
+  <h1>Incidents that <em>dedupe</em> themselves.</h1>
+  <p class="lede">Same open title on a monitor cannot page twice. Ack only from open.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Sites</h3><p class="muted">Named edges.</p></div>
+<div class="card"><h3>Monitors</h3><p class="muted">HTTP / latency.</p></div>
+<div class="card"><h3>Page</h3><p class="muted">No duplicate opens.</p></div>
+<div class="card"><h3>Ack</h3><p class="muted">Then resolve.</p></div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Practice OS</div>
+  <h1>Matters, six-minute slices, retainers that <em>draw down</em>.</h1>
+  <p class="lede">Closed files refuse time. Billing with zero unbilled minutes is refused.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Matters</h3><p class="muted">Numbered files.</p></div>
+<div class="card"><h3>Time</h3><p class="muted">6-minute minimum.</p></div>
+<div class="card"><h3>Bill</h3><p class="muted">Rate × hours.</p></div>
+<div class="card"><h3>Retainer</h3><p class="muted">Draws on invoice.</p></div>
+</div>
+
+{% endblock %}

@@ -26,6 +26,17 @@ PROJECTS = [
     {"dir": "17-nexora", "title": "Nexora", "tag": "Retail operating system — POS, stock, purchase, accounts, warranty, installment"},
     {"dir": "18-campusos", "title": "CampusOS", "tag": "School operating system — admissions, fees, exams, timetable, parent portal"},
     {"dir": "19-aetherhr", "title": "AetherHR", "tag": "People operating system — HRIS, attendance, leave, payroll, performance"},
+    # ---- wave 4: ten distinct deployable websites ---------------------------
+    {"dir": "20-tidetable", "title": "TideTable", "tag": "Restaurant operating system — floor, reservations, kitchen"},
+    {"dir": "21-parcelio", "title": "Parcelio", "tag": "Courier operating system — waybills, scans, COD"},
+    {"dir": "22-aurorarealty", "title": "AuroraRealty", "tag": "Property operating system — listings, viewings, offers"},
+    {"dir": "23-salonova", "title": "Salonova", "tag": "Salon operating system — stylists, chairs, memberships"},
+    {"dir": "24-vaultsign", "title": "VaultSign", "tag": "Contract operating system — versions, parties, e-sign"},
+    {"dir": "25-civicpulse", "title": "CivicPulse", "tag": "Civic operating system — wards, requests, SLA"},
+    {"dir": "26-fleetnova", "title": "FleetNova", "tag": "Mobility operating system — fleet, rentals, inspections"},
+    {"dir": "27-orbitpay", "title": "OrbitPay", "tag": "Wallet operating system — P2P transfers, merchant QR"},
+    {"dir": "28-pulsegrid", "title": "PulseGrid", "tag": "Telemetry operating system — devices, alerts, firmware"},
+    {"dir": "29-lexora", "title": "Lexora", "tag": "Practice operating system — matters, hearings, time, invoices"},
 ]
 
 # --------------------------------------------------------------------------

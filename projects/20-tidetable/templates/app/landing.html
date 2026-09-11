@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="hero-block">
+  <div class="kicker">Restaurant OS</div>
+  <h1>Reservations, the floor and the pass — in one <em>ember</em> desk.</h1>
+  <p class="lede">TideTable keeps covers honest: a four-top never takes six, and two parties never share a 90-minute window.</p>
+  <p><a class="btn btn-primary btn-lg" href="{% url 'login' %}">Open the desk</a>
+     <a class="btn btn-secondary btn-lg" href="{% url 'register' %}">Create an account</a></p>
+</div>
+<div class="feature-grid">
+<div class="card"><h3>Floor</h3><p class="muted">Tables, zones, covers.</p></div>
+<div class="card"><h3>Book</h3><p class="muted">Party size vs seats.</p></div>
+<div class="card"><h3>Kitchen</h3><p class="muted">Tickets fire from the reservation.</p></div>
+<div class="card"><h3>No-show</h3><p class="muted">Statuses you can actually trust.</p></div>
+</div>
+
+{% endblock %}

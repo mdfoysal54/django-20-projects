@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Intake{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <div class="form-group"><label class="form-label">Sender</label><input class="form-control" name="sender" required></div>
+  <div class="form-group"><label class="form-label">Recipient</label><input class="form-control" name="recipient" required></div>
+  <div class="form-group"><label class="form-label">City</label><input class="form-control" name="dest"></div>
+  <div class="form-group"><label class="form-label">Kg</label><input class="form-control" name="kg" value="1.0"></div>
+  <div class="form-group"><label class="form-label">COD</label><input class="form-control" name="cod" value="0"></div>
+  <div class="form-group"><label class="form-label">Origin</label>
+    <select name="origin" class="form-control">{% for s in stations %}<option value="{{ s.pk }}">{{ s }}</option>{% endfor %}</select></div>
+  <button class="btn btn-primary" type="submit">Create AWB</button>
+</form></div>
+
+{% endblock %}

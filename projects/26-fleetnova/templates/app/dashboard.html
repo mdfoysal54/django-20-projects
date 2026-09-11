@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Yard{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>The yard</h1><a class="btn btn-primary" href="{% url 'trip_new' %}">Dispatch</a></div>
+<div class="grid grid-2"><div class="card stat"><div class="stat-label">Vehicles</div><div class="stat-value">{{ n_v }}</div></div>
+<div class="card stat"><div class="stat-label">Open trips</div><div class="stat-value">{{ open }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.vehicle }} · {{ r.driver }}</td><td>{{ r.origin }} → {{ r.dest }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

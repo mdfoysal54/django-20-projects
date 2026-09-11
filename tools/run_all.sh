@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # Start every project's dev server at once (local development).
 #
-#   bash tools/run_all.sh          # serve on ports 8000–8018
+#   bash tools/run_all.sh          # serve on ports 8000–8028
 #   Ctrl+C                          # stop everything
 #
 # Each project keeps its own SQLite database. If a project has never been
@@ -33,6 +33,16 @@ PROJECTS=(
   "17-nexora:8016:◈  Nexora"
   "18-campusos:8017:🏛  CampusOS"
   "19-aetherhr:8018:✦  AetherHR"
+  "20-tidetable:8019:🍽  TideTable"
+  "21-parcelio:8020:📦  Parcelio"
+  "22-aurorarealty:8021:🏠  AuroraRealty"
+  "23-salonova:8022:✂  Salonova"
+  "24-vaultsign:8023:🖋  VaultSign"
+  "25-civicpulse:8024:🏛  CivicPulse"
+  "26-fleetnova:8025:🚚  FleetNova"
+  "27-orbitpay:8026:◈  OrbitPay"
+  "28-pulsegrid:8027:⚡  PulseGrid"
+  "29-lexora:8028:⚖  Lexora"
 )
 
 PIDS=()

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>{{ title }}</h1></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td>{% if r.get_absolute_url %}<a href="{{ r.get_absolute_url }}">{{ r }}</a>{% else %}{{ r }}{% endif %} {% if r.buyer %}{{ r.buyer }} ৳ {{ r.amount }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}

@@ -2,11 +2,13 @@
 
 Two things get published:
 
-1. **The monorepo** → `django-20-projects` (all 16 projects, tooling, docs).
+1. **The monorepo** → `django-20-projects` (all 29 projects, tooling, docs).
 2. **One repository per project** → named after the project: `shopnest`,
    `learnhub`, `stayhub`, `devjobs`, `taskflow`, `fintrack`, `blogpress`,
    `eventtix`, `helpdesk`, `medcare`, `fittrack`, `recipebox`, `invoicepro`,
-   `attendx`, `quizmaster`, `linkshort`, `nexora`, `campusos`, `aetherhr`.
+   `attendx`, `quizmaster`, `linkshort`, `nexora`, `campusos`, `aetherhr`,
+   `tidetable`, `parcelio`, `aurorarealty`, `salonova`, `vaultsign`,
+   `civicpulse`, `fleetnova`, `orbitpay`, `pulsegrid`, `lexora`.
 
 Each project repository is built from the files the monorepo tracks for that
 project only (no local database, no `__pycache__`, no `.env`), gets its own
@@ -29,7 +31,7 @@ GitHub → *Settings* → *Developer settings* → *Personal access tokens* →
 |---|---|---|
 | **Repository access** | **All repositories** | a brand-new repository can't be pre-selected |
 | **Permissions ▸ Contents** | **Read and write** | push the code |
-| **Permissions ▸ Administration** | **Read and write** | create the 16 new repositories |
+| **Permissions ▸ Administration** | **Read and write** | create the project repositories |
 | **Permissions ▸ Workflows** | **Read and write** | the repos ship `.github/workflows/tests.yml` |
 | **Expiration** | 7 days (shortest available) | blast radius stays tiny |
 
@@ -44,8 +46,8 @@ export GITHUB_TOKEN=github_pat_xxxxxxxx
 bash tools/push_all.sh mdfoysal54
 ```
 
-That pushes the monorepo first, then creates and pushes the 16 project
-repositories one by one, printing a line per repository:
+That pushes the monorepo first, then creates and pushes each project
+repository one by one, printing a line per repository:
 
 ```
 ════ 1/2  monorepo ════
@@ -54,7 +56,7 @@ repositories one by one, printing a line per repository:
   + created mdfoysal54/shopnest
   ✓ 01-shopnest → https://github.com/mdfoysal54/shopnest  (48 files)
   …
-Done — created 16, pushed 16, failed 0.
+Done — created 29, pushed 29, failed 0.
 ```
 
 Useful flags and switches:

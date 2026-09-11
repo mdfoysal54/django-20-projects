@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ inc.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ inc.number }}</h1>
+<p>{{ inc.monitor }} · {{ inc.title }} · {{ inc.get_status_display }}</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="act" value="ack"><button class="btn btn-secondary">Ack</button></form>
+<form method="post">{% csrf_token %}<button class="btn btn-primary">Resolve</button></form></div>
+
+{% endblock %}

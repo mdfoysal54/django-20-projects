@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Dispatch{% endblock %}
+{% block content %}
+
+<div class="card"><form method="post">{% csrf_token %}
+  <select name="vehicle" class="form-control">{% for v in vehicles %}<option value="{{ v.pk }}">{{ v }}</option>{% endfor %}</select>
+  <select name="driver" class="form-control mt-1">{% for d in drivers %}<option value="{{ d.pk }}">{{ d }}</option>{% endfor %}</select>
+  <input name="origin" class="form-control mt-1" placeholder="Origin">
+  <input name="dest" class="form-control mt-1" placeholder="Dest">
+  <input name="start_km" class="form-control mt-1" placeholder="Start km">
+  <button class="btn btn-primary mt-2">Open trip</button>
+</form></div>
+
+{% endblock %}

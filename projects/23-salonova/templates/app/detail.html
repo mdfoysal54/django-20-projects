@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ appt.number }}{% endblock %}
+{% block content %}
+
+<div class="card"><h1>{{ appt.number }}</h1>
+<p>{{ appt.client }} with {{ appt.stylist }} · {{ appt.service }} · {{ appt.get_status_display }}</p>
+<form method="post">{% csrf_token %}<button class="btn btn-primary">Mark done</button></form></div>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Pulse{% endblock %}
+{% block content %}
+
+<div class="page-head"><h1>The city tonight</h1><a class="btn btn-primary" href="{% url 'issue_new' %}">File</a></div>
+<div class="grid grid-3"><div class="card stat"><div class="stat-label">Open</div><div class="stat-value">{{ open }}</div></div>
+<div class="card stat"><div class="stat-label">Works</div><div class="stat-value">{{ work }}</div></div>
+<div class="card stat"><div class="stat-label">Resolved</div><div class="stat-value">{{ done }}</div></div></div>
+<div class="table-wrap"><table class="tbl"><tbody>{% for r in rows %}<tr><td><a href="{{ r.get_absolute_url }}">{{ r.number }}</a></td><td>{{ r.title }}</td><td>{{ r.ward }}</td></tr>{% endfor %}</tbody></table></div>
+
+{% endblock %}
