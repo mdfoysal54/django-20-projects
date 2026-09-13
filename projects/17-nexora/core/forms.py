@@ -5,8 +5,8 @@ from django import forms
 from django.contrib.auth.models import User
 
 from .models import (
-    Asset, BankAccount, Brand, Category, Company, Customer, CustomerType,
-    Employee, Expense, ExpenseHead, Investor, Product, Profile, Shop, Station,
+    Asset, BankAccount, BankCheck, Brand, Category, Company, Customer, CustomerType,
+    Employee, Expense, ExpenseHead, Investor, Package, Product, Profile, Shop, Station,
     SubCategory, Supplier, UnitType, Variant,
 )
 
@@ -97,6 +97,18 @@ class CustomerTypeForm(StyledModelForm):
     class Meta:
         model = CustomerType
         fields = ["name", "discount_rate"]
+
+
+class PackageForm(StyledModelForm):
+    class Meta:
+        model = Package
+        fields = ["name", "sku", "price", "is_active"]
+
+
+class BankCheckForm(StyledModelForm):
+    class Meta:
+        model = BankCheck
+        fields = ["account", "number", "payee", "amount", "issued_on", "status"]
 
 
 class SupplierForm(StyledModelForm):

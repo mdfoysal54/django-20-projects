@@ -17,16 +17,16 @@ from django.views.decorators.http import require_POST
 
 from .forms import (
     AssetForm, BankForm, BrandForm, CategoryForm, CompanyForm, CustomerForm,
-    EmployeeForm, ExpenseForm, ExpenseHeadForm, InvestorForm, KistiForm, LedgerForm,
+    BankCheckForm, CustomerTypeForm, EmployeeForm, ExpenseForm, ExpenseHeadForm, InvestorForm, KistiForm, LedgerForm, PackageForm,
     PosForm, ProductForm, ProfileForm, PurchaseForm, ShopForm, SmsForm, StationForm,
     StockMoveForm, SubCategoryForm, SupplierForm, UnitForm, UserSettingsForm, VariantForm,
 )
 from .models import (
-    ZERO, Asset, BankAccount, Brand, Category, CommissionEntry, Company, Customer,
-    Employee, Expense, ExpenseHead, InstallmentDue, InstallmentPlan, Investment,
-    Investor, LedgerEntry, OnlineOrder, Product, Profile, Purchase, PurchaseLine,
-    Replacement, SalaryPayment, Sale, SaleLine, Shop, SmsLog, Station, StockBalance,
-    StockMove, SubCategory, Supplier, UnitType, UserLog, Variant, Warranty,
+    ZERO, Asset, BankAccount, BankCheck, Brand, Category, CommissionEntry, Company, Customer,
+    CustomerType, Employee, Expense, ExpenseHead, InstallmentDue, InstallmentPlan, Investment,
+    Investor, LedgerEntry, OnlineOrder, Package, PointLedger, Product, Profile, Purchase, PurchaseLine,
+    Replacement, SalaryPayment, Sale, SaleLine, SaleReturn, Shop, SmsLog, Station, StockBalance,
+    StockMove, SubCategory, Supplier, SupplierReturn, UnitType, UserLog, Variant, Warranty,
     WarrantyClaim, money,
 )
 from .services import (
@@ -36,18 +36,23 @@ from .services import (
 )
 
 NAV = [
-    ("Command", [("dashboard", "Dashboard"), ("pos", "POS"), ("sale_list", "Sales")]),
-    ("Inventory", [("stock_on_hand", "On hand"), ("stock_in", "Stock in"),
-                   ("stock_out", "Stock out"), ("stock_transfer", "Transfer"),
-                   ("purchase_list", "Purchases"), ("product_list", "Products")]),
+    ("Command", [("dashboard", "Dashboard"), ("pos", "POS"), ("sale_list", "Sales"),
+                 ("wholesale", "Wholesale"), ("commission", "Commission")]),
+    ("Inventory", [("stock_on_hand", "On hand"), ("stock_category", "By category"),
+                   ("stock_brand", "By brand"), ("stock_consign", "After-sell"),
+                   ("stock_in", "Stock in"), ("stock_out", "Stock out"),
+                   ("stock_transfer", "Transfer"), ("purchase_list", "Purchases")]),
+    ("Catalogue", [("product_list", "Products"), ("category_list", "Categories"),
+                   ("brand_list", "Brands"), ("barcode_sheet", "Barcodes")]),
     ("Intelligence", [("report_pl", "P&L"), ("report_sell", "Sell"), ("report_vat", "VAT"),
-                      ("report_minstock", "Min stock"), ("report_ledger", "Ledgers")]),
+                      ("report_daily", "Daily sell"), ("report_minstock", "Min stock"),
+                      ("report_ledger", "Ledgers"), ("report_userlog", "User log")]),
     ("Finance", [("accounts_receive", "Receive"), ("accounts_pay", "Pay"),
                  ("accounts_expense", "Expenses"), ("accounts_salary", "Salary"),
-                 ("accounts_invest", "Invest")]),
+                 ("accounts_invest", "Invest"), ("bank_list", "Banks")]),
     ("Lifecycle", [("kisti_list", "কিস্তি"), ("warranty_list", "Warranty"),
                    ("replacement_list", "Replace"), ("order_list", "Online"),
-                   ("sms_list", "SMS"), ("backup", "Backup")]),
+                   ("sms_list", "SMS"), ("asset_list", "Assets"), ("backup", "Backup")]),
 ]
 
 
@@ -259,7 +264,10 @@ def order_advance(request, number):
 def stock_on_hand(request):
     rows = (StockBalance.objects.select_related("variant__product__category", "variant__product__brand", "station")
             .order_by("variant__product__name"))
-    axis = request.GET.get("axis", "")
+    axis = request.GET.get("axis", "") or {
+        "stock_category": "category", "stock_subcategory": "sub",
+        "stock_brand": "brand", "stock_consign": "supplier",
+    }.get(request.resolver_match.url_name, "")
     grouped = {}
     if axis == "category":
         for row in rows:
@@ -275,8 +283,10 @@ def stock_on_hand(request):
             product = row.variant.product
             if product.stock_mode == Product.Mode.CONSIGN:
                 grouped.setdefault(product.consign_supplier.name if product.consign_supplier else "—", []).append(row)
+    titles = {"category": "Category-wise stock", "sub": "Sub-category-wise stock",
+              "brand": "Brand-wise stock", "supplier": "After-sell supplier stock"}
     return render(request, "nexora/stock.html", _ctx(request, rows=rows, grouped=grouped, axis=axis,
-                                                     title="On-hand stock"))
+                                                     title=titles.get(axis, "On-hand stock")))
 
 
 @login_required
@@ -305,14 +315,75 @@ def stock_move(request):
 
 @login_required
 def stock_report(request):
-    moves = StockMove.objects.select_related("variant__product", "station").order_by("-moved_on", "-id")
+    moves = StockMove.objects.select_related("variant__product__category", "variant__product__brand", "station").order_by("-moved_on", "-id")
     kind = request.GET.get("kind", "")
+    name = request.resolver_match.url_name
+    if name in ("stock_in_report", "stock_in_category", "stock_in_brand"):
+        kind = StockMove.Kind.IN
+    elif name in ("stock_out_report", "stock_out_category"):
+        kind = StockMove.Kind.OUT
     if kind in dict(StockMove.Kind.choices):
         moves = moves.filter(kind=kind)
-    return render(request, "nexora/stock_report.html", _ctx(request, moves=moves[:200], kind=kind))
+    grouped = {}
+    if name in ("stock_in_category", "stock_out_category"):
+        for m in moves[:400]:
+            grouped.setdefault(m.variant.product.category.name, []).append(m)
+    elif name == "stock_in_brand":
+        for m in moves[:400]:
+            grouped.setdefault(m.variant.product.brand.name if m.variant.product.brand else "—", []).append(m)
+    title = {"stock_in_report": "Stock-in report", "stock_in_category": "Category-wise stock in",
+             "stock_in_brand": "Brand-wise stock in", "stock_out_report": "Stock-out report",
+             "stock_out_category": "Category-wise stock out"}.get(name, "Stock report")
+    return render(request, "nexora/stock_report.html", _ctx(request, moves=moves[:200], kind=kind,
+                                                            grouped=grouped, title=title))
 
 
 # ------------------------------------------------------------------ purchase
+@login_required
+def purchase_report(request):
+    name = request.resolver_match.url_name
+    if name == "supplier_return_report":
+        rows = SupplierReturn.objects.select_related("purchase", "variant__product").order_by("-id")[:200]
+        return render(request, "nexora/report.html", _ctx(request, title="Supplier return report",
+                                                          rows=rows, kind="sret"))
+    rows = Purchase.objects.select_related("supplier", "station").order_by("-ordered_on", "-id")
+    if name == "purchase_daily":
+        rows = rows.filter(ordered_on=timezone.localdate())
+        title = "Daily purchase report"
+    else:
+        title = "Purchase product report"
+    return render(request, "nexora/purchase_list.html", _ctx(request, rows=rows, title=title))
+
+
+@login_required
+def points(request):
+    company = _company()
+    if request.method == "POST":
+        company.point_rate = money(request.POST.get("point_rate") or company.point_rate)
+        company.point_value = money(request.POST.get("point_value") or company.point_value)
+        company.save(update_fields=["point_rate", "point_value"])
+        messages.success(request, "Loyalty point settings saved.")
+        return redirect("points")
+    return render(request, "nexora/points.html", _ctx(
+        request, company=company, rows=PointLedger.objects.select_related("customer")[:80],
+        customers=Customer.objects.filter(is_active=True)))
+
+
+@login_required
+def bank_checks(request):
+    if request.method == "POST":
+        form = BankCheckForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cheque recorded.")
+            return redirect("bank_checks")
+    else:
+        form = BankCheckForm()
+    return render(request, "nexora/simple_list.html", _ctx(
+        request, form=form, rows=BankCheck.objects.select_related("account")[:80],
+        title="Bank cheques", fields=["account", "number", "payee", "amount", "status"]))
+
+
 @login_required
 def purchase_list(request):
     rows = Purchase.objects.select_related("supplier", "station").order_by("-ordered_on", "-id")
@@ -390,8 +461,13 @@ def purchase_return(request, number):
 @login_required
 def product_list(request):
     products = Product.objects.select_related("category", "brand", "unit")
-    inactive = request.resolver_match.url_name == "product_inactive"
+    name = request.resolver_match.url_name
+    inactive = name == "product_inactive"
     products = products.filter(is_active=not inactive)
+    if name == "product_with_vat":
+        products = products.filter(vat_rate__gt=0)
+    elif name == "product_without_vat":
+        products = products.filter(vat_rate=0)
     q = request.GET.get("q", "").strip()
     if q:
         products = products.filter(Q(name__icontains=q) | Q(sku__icontains=q) | Q(barcode__icontains=q))
@@ -449,6 +525,8 @@ SIMPLE = {
     "subcategory_list": (SubCategory, SubCategoryForm, ["category", "name", "slug"]),
     "brand_list": (Brand, BrandForm, ["name", "slug", "is_active"]),
     "unit_list": (UnitType, UnitForm, ["name", "code"]),
+    "package_list": (Package, PackageForm, ["name", "sku", "price", "is_active"]),
+    "customer_type_list": (CustomerType, CustomerTypeForm, ["name", "discount_rate"]),
 }
 
 
@@ -584,7 +662,7 @@ def report_pl(request):
 @login_required
 def report_sell(request):
     date_from, date_to = _range(request)
-    daily = request.resolver_match.url_name == "report_daily"
+    daily = request.resolver_match.url_name in ("report_daily", "report_daily_auto")
     sales = Sale.objects.exclude(status__in=(Sale.Status.VOID, Sale.Status.DRAFT)).filter(
         sold_on__gte=date_from, sold_on__lte=date_to)
     if daily:
@@ -667,9 +745,13 @@ def report_userlog(request):
 
 @login_required
 def report_exchange(request):
+    name = request.resolver_match.url_name
+    if name == "sale_return_report":
+        rows = SaleReturn.objects.select_related("sale", "variant__product")[:200]
+        return render(request, "nexora/report.html", _ctx(request, title="Sell return report", rows=rows, kind="sret"))
     rows = Replacement.objects.select_related("out_variant", "in_variant", "customer")[:200]
-    return render(request, "nexora/report.html", _ctx(request, title="Exchange / replacement report",
-                                                      rows=rows, kind="exchange"))
+    title = "Sell replace report" if name == "sale_replace_report" else "Exchange / replacement report"
+    return render(request, "nexora/report.html", _ctx(request, title=title, rows=rows, kind="exchange"))
 
 
 # ------------------------------------------------------------------ accounts
