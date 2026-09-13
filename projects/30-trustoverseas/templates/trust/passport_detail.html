@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ passport.number }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="kicker">Vault</div><h1>{{ passport.number }}</h1>
+       <p class="lede">{{ passport.client.full_name }} · {{ passport.days_left }} days left · {{ passport.get_location_display }}</p></div>
+</div>
+{% if passport.needs_renewal %}
+<div class="lock-banner">Under 190 days — this booklet cannot open a new visa file.</div>
+{% endif %}
+<div class="grid grid-2">
+  <div class="card">
+    <p>Issued {{ passport.issue_date }} · expires {{ passport.expiry_date }} · {{ passport.blank_pages }} blank pages</p>
+    <p>Envelope {{ passport.envelope|default:"—" }} · {{ passport.issuing_country }} / {{ passport.place_of_issue }}</p>
+    <h3>Custody</h3>
+    <ul class="list-plain">{% for e in passport.custody.all %}
+      <li class="small">{{ e.created }} · {{ e.from_loc }} → {{ e.to_loc }} {% if e.note %}· {{ e.note }}{% endif %}</li>
+    {% empty %}<li class="muted">No movements yet.</li>{% endfor %}</ul>
+  </div>
+  <div class="card">
+    <h3>Move</h3>
+    <form method="post" action="{% url 'passport_move' passport.number %}">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Move</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

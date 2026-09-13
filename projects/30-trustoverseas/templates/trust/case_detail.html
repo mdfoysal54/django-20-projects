@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ case.number }}{% endblock %}
+{% block crumb %}File {{ case.number }} · {{ case.get_stage_display }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="kicker">{{ case.number }}</div>
+    <h1>{{ case.client.full_name }}</h1>
+    <p class="lede">{{ case.destination }} · {{ case.visa_category }} · {{ case.job_title|default:"—" }}
+       · passport <a href="{{ case.passport.get_absolute_url }}">{{ case.passport.number }}</a></p>
+  </div>
+  <div class="pill-row">
+    {% if can_release %}
+      <a class="btn btn-primary" href="{% url 'visa_download' case.number %}">Visa pouch</a>
+    {% else %}
+      <span class="badge badge-bad">pouch locked</span>
+    {% endif %}
+  </div>
+</div>
+{% if not can_release %}
+<div class="lock-banner">Unpaid balance or agent credit lock — visa PDF and client-return of the passport stay in the vault.</div>
+{% endif %}
+
+<div class="card">
+  <div class="pipeline">
+    <span class="pipe on">{{ case.get_stage_display }}</span>
+    {% for s in next_stages %}
+    <form method="post" action="{% url 'case_advance' case.number %}" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="to_stage" value="{{ s }}">
+      <button class="btn btn-sm btn-secondary" type="submit">Advance → {{ s }}</button>
+    </form>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Documents</h3>
+    <ul class="list-plain">{% for d in case.documents.all %}
+      <li>{{ d.kind }} · <span class="badge">{{ d.get_status_display }}</span> {{ d.filename }}</li>
+    {% empty %}<li class="muted">None yet.</li>{% endfor %}</ul>
+    <form method="post" action="{% url 'case_document' case.number %}" class="mt-2">
+      {% csrf_token %}
+      {% for field in doc_form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+      <button class="btn btn-sm btn-primary" type="submit">Log document</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>GAMCA / Wafid</h3>
+    {% if case.medical %}
+      <p>{{ case.medical.get_result_display }} · {{ case.medical.clinic }} · slip {{ case.medical.slip|default:"—" }}
+        {% if case.medical.days_left != None %}· {{ case.medical.days_left }} days left{% endif %}
+        {% if not case.medical.is_live %}<span class="badge badge-bad">not live</span>{% endif %}</p>
+    {% else %}<p class="muted">No medical yet.</p>{% endif %}
+    <form method="post" action="{% url 'case_medical' case.number %}">
+      {% csrf_token %}
+      {% for field in med_form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+      <button class="btn btn-sm btn-primary" type="submit">Save medical</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Attestation</h3>
+    <ul class="list-plain">{% for a in case.attestations.all %}
+      <li>{{ a.order }}. {{ a.certificate }} · {{ a.authority }}
+        {% if a.cleared %}<span class="badge badge-ok">cleared</span>{% endif %}</li>
+    {% empty %}<li class="muted">No steps.</li>{% endfor %}</ul>
+    <form method="post" action="{% url 'case_attest' case.number %}">
+      {% csrf_token %}
+      {% for field in attest_form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+      <button class="btn btn-sm btn-primary" type="submit">Add step</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>GCC portals</h3>
+    <ul class="list-plain">{% for p in case.portals.all %}
+      <li>{{ p.portal }} · {{ p.application_no|default:"—" }} · {{ p.status_raw }}</li>
+    {% empty %}<li class="muted">Qiwa, Enjaz, MOHRE, GDRFA, ICP, Metrash2, PAM…</li>{% endfor %}</ul>
+    <form method="post" action="{% url 'case_portal' case.number %}">
+      {% csrf_token %}
+      {% for field in portal_form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+      <button class="btn btn-sm btn-primary" type="submit">Log submission</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Invoices (unearned until issued)</h3>
+  <ul class="list-plain">{% for i in case.invoices.all %}
+    <li><a href="{{ i.get_absolute_url }}">{{ i.number }}</a> · ৳ {{ i.grand_total }}
+      · <span class="badge badge-{{ i.status }}">{{ i.get_status_display }}</span>
+      · balance ৳ {{ i.balance_due }}
+      {% if i.revenue_recognized %}<span class="badge badge-ok">recognized</span>{% else %}<span class="badge">unearned</span>{% endif %}</li>
+  {% empty %}<li class="muted">No invoices.</li>{% endfor %}</ul>
+  <form method="post" action="{% url 'case_invoice' case.number %}" class="grid grid-2 mt-2">
+    {% csrf_token %}
+    {% for field in inv_form %}
+    <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+    {% endfor %}
+    <div><button class="btn btn-primary" type="submit">Raise invoice</button></div>
+  </form>
+</div>
+{% endblock %}

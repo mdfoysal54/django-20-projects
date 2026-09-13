@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Client portal{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="kicker">{{ client.code }}</div><h1>{{ client.full_name }}</h1>
+  <p class="lede">Your files, invoices and tracking PIN ({{ client.pin|default:"ask the desk" }}).</p></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Visa files</h3>
+    <div class="table-wrap"><table class="tbl">
+      <thead><tr><th>File</th><th>Stage</th><th>Pouch</th></tr></thead>
+      <tbody>{% for c in cases %}
+        <tr>
+          <td class="mono">{{ c.number }}<div class="small muted">{{ c.destination }} · {{ c.passport.number }}</div></td>
+          <td><span class="badge badge-{{ c.stage }}">{{ c.get_stage_display }}</span></td>
+          <td><a href="{% url 'visa_download' c.number %}">Download</a></td>
+        </tr>
+      {% empty %}<tr><td colspan="3">No file yet.</td></tr>{% endfor %}
+      </tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>Invoices</h3>
+    <ul class="list-plain">{% for i in invoices %}
+      <li>{{ i.number }} · ৳ {{ i.grand_total }} · <span class="badge badge-{{ i.status }}">{{ i.get_status_display }}</span>
+        <span class="muted small">due {{ i.due_on }} · balance ৳ {{ i.balance_due }}</span></li>
+    {% empty %}<li class="muted">No invoices.</li>{% endfor %}</ul>
+  </div>
+</div>
+{% endblock %}

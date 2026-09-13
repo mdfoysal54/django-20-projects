@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}GAMCA / Wafid{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>GAMCA / Wafid board</h1>
+  <p class="lede">FIT certificates live 60 days. Embassy submit needs ≥ 5 days remaining.</p></div>
+</div>
+{% if alerts %}
+<div class="card"><h3>Inside 30 days</h3>
+  <ul class="list-plain">{% for med, left in alerts %}
+    <li><a href="{{ med.case.get_absolute_url }}">{{ med.case.number }}</a> · {{ med.case.client }} · {{ left }} days
+      {% if left < 5 %}<span class="badge badge-bad">lock</span>{% endif %}</li>
+  {% endfor %}</ul>
+</div>
+{% endif %}
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>File</th><th>Client</th><th>Slip</th><th>Clinic</th><th>Result</th><th>Expires</th><th>Days</th></tr></thead>
+  <tbody>{% for m in rows %}
+    <tr>
+      <td class="mono"><a href="{{ m.case.get_absolute_url }}">{{ m.case.number }}</a></td>
+      <td>{{ m.case.client }}</td>
+      <td class="mono">{{ m.slip|default:"—" }}</td>
+      <td>{{ m.clinic }}</td>
+      <td><span class="badge badge-{{ m.result }}">{{ m.get_result_display }}</span></td>
+      <td>{{ m.expires_on|default:"—" }}</td>
+      <td>{% if m.days_left != None %}{{ m.days_left }}{% else %}—{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="7">No medicals.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

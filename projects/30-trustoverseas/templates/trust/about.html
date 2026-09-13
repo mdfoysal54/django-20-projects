@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="kicker">The house</div>
+  <h1>Trust Overseas Ltd</h1>
+  <p class="lede">A Dhaka recruiting house that treats every visa as a ledger, a vault and a medical clock — not a WhatsApp thread.</p>
+  <div class="card">
+    <p>Licensed recruiting agency. Headquarters: {{ branch.city|default:"Dhaka" }}{% if branch %}, trade licence {{ branch.trade_license }}{% endif %}.</p>
+    <p>We do not open a file on a passport with fewer than 190 days of life. We do not submit to an embassy on a GAMCA slip with fewer than 5 days remaining. We do not release a pouch while an invoice is open or a sub-agent is over their credit line. Advances stay unearned until the visa is issued.</p>
+    <p class="mb-0">Demo staff desk: <span class="mono">alice / DemoPass123!</span></p>
+  </div>
+</div>
+{% endblock %}

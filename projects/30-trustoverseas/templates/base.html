@@ -1,0 +1,93 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ APP_NAME }}{% endblock %} · {{ APP_NAME }}</title>
+<meta name="description" content="{% block meta_description %}{{ APP_TAGLINE }}{% endblock %}">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body class="{% if ui_role == 'staff' %}app-shell{% endif %}{% block body_class %}{% endblock %}">
+{% if ui_role == 'staff' %}
+<aside class="rail" aria-label="Modules">
+  <a class="brand" href="{% url 'dashboard' %}">
+    <span class="brand-badge">T</span>
+    <span>Trust Overseas</span>
+  </a>
+  {% for group, items in nav %}
+    <div class="rail-group">{{ group }}</div>
+    {% for name, label in items %}
+      <a class="nav-item{% if request.resolver_match.url_name == name %} active{% endif %}" href="{% url name %}">{{ label }}</a>
+    {% endfor %}
+  {% empty %}
+    <a class="nav-item" href="{% url 'dashboard' %}">Dashboard</a>
+    <a class="nav-item" href="{% url 'case_list' %}">Cases</a>
+    <a class="nav-item" href="{% url 'vault' %}">Vault</a>
+  {% endfor %}
+</aside>
+{% endif %}
+<div class="{% if ui_role == 'staff' %}stage{% endif %}">
+  {% if ui_role == 'staff' %}
+  <header class="topbar">
+    <div class="small muted">{% block crumb %}{{ APP_TAGLINE }}{% endblock %}</div>
+    <div class="nav-right">
+      <a class="btn btn-sm btn-primary" href="{% url 'case_open' %}">Open file</a>
+      <a class="btn btn-sm btn-ghost" href="{% url 'profile' %}">{{ user.username }}</a>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+        <button class="btn btn-sm btn-secondary" type="submit">Log out</button>
+      </form>
+    </div>
+  </header>
+  {% else %}
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="{% url 'home' %}">
+        <span class="brand-badge">T</span>
+        <span>Trust Overseas Ltd</span>
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'destinations' %}">Destinations</a>
+        <a href="{% url 'track' %}">Track a file</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'contact' %}">Enquire</a>
+        {% if ui_role == 'client' %}<a href="{% url 'portal' %}">My portal</a>{% endif %}
+        {% if ui_role == 'agent' %}<a href="{% url 'agent_desk' %}">Agent desk</a>{% endif %}
+      </div>
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+          <span class="small muted hide-sm">Hi, <strong>{{ user.username }}</strong></span>
+          <a class="btn btn-sm btn-ghost" href="{% url 'profile' %}">Profile</a>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+            <button class="btn btn-sm btn-secondary" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a class="btn btn-sm btn-ghost" href="{% url 'login' %}">Log in</a>
+          <a class="btn btn-sm btn-primary" href="{% url 'contact' %}">Start a file</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+  {% endif %}
+  <main class="{% if ui_role == 'staff' %}stage-main{% else %}site-main{% endif %}{% block main_class %}{% endblock %}">
+    {% if messages %}{% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>
+    {% endfor %}{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% if ui_role == 'staff' %}
+  <footer class="site-footer">© {% now "Y" %} Trust Overseas Ltd — recruiting with a balanced ledger.</footer>
+  {% else %}
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>&copy; {% now "Y" %} Trust Overseas Ltd — BOESL-ready recruiting, Dhaka.</div>
+      <div><span class="heart">◆</span> Visa files with a double-entry spine</div>
+    </div>
+  </footer>
+  {% endif %}
+</div>
+{% block extra_script %}{% endblock %}
+</body>
+</html>

@@ -74,6 +74,7 @@ declare -A DESC=(
   [orbitpay]="OrbitPay — wallet OS: double-entry ledger, P2P transfers."
   [pulsegrid]="PulseGrid — SRE OS: sites, monitors, deduped incidents."
   [lexora]="Lexora — practice OS: matters, six-minute time, retainers, invoices."
+  [trustoverseas]="Trust Overseas Ltd — visa & recruitment ERP: cases, GAMCA, vault, double-entry, GCC portals."
 )
 
 TOKEN_LOGIN="$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \

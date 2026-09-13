@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Desk{% endblock %}
+{% block crumb %}Command centre · {{ today }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Good morning{% if user.first_name %}, {{ user.first_name }}{% endif %}.</h1>
+       <p class="lede">Live files, medical clocks and a ledger that must stay at zero.</p></div>
+  <a class="btn btn-primary" href="{% url 'case_open' %}">Open a file</a>
+</div>
+<div class="grid grid-4">
+  <div class="card stat"><div class="stat-label">Open files</div><div class="stat-value">{{ open_count }}</div></div>
+  <div class="card stat"><div class="stat-label">Issued</div><div class="stat-value">{{ issued_mtd }}</div></div>
+  <div class="card stat"><div class="stat-label">New inquiries</div><div class="stat-value">{{ leads_new }}</div></div>
+  <div class="card stat"><div class="stat-label">Receivable</div><div class="stat-value">৳ {{ receivable }}</div></div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Live files</h3>
+    <div class="table-wrap"><table class="tbl">
+      <thead><tr><th>File</th><th>Client</th><th>Stage</th></tr></thead>
+      <tbody>{% for c in recent %}
+        <tr><td class="mono"><a href="{{ c.get_absolute_url }}">{{ c.number }}</a></td>
+            <td>{{ c.client }}</td>
+            <td><span class="badge badge-{{ c.stage }}">{{ c.get_stage_display }}</span></td></tr>
+      {% empty %}<tr><td colspan="3">No open files.</td></tr>{% endfor %}
+      </tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>GAMCA countdown</h3>
+    <ul class="list-plain">{% for med, left in alerts %}
+      <li><a href="{{ med.case.get_absolute_url }}">{{ med.case.number }}</a>
+        · {{ med.case.client }} · <strong>{{ left }} days</strong>
+        {% if left < 5 %}<span class="badge badge-bad">embassy lock</span>{% endif %}</li>
+    {% empty %}<li class="muted">No FIT certificates inside 30 days.</li>{% endfor %}</ul>
+    <h3 class="mt-2">Passport watch (&lt; 220 days)</h3>
+    <ul class="list-plain">{% for p in expiring %}
+      <li><a href="{{ p.get_absolute_url }}">{{ p.number }}</a> · {{ p.client }} · {{ p.days_left }} days
+        {% if p.needs_renewal %}<span class="badge badge-bad">halt</span>{% endif %}</li>
+    {% empty %}<li class="muted">All booklets above the floor.</li>{% endfor %}</ul>
+  </div>
+</div>
+{% if sla %}
+<div class="card">
+  <h3>SLA overrun</h3>
+  <ul class="list-plain">{% for c in sla %}
+    <li><a href="{{ c.get_absolute_url }}">{{ c.number }}</a> · {{ c.client }} · due {{ c.sla_date }}</li>
+  {% endfor %}</ul>
+</div>
+{% endif %}
+{% if locked_agents %}
+<div class="lock-banner">Credit-locked agents:
+  {% for a in locked_agents %}{{ a.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Invoices</h1></div>
+<div class="pill-row mb-2">
+  <a class="btn btn-sm btn-secondary" href="{% url 'invoice_list' %}">All</a>
+  <a class="btn btn-sm btn-ghost" href="?status=open">Open</a>
+  <a class="btn btn-sm btn-ghost" href="?status=part">Partial</a>
+  <a class="btn btn-sm btn-ghost" href="?status=paid">Paid</a>
+</div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Number</th><th>Client</th><th>File</th><th class="num">Total</th><th class="num">Balance</th><th>Status</th></tr></thead>
+  <tbody>{% for i in page %}
+    <tr>
+      <td class="mono"><a href="{{ i.get_absolute_url }}">{{ i.number }}</a></td>
+      <td>{{ i.client }}</td>
+      <td class="mono"><a href="{{ i.case.get_absolute_url }}">{{ i.case.number }}</a></td>
+      <td class="num">৳ {{ i.grand_total }}</td>
+      <td class="num">৳ {{ i.balance_due }}</td>
+      <td><span class="badge badge-{{ i.status }}">{{ i.get_status_display }}</span>
+          {% if not i.revenue_recognized %}<span class="badge">unearned</span>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6">No invoices.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

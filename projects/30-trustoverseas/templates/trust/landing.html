@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block main_class %} landing-main{% endblock %}
+{% block content %}
+<div class="landing">
+  <div class="hero-block">
+    <div class="kicker">Dhaka · GCC · Malaysia</div>
+    <h1>Visa files that never leave the <em>vault</em> unpaid.</h1>
+    <p class="lede">Trust Overseas Ltd runs work, Umrah and family visas as an agency ERP: 190-day passport halt, GAMCA/Wafid 60-day medical, sub-agent credit lock, unearned retainers until the sticker is issued — and a public PIN so every worker can see their stage.</p>
+    <div class="stamp-row">
+      <span class="stamp">190-day passport</span>
+      <span class="stamp">GAMCA 60 days</span>
+      <span class="stamp">Credit hard-stop</span>
+      <span class="stamp">Double-entry</span>
+    </div>
+    <p>
+      <a class="btn btn-primary btn-lg" href="{% url 'contact' %}">Enquire about a visa</a>
+      <a class="btn btn-secondary btn-lg" href="{% url 'track' %}">Track a file</a>
+      <a class="btn btn-secondary btn-lg" href="{% url 'login' %}">Staff / agent login</a>
+    </p>
+    <p class="small muted mt-2">{{ open_files }} live files · {{ issued }} issued or in flight</p>
+  </div>
+  <div class="feature-grid">
+    <div class="card"><div class="kicker">01</div><h3>Case machine</h3><p class="muted">Inquiry → documents → attestation → medical → Qiwa/Enjaz/MOHRE → embassy → issued → flight.</p></div>
+    <div class="card"><div class="kicker">02</div><h3>Passport vault</h3><p class="muted">Every booklet is a custody event. Unpaid balances keep it in the safe.</p></div>
+    <div class="card"><div class="kicker">03</div><h3>GAMCA / Wafid</h3><p class="muted">FIT certificates expire in 60 days. Embassy submit locks under 5 days remaining.</p></div>
+    <div class="card"><div class="kicker">04</div><h3>Ledger</h3><p class="muted">Advances sit in unearned retainers (2010) until the visa is issued. Trial balance is zero.</p></div>
+  </div>
+  <div class="dest-grid">
+    {% for code, name, portals, kinds in destinations %}
+    <div class="card card-hover">
+      <div class="kicker">{{ code }}</div>
+      <h3>{{ name }}</h3>
+      <p class="muted mb-0">{{ portals }}</p>
+      <p class="small">{{ kinds }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

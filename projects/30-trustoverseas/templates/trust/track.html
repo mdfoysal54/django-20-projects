@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Track a file{% endblock %}
+{% block content %}
+<div class="container-narrow">
+  <div class="kicker">Public tracking</div>
+  <h1>Where is my passport?</h1>
+  <p class="lede">Enter the file number from your receipt and the 6-digit PIN we sent to your phone.</p>
+  <div class="card">
+    <form method="get" class="grid grid-2">
+      <div class="form-group"><label class="form-label">{{ form.number.label }}</label>{{ form.number }}</div>
+      <div class="form-group"><label class="form-label">{{ form.pin.label }}</label>{{ form.pin }}</div>
+      <div><button class="btn btn-primary" type="submit">Look up</button></div>
+    </form>
+  </div>
+  {% if case %}
+  <div class="card">
+    <div class="kicker">{{ case.number }}</div>
+    <h2>{{ case.client.full_name }}</h2>
+    <p>Passport {{ case.passport.number }} · {{ case.destination }} · {{ case.visa_category }}</p>
+    <p><span class="badge badge-{{ case.stage }}">{{ case.get_stage_display }}</span>
+       {% if case.sla_date %}<span class="muted small">SLA {{ case.sla_date }}</span>{% endif %}</p>
+    <div class="pipeline mt-2">
+      <span class="pipe on">{{ case.get_stage_display }}</span>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}GCC portals{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>GCC portals</h1>
+  <p class="lede">Qiwa · Enjaz · MOHRE · GDRFA · ICP · Metrash2 · PAM — logged against the file, never as a screenshot dump.</p></div>
+</div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>File</th><th>Portal</th><th>Application</th><th>Sponsor</th><th>Status</th></tr></thead>
+  <tbody>{% for p in rows %}
+    <tr>
+      <td class="mono"><a href="{{ p.case.get_absolute_url }}">{{ p.case.number }}</a></td>
+      <td>{{ p.portal }}</td>
+      <td class="mono">{{ p.application_no }}</td>
+      <td>{{ p.sponsor }}</td>
+      <td>{{ p.status_raw }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">No submissions yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

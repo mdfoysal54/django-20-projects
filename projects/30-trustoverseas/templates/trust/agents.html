@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Sub-agents{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Sub-agents</h1>
+  <a class="btn btn-primary" href="{% url 'agent_create' %}">New agent</a>
+</div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Name</th><th>District</th><th class="num">Limit</th><th class="num">Receivable</th><th>Status</th><th></th></tr></thead>
+  <tbody>{% for a in agents %}
+    <tr>
+      <td>{{ a.name }}<div class="small muted">{{ a.contact }} · {{ a.phone }}</div></td>
+      <td>{{ a.district }}</td>
+      <td class="num">৳ {{ a.credit_limit }}</td>
+      <td class="num">৳ {{ a.receivable }}</td>
+      <td>{% if a.is_locked %}<span class="badge badge-bad">locked</span>{% else %}<span class="badge badge-ok">open</span>{% endif %}</td>
+      <td><a href="{% url 'agent_edit' a.pk %}">Edit</a></td>
+    </tr>
+  {% empty %}<tr><td colspan="6">No sub-agents.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

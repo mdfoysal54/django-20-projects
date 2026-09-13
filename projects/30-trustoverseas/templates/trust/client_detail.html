@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ client.code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="kicker">{{ client.code }}</div><h1>{{ client.full_name }}</h1>
+       <p class="lede">{{ client.phone }} · {{ client.district }} · PIN {{ client.pin|default:"—" }}</p></div>
+  <div class="pill-row">
+    <a class="btn btn-secondary" href="{% url 'client_edit' client.code %}">Edit</a>
+    <a class="btn btn-primary" href="{% url 'passport_create' %}?client={{ client.code }}">Lodge passport</a>
+  </div>
+</div>
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Passports</h3>
+    <ul class="list-plain">{% for p in client.passports.all %}
+      <li><a href="{{ p.get_absolute_url }}">{{ p.number }}</a> · {{ p.days_left }} days
+        · {{ p.get_location_display }}
+        {% if p.needs_renewal %}<span class="badge badge-bad">renew</span>{% endif %}</li>
+    {% empty %}<li class="muted">None lodged.</li>{% endfor %}</ul>
+  </div>
+  <div class="card">
+    <h3>Files</h3>
+    <ul class="list-plain">{% for c in client.cases.all %}
+      <li><a href="{{ c.get_absolute_url }}">{{ c.number }}</a>
+        · {{ c.destination }} · <span class="badge badge-{{ c.stage }}">{{ c.get_stage_display }}</span></li>
+    {% empty %}<li class="muted">No file.</li>{% endfor %}</ul>
+  </div>
+</div>
+{% endblock %}

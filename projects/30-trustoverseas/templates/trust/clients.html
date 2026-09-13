@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Clients</h1><p class="lede">KYC, passports and open files.</p></div>
+  <a class="btn btn-primary" href="{% url 'client_create' %}">New client</a>
+</div>
+<form class="filter-bar" method="get">
+  <input class="form-control" name="q" value="{{ q }}" placeholder="Name, phone or code">
+  <button class="btn btn-secondary" type="submit">Search</button>
+</form>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>KYC</th><th>District</th></tr></thead>
+  <tbody>{% for c in page %}
+    <tr>
+      <td class="mono"><a href="{{ c.get_absolute_url }}">{{ c.code }}</a></td>
+      <td>{{ c.full_name }}</td>
+      <td>{{ c.phone }}</td>
+      <td><span class="badge badge-{{ c.kyc }}">{{ c.get_kyc_display }}</span></td>
+      <td>{{ c.district }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">No clients yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

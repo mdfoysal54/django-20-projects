@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Payroll{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Payroll</h1></div>
+<div class="card">
+  <h3>Run a slip</h3>
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="grid grid-2">
+      {% for field in form %}
+      <div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+      {% endfor %}
+    </div>
+    <p class="muted small">Pick a staff member to post 6010 / 2030.</p>
+    <div class="pill-row">
+      {% for s in people %}
+      <button class="btn btn-sm btn-primary" formmethod="post" formaction="{% url 'hr_run_pay' s.code %}" type="submit">{{ s.code }} {{ s }}</button>
+      {% endfor %}
+    </div>
+  </form>
+</div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Period</th><th>Staff</th><th class="num">Base</th><th class="num">Net</th><th></th></tr></thead>
+  <tbody>{% for r in rows %}
+    <tr>
+      <td class="mono">{{ r.period }}</td>
+      <td>{{ r.staff }}</td>
+      <td class="num">৳ {{ r.base }}</td>
+      <td class="num">৳ {{ r.net }}</td>
+      <td>{{ r.status }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">No slips.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

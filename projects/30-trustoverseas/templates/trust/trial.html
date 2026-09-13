@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Trial balance{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Trial balance</h1>
+  <p class="lede">Residual must be ৳ 0.00 — currently <strong>৳ {{ residual }}</strong>.</p></div>
+</div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Code</th><th>Account</th><th>Kind</th><th class="num">Balance</th></tr></thead>
+  <tbody>{% for a in accounts %}
+    <tr>
+      <td class="mono">{{ a.code }}</td>
+      <td>{{ a.name }}</td>
+      <td>{{ a.get_kind_display }}</td>
+      <td class="num">৳ {{ a.balance }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

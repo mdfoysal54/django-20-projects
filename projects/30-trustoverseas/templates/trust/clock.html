@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Clock{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Attendance</h1></div>
+{% if me %}
+<form method="post" class="pill-row mb-2">
+  {% csrf_token %}
+  <button class="btn btn-primary" name="action" value="in" type="submit">Clock in</button>
+  <button class="btn btn-secondary" name="action" value="out" type="submit">Clock out</button>
+</form>
+{% endif %}
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Staff</th><th>In</th><th>Out</th><th>Status</th></tr></thead>
+  <tbody>{% for a in today %}
+    <tr>
+      <td>{{ a.staff }}</td>
+      <td>{{ a.check_in|default:"—" }}</td>
+      <td>{{ a.check_out|default:"—" }}</td>
+      <td>{{ a.status }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="4">Nobody in yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

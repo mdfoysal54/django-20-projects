@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Destinations{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="kicker">Corridors</div><h1>Where we send workers</h1>
+  <p class="lede">Each destination has its own portal, medical and attestation stack. Trust Overseas maps them onto one file.</p></div>
+</div>
+<div class="grid grid-3">
+  {% for code, name, portals, kinds in destinations %}
+  <div class="card">
+    <div class="kicker">{{ code }}</div>
+    <h3>{{ name }}</h3>
+    <p>{{ portals }}</p>
+    <p class="muted small">{{ kinds }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

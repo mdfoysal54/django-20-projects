@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}HR desk{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>People</h1><p class="lede">{{ present }} clocked in today.</p></div>
+  <a class="btn btn-secondary" href="{% url 'hr_clock' %}">Clock</a>
+</div>
+{% if pending_leave %}
+<div class="card">
+  <h3>Leave waiting</h3>
+  <ul class="list-plain">{% for l in pending_leave %}
+    <li>{{ l.staff }} · {{ l.get_kind_display }} · {{ l.start }}–{{ l.end }} ({{ l.days }}d)
+      <form method="post" action="{% url 'hr_leave_decide' l.pk 'ok' %}" style="display:inline">{% csrf_token %}
+        <button class="btn btn-sm btn-primary" type="submit">Approve</button></form>
+      <form method="post" action="{% url 'hr_leave_decide' l.pk 'no' %}" style="display:inline">{% csrf_token %}
+        <button class="btn btn-sm btn-danger" type="submit">Reject</button></form>
+    </li>
+  {% endfor %}</ul>
+</div>
+{% endif %}
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Code</th><th>Name</th><th>Role</th><th>Branch</th><th class="num">Salary</th><th></th></tr></thead>
+  <tbody>{% for s in people %}
+    <tr>
+      <td class="mono">{{ s.code }}</td>
+      <td>{{ s }}</td>
+      <td>{{ s.get_role_display }}</td>
+      <td>{{ s.branch }}</td>
+      <td class="num">৳ {{ s.base_salary }}</td>
+      <td><span class="badge badge-{{ s.status }}">{{ s.get_status_display }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

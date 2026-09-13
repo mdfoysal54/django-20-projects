@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Agent desk{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="kicker">B2B</div><h1>{{ agent.name }}</h1>
+  <p class="lede">Credit limit ৳ {{ agent.credit_limit }} · receivable ৳ {{ agent.receivable }}
+    {% if agent.is_locked %}<span class="badge badge-bad">LOCKED</span>{% endif %}</p></div>
+</div>
+{% if agent.is_locked %}
+<div class="lock-banner">Credit hard-stop. Visa PDFs and pouch barcodes stay hidden until the ledger is inside the limit.</div>
+{% endif %}
+<div class="card">
+  <h3>Your files</h3>
+  <div class="table-wrap"><table class="tbl">
+    <thead><tr><th>File</th><th>Worker</th><th>Stage</th><th>Pouch</th></tr></thead>
+    <tbody>{% for c in cases %}
+      <tr>
+        <td class="mono">{{ c.number }}</td>
+        <td>{{ c.client.full_name }}</td>
+        <td><span class="badge badge-{{ c.stage }}">{{ c.get_stage_display }}</span></td>
+        <td>{% if c.number in locked %}<span class="badge badge-bad">locked</span>{% else %}
+            <a href="{% url 'visa_download' c.number %}">Download</a>{% endif %}</td>
+      </tr>
+    {% empty %}<tr><td colspan="4">No files.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+{% endblock %}

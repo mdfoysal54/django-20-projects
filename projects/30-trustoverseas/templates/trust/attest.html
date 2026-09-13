@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Attestation{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Attestation board</h1></div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>File</th><th>Certificate</th><th>Authority</th><th>Consignment</th><th>Fee</th><th></th></tr></thead>
+  <tbody>{% for a in rows %}
+    <tr>
+      <td class="mono"><a href="{{ a.case.get_absolute_url }}">{{ a.case.number }}</a></td>
+      <td>{{ a.certificate }}</td>
+      <td>{{ a.authority }}</td>
+      <td class="mono">{{ a.consignment|default:"—" }}</td>
+      <td class="num">৳ {{ a.gov_fee }}</td>
+      <td>{% if a.cleared %}<span class="badge badge-ok">cleared</span>{% else %}<span class="badge">open</span>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6">No attestation steps.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

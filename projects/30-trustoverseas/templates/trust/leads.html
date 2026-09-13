@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Leads{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Inquiries</h1>
+  <a class="btn btn-primary" href="{% url 'lead_new' %}">New inquiry</a>
+</div>
+<form class="filter-bar" method="get">
+  <input class="form-control" name="q" value="{{ q }}" placeholder="Name or phone">
+  <button class="btn btn-secondary" type="submit">Search</button>
+</form>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Name</th><th>Phone</th><th>Destination</th><th>Status</th><th></th></tr></thead>
+  <tbody>{% for l in page %}
+    <tr>
+      <td>{{ l.name }}</td>
+      <td>{{ l.phone }}</td>
+      <td>{{ l.destination }} · {{ l.visa_category }}</td>
+      <td><span class="badge">{{ l.get_status_display }}</span></td>
+      <td>{% if l.status == 'new' %}
+        <form method="post" action="{% url 'lead_win' l.pk %}">{% csrf_token %}
+          <button class="btn btn-sm btn-primary" type="submit">Mark won</button></form>
+      {% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">No inquiries.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

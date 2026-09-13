@@ -37,6 +37,9 @@ PROJECTS = [
     {"dir": "27-orbitpay", "title": "OrbitPay", "tag": "Wallet operating system — P2P transfers, merchant QR"},
     {"dir": "28-pulsegrid", "title": "PulseGrid", "tag": "Telemetry operating system — devices, alerts, firmware"},
     {"dir": "29-lexora", "title": "Lexora", "tag": "Practice operating system — matters, hearings, time, invoices"},
+    # ---- visa / recruitment agency ERP --------------------------------------
+    {"dir": "30-trustoverseas", "title": "Trust Overseas Ltd",
+     "tag": "Visa & recruitment ERP — cases, GAMCA, vault, double-entry, GCC portals"},
 ]
 
 # --------------------------------------------------------------------------

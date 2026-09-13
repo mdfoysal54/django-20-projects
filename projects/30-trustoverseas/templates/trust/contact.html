@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Enquire{% endblock %}
+{% block content %}
+<div class="grid grid-2">
+  <div>
+    <div class="kicker">Front desk</div>
+    <h1>Tell us where you want to go</h1>
+    <p class="lede">A counsellor will call you. Bring a passport with at least 190 days left and two blank pages.</p>
+    <ul class="list-plain">
+      <li>Saudi · UAE · Qatar · Kuwait · Bahrain · Oman · Malaysia</li>
+      <li>Work, Umrah, family and student corridors</li>
+      <li>Sub-agents: ask for a B2B desk login</li>
+    </ul>
+  </div>
+  <div class="card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<ul class="field-errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary btn-block" type="submit">Send inquiry</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

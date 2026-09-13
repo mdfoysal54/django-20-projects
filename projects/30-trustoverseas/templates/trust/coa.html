@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Chart of accounts{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Chart of accounts</h1></div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Code</th><th>Name</th><th>Kind</th><th class="num">Balance</th></tr></thead>
+  <tbody>{% for a in accounts %}
+    <tr>
+      <td class="mono">{{ a.code }}</td>
+      <td>{{ a.name }}</td>
+      <td>{{ a.get_kind_display }}</td>
+      <td class="num">৳ {{ a.balance }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}
